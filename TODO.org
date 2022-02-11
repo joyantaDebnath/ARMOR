@@ -30,6 +30,10 @@
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
+*** TODO Review CCP7 from spec                                        :@code:
+    :PROPERTIES:
+    :Assignee: Joy
+    :END:
 ** Presentation
   
 *** TODO Rename grammar properties                                    :@code:
