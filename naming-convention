@@ -1,0 +1,82 @@
+#! /bin/bash
+set -u
+
+## Returns a grep regexp to look for
+## forbidden spellings.
+function getForbiddenPat() {
+  pat=$1
+  if [[ "${pat:0:1}" == "!" ]]; then
+    aux=${pat:1}
+    echo "${aux//\|/[\\n -]?}"
+  elif [[ "$pat" =~ .*\|.* ]]; then
+    echo "${pat//\|/[\\n -]}"
+  elif [[ "$pat" =~ .*\ .* ]]; then
+    echo "${pat// /[-]?}"
+  elif [[ "$pat" =~ .*-.* ]]; then
+    echo "${pat//-/[ \\n]?}"
+  fi
+}
+
+##
+## Check: https://www.grammarbook.com/punctuation/hyphens.asp
+##
+enforce=("data|type"    # enforce spelling of 'datatype', forbids 'data-type' and 'data type'
+         "fix|point"
+         "!fixed|point" # forbids all combinations of fixedpoint
+         "sub|tree"
+         "pattern functor"
+         "general purpose"
+         "type|class"
+         "type family"
+         "type-level"
+         "type-safe"
+         "real-world"
+         "edit-script"
+         "well-scoped"
+         "ill-scoped"
+         "well-typed"
+         "ill-typed"
+         "well-known"
+         "non-interfering"
+         "non-trivial"
+         "non-minimal"
+         "anti-unif"
+         )
+
+ok=true
+IFS=,
+for enf in ${enforce[*]}; do
+  pat=$(getForbiddenPat "$enf")
+  echo "{Enforcing: $pat}"
+  # grep -n --colour "$pat" src/*.lhs
+  pcregrep -i -M -n -H --colour "$pat" src/*.lhs
+  if [[ "$?" == "0" ]]; then
+    ok=false
+  fi
+done
+
+## Enforce parenthetical phrasing with -- and spaces
+## https://tex.stackexchange.com/questions/3819/dashes-vs-vs
+##
+hyphens=("[\\n ]?-{3}[\n ]?"
+         "[^\\n -]-{2}"
+         "[\\n ]-{2}[^\\n -]"
+        )
+
+IFS=,
+for pat in ${hyphens[*]}; do
+  echo "{Enforcing: $pat}"
+  # grep -n --colour "$pat" src/*.lhs
+  pcregrep -i -M -n -H --colour "$pat" src/*.lhs
+  if [[ "$?" == "0" ]]; then
+    ok=false
+  fi
+done
+
+if $ok; then
+  echo "You're ok! :)"
+  exit 0
+else
+  echo "Be congruent!"
+  exit 1
+fi
