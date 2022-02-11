@@ -1,6 +1,6 @@
 #+TITLE: AERES Project Management
 
-* AERES Project Status
+* AERES Project Status                                                 :work:
 ** Cryptography
    - Note taken on [2022-02-11 Fri 12:38] \\
      After a discussion, it was decided we will outsource cryptographic checks,
@@ -22,17 +22,17 @@
       cryptographic checks) or [[https://github.com/Morpheus-Repo/Morpheus][Morpehus]] (for full PKCS checks)
 
 ** General
-*** TODO Make AERES executable run semantic checks               :@code:work:
+*** TODO Make AERES executable run semantic checks                    :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
-*** TODO Review semantic checks                                  :@code:work:
+*** TODO Review semantic checks                                       :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
 ** Presentation
   
-*** TODO Rename grammar properties                               :@code:work:
+*** TODO Rename grammar properties                                    :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
@@ -50,6 +50,9 @@
     | =Dig=         | =UInt8=       |
 
 
+*** TODO Move tests to their own directory                            :@code:
+
+    This will also speed-up typechecking and compilation time
 * End
 
 #  LocalWords:  AERES
