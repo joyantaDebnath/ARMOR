@@ -1,0 +1,60 @@
+#+TITLE: AERES Project Management
+
+* AERES Project Status
+** Cryptography
+   - Note taken on [2022-02-11 Fri 12:38] \\
+     After a discussion, it was decided we will outsource cryptographic checks,
+     invoking Aeres from a harness
+
+   In order to perform differential testing, AERES or a harness for AERES needs
+   to be able check that a digest was signed by the a given public key. There are
+   no cryptographic libraries for Agda (that we know of), so we have considered
+   the following options.
+
+   1. [ ] Use Agda's Haskell FFI to connect Aeres to [[https://hackage.haskell.org/package/crypto-sodium][crypto-sodium]], a Haskell
+      crypto library
+
+   2. [ ] Use Agda's Haskell FFI to connect Aeres to Haskell, then use Haskell's
+      FFI to connect to EverCrypt (or another formally verified crypto library)
+
+   3. [X] Have Aeres return as output remaining cryptographic / PKCS checks to
+      check, and use a harness to invoke EverCrypt / HaCL* / Vale (for just
+      cryptographic checks) or [[https://github.com/Morpheus-Repo/Morpheus][Morpehus]] (for full PKCS checks)
+
+** General
+*** TODO Make AERES executable run semantic checks               :@code:work:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+*** TODO Review semantic checks                                  :@code:work:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+** Presentation
+  
+*** TODO Rename grammar properties                               :@code:work:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+
+    The names of properties for the grammar elements should, where possible, be
+    named following existing literature on languages.
+
+    | Old name      | New name      |
+    |---------------+---------------|
+    | =NoConfusion= | =NoConflict=  |
+    | =Unambiguous= | =Unique=      |
+    | =NonEmpty=    |               |
+    | =NonNesting=  | =Unambiguous= |
+    |---------------+---------------|
+    | =Dig=         | =UInt8=       |
+
+
+* End
+
+#  LocalWords:  AERES
+
+# Local Variables:
+# eval: (flyspell-mode)
+# eval: (smartparens-mode)
+# End:
