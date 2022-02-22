@@ -34,6 +34,30 @@
     :PROPERTIES:
     :Assignee: Joy
     :END:
+*** TODO Update SCP18 to use total ordering for time                  :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+*** TODO Implement chain building                                     :@code:
+
+** StringPrep
+*** TODO Define UTF8 spec                                             :@code:
+*** TODO Analyze cert. census data for language (unicode)             :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Joy
+    :END:
+
+    We are not planning on supporting /all/ languages supported by Unicode, so
+    lets find a subset that covers most / all of our testing data
+*** TODO String normalization code generation                         :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Joy
+    :END:
+
+    Per discussion with Omar, having a function with "trie-like" cases might
+    speed up runtime by sharing lookup, and compile time by reducing the number
+    of cases
+
 ** Presentation
   
 *** TODO Rename grammar properties                                    :@code:
@@ -52,7 +76,6 @@
     | =NonNesting=  | =Unambiguous= |
     |---------------+---------------|
     | =Dig=         | =UInt8=       |
-
 
 *** TODO Move tests to their own directory                            :@code:
 
