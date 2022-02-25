@@ -60,6 +60,22 @@
 
 ** Presentation
   
+
+*** TODO Note =--sized-types= =--guardedness= inconsistency        :@typeset:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+
+   See the remark in the documentation [[https://agda.readthedocs.io/en/v2.6.1/language/safe-agda.html][here]], and the filed issue [[https://github.com/agda/agda/issues/1209][here]].
+
+   - We only use sized types for the agda-stdlib trie implementation, and
+     guardedness for the agda-stdlib IO implementation. We do not mixed guarded
+     coinductive and sized inductive types, so the issue should not apply to us.
+
+     That said, since sized types are broken on their own, the ideal solution is
+     to roll our own trie implementation.
+   
+
 *** TODO Rename grammar properties                                    :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
@@ -80,6 +96,7 @@
 *** TODO Move tests to their own directory                            :@code:
 
     This will also speed-up typechecking and compilation time
+
 * End
 
 #  LocalWords:  AERES
