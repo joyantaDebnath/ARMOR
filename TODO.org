@@ -26,18 +26,18 @@
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
-*** TODO Review semantic checks                                       :@code:
+*** TODO [0/2] Review semantic checks                                 :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
-*** TODO Review CCP7 from spec                                        :@code:
-    :PROPERTIES:
-    :Assignee: Joy
-    :END:
-*** TODO Update SCP18 to use total ordering for time                  :@code:
-    :PROPERTIES:
-    :ASSIGNEE: Chris
-    :END:
+**** TODO Review CCP7 from spec                                       :@code:
+     :PROPERTIES:
+     :Assignee: Joy
+     :END:
+**** TODO Update SCP18 to use total ordering for time                 :@code:
+     :PROPERTIES:
+     :ASSIGNEE: Chris
+     :END:
 *** DONE Implement chain building                                     :@code:
     CLOSED: [2022-03-22 Tue 13:17]
     :PROPERTIES:
@@ -49,18 +49,29 @@
     :PROPERTIES:
     :ASSIGNEE: Joy
     :END:
+    - Note taken on [2022-04-15 Fri 15:41] \\
+      Do we need this? Switched focus to case folding, which already does
+      normalization for large set of characters already.
+      So the info we are pulling from comes from the [[https://datatracker.ietf.org/doc/html/rfc3454#appendix-B.2][RFC]] instead
 
     We are not planning on supporting /all/ languages supported by Unicode, so
     lets find a subset that covers most / all of our testing data
-*** TODO String normalization code generation                         :@code:
+*** WONT String normalization code generation                         :@code:
+    CLOSED: [2022-04-15 Fri 14:40]
     :PROPERTIES:
     :ASSIGNEE: Joy
     :END:
 
+    - State "WONT"       from "TODO"       [2022-04-15 Fri 14:40] \\
+      We will use actual tries instead, hoping this will improve performance for
+      typechecking and runtime
     Per discussion with Omar, having a function with "trie-like" cases might
     speed up runtime by sharing lookup, and compile time by reducing the number
     of cases
-*** TODO Ordering for UTF8Char
+*** TODO Ordering for UTF8Char                                        :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
 
     If we use an ordering other than the obvious translation to Nat, then we
     will want to prove it is a total order
@@ -103,9 +114,50 @@
     |---------------+---------------|
     | =Dig=         | =UInt8=       |
 
+*** TODO Remove postulate, =--allow-unsolved-metas=                   :@code:
+
+** Building and running
 *** TODO Move tests to their own directory                            :@code:
 
     This will also speed-up typechecking and compilation time
+* Misc Notes
+*** 2022 Apr 15 Fri
+
+    - Semantic Checks
+      - We should review the specification and proof of each semantic check, to
+        make sure that the spec is convincing
+
+        For example
+        - SCP18: The check on time just uses booleans, rather than defining an ordering
+          on time values
+        - CCP7: whether a cert is in a given set (with stringprep)
+    - Executable
+      - Testing for performance, parsing PEM
+      - Returing the remaining crypto checks: PK, Digest, Signature
+
+        For the harness to invoke on an external program
+    - Spec improvements
+      - Time
+        Not as precisely specified as it could be (e.g., leap days, leap seconds
+        not covered --- also day ranges for months is inaccurate)
+    - String prep
+      - It seems to me like idempotency / normalization is the only thing people
+        would care about when it comes to the stringprep algorithm
+
+        Its purpose is to give a decidable equivalence relation by giving every
+        string a canonical form. If the spec introduces nondeterminism, we are
+        no longer formalizing the stringprep algorithm
+
+        To ease reasoning, we can also use lemmas stating no character in the
+        image of one mapping is in the domain of a previous mapping
+    - Cryptographic checks
+      Outsourced to a harness
+      - I need to know (from Joy, Omar) what fields need to be checked: for a
+        cert, where is the digest, where is the public key
+    - Org
+      - Joy: update the TODO items that have been assigned to you with the
+        results (e.g., analysis of cert data for unicode coverage)
+
 
 * End
 
