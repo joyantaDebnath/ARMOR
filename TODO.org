@@ -124,6 +124,13 @@
 
     This will also speed-up typechecking and compilation time during development
 * Misc Notes
+
+*** 2022 May 31 Tue 20:33
+
+    - serializer for OID, for getSignAlgBS
+    - nonnesting for PkAlg
+    - postulated public key fields properties
+
 *** 2022 Apr 15 Fri
 
     - Semantic Checks
@@ -160,8 +167,6 @@
     - Org
       - Joy: update the TODO items that have been assigned to you with the
         results (e.g., analysis of cert data for unicode coverage)
-
-
 * End
 
 #  LocalWords:  AERES
