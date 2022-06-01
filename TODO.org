@@ -38,11 +38,14 @@
      :PROPERTIES:
      :ASSIGNEE: Chris
      :END:
-*** DONE Implement chain building                                     :@code:
-    CLOSED: [2022-03-22 Tue 13:17]
+*** TODO Implement chain building                                     :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
+    - Note taken on [2022-05-03 Tue 16:07] \\
+      Was not truly finished --- requires parsing PEM first, then decoding.
+      
+      And then this requires proper parsing of base64
     - State "DONE"       from "TODO"       [2022-03-22 Tue 13:17]
 ** StringPrep
 *** TODO Analyze cert. census data for language (unicode)             :@code:
@@ -114,12 +117,12 @@
     |---------------+---------------|
     | =Dig=         | =UInt8=       |
 
-*** TODO Remove postulate, =--allow-unsolved-metas=                   :@code:
+*** TODO Remove postulates, =--allow-unsolved-metas=                  :@code:
 
 ** Building and running
 *** TODO Move tests to their own directory                            :@code:
 
-    This will also speed-up typechecking and compilation time
+    This will also speed-up typechecking and compilation time during development
 * Misc Notes
 *** 2022 Apr 15 Fri
 
