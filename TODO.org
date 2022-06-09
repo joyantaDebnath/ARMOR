@@ -38,20 +38,44 @@
      :PROPERTIES:
      :ASSIGNEE: Chris
      :END:
-*** TODO Implement chain building                                     :@code:
+** Chain Building
+    - Note taken on [2022-05-03 Tue 16:07] \\
+      Was not truly finished --- requires parsing PEM first, then decoding.
+
+      And then this requires proper parsing of base64
+    - State "DONE"       from "TODO"       [2022-03-22 Tue 13:17]
+
+
+    Sequence of tasks:
+    1. Parse PEM (valid character set, length divisible by 4, padding)
+       Requires Base64 parser
+    2. Unverified conversion to byte string
+       To be verified later?
+    3. Parse X509 cert
+   
+*** DONE Parse Base64                                                 :@code:
+    CLOSED: [2022-06-02 Thu 17:24]
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
-    - Note taken on [2022-05-03 Tue 16:07] \\
-      Was not truly finished --- requires parsing PEM first, then decoding.
-      
-      And then this requires proper parsing of base64
-    - State "DONE"       from "TODO"       [2022-03-22 Tue 13:17]
-** StringPrep
-*** TODO Analyze cert. census data for language (unicode)             :@code:
+    - State "DONE"       from "TODO"       [2022-06-02 Thu 17:24]
+*** TODO Parse PEM                                                    :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+** Cert parsing
+*** TODO Parse public key extensions                                  :@code:
     :PROPERTIES:
     :ASSIGNEE: Joy
     :END:
+
+** StringPrep
+*** WONT Analyze cert. census data for language (unicode)             :@code:
+    CLOSED: [2022-06-02 Thu 17:23]
+    :PROPERTIES:
+    :ASSIGNEE: Joy
+    :END:
+    - State "WONT"       from "TODO"       [2022-06-02 Thu 17:23]
     - Note taken on [2022-04-15 Fri 15:41] \\
       Do we need this? Switched focus to case folding, which already does
       normalization for large set of characters already.
@@ -71,19 +95,29 @@
     Per discussion with Omar, having a function with "trie-like" cases might
     speed up runtime by sharing lookup, and compile time by reducing the number
     of cases
-*** TODO Ordering for UTF8Char                                        :@code:
+*** MAYBE Custom ordering for UTF8Char                                :@code:
+    CLOSED: [2022-06-02 Thu 18:33]
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
 
+    A custom ordering for UTF8Char may be needed if comparisons (needed for
+    checking if a code lands within a certain range) are too slow.
+
     If we use an ordering other than the obvious translation to Nat, then we
-    will want to prove it is a total order
+    will want to prove, at least, that it is a total order.
+    Probably we also want to prove it coincides with the obvious ordering
 *** DONE Define UTF8 spec                                             :@code:
     CLOSED: [2022-03-22 Tue 13:17]
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
     - State "DONE"       from "TODO"       [2022-03-22 Tue 13:17]
+*** TODO Prove StringPrep algorithm is idempotent                     :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+
 ** Presentation
   
 *** TODO Note =--sized-types= =--guardedness= inconsistency        :@typeset:
