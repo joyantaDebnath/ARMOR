@@ -53,11 +53,13 @@
        To be verified later?
     3. Parse X509 cert
    
-*** DONE Parse Base64                                                 :@code:
-    CLOSED: [2022-06-02 Thu 17:24]
+*** TODO Parse Base64                                                 :@code:
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
+    - Note taken on [2022-06-10 Fri 15:01] \\
+      Had to return to base64 parsing because the spec was not quite right (too lax
+      when it comes to input whose bit length is not a multiple of 24)
     - State "DONE"       from "TODO"       [2022-06-02 Thu 17:24]
 *** TODO Parse PEM                                                    :@code:
     :PROPERTIES:
@@ -68,7 +70,14 @@
     :PROPERTIES:
     :ASSIGNEE: Joy
     :END:
-
+**** TODO Lemmas for public key extensions parser                     :@code:
+     :PROPERTIES:
+     :ASSIGNEE: Chris
+     :END:
+     - Note taken on [2022-06-14 Tue 18:29] \\
+       Need to be able to use the OID parser to show that a literal (for RSA PK
+       algorithm) is a valid OID. For that, need to move TLV, Length properties to
+       avoid cyclic module dependency
 ** StringPrep
 *** WONT Analyze cert. census data for language (unicode)             :@code:
     CLOSED: [2022-06-02 Thu 17:23]
