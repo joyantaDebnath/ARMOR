@@ -38,6 +38,15 @@
      :PROPERTIES:
      :ASSIGNEE: Chris
      :END:
+*** DONE Change Int specification                                     :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Chris
+    :END:
+
+    This came up when we realized we needed a serializer for parsing public key
+    fields. The previous specification for IntegerValue made serialization
+    difficult. For now, the representation of integer values is the literal byte
+    string (this can and probably should change in the future)
 ** Chain Building
     - Note taken on [2022-05-03 Tue 16:07] \\
       Was not truly finished --- requires parsing PEM first, then decoding.
