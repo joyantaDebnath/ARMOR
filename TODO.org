@@ -62,10 +62,14 @@
        To be verified later?
     3. Parse X509 cert
    
-*** TODO Parse Base64                                                 :@code:
+*** DONE Parse Base64                                                 :@code:
+    CLOSED: [2022-07-08 Fri 17:09]
     :PROPERTIES:
     :ASSIGNEE: Chris
     :END:
+    - State "DONE"       from "TODO"       [2022-07-08 Fri 17:09] \\
+      Finished, with some tests. There is now particular care taken to the last
+      character of a B64 quartet that includes padding
     - Note taken on [2022-06-10 Fri 15:01] \\
       Had to return to base64 parsing because the spec was not quite right (too lax
       when it comes to input whose bit length is not a multiple of 24)
@@ -75,14 +79,18 @@
     :ASSIGNEE: Chris
     :END:
 ** Cert parsing
-*** TODO Parse public key extensions                                  :@code:
+*** DONE Parse public key extensions                                  :@code:
+    CLOSED: [2022-07-11 Mon 17:54]
     :PROPERTIES:
     :ASSIGNEE: Joy
     :END:
-**** TODO Lemmas for public key extensions parser                     :@code:
+    - State "DONE"       from "TODO"       [2022-07-11 Mon 17:54]
+**** DONE Lemmas for public key extensions parser                     :@code:
+     CLOSED: [2022-07-11 Mon 17:54]
      :PROPERTIES:
      :ASSIGNEE: Chris
      :END:
+     - State "DONE"       from "TODO"       [2022-07-11 Mon 17:54]
      - Note taken on [2022-06-14 Tue 18:29] \\
        Need to be able to use the OID parser to show that a literal (for RSA PK
        algorithm) is a valid OID. For that, need to move TLV, Length properties to
