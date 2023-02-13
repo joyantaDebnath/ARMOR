@@ -60,5 +60,8 @@ bib: references.bib dist/$(TGT).aux
 	export TEXMFHOME=".:$(TEXMFHOME)" && \
 	$(LATEX) src/$(TGT).tex
 
+me : default
+	evince dist/index.pdf &
+
 clean :
 	cd dist && rm -rf * && cd ..

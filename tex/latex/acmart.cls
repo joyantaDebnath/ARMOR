@@ -1,1 +1,0 @@
-../../acmart/acmart.cls

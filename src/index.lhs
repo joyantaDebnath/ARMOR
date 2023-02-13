@@ -51,6 +51,147 @@
 
 
 \documentclass[conference,compsoc]{IEEEtran}
+%include polycode.fmt
+
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\useunder{\uline}{\ul}{}
+\usepackage[usenames, dvipsnames, table, xcdraw]{xcolor}
+% \usepackage{cite}
+\usepackage{amsmath}
+\usepackage{algorithmic}
+\usepackage{listings}
+\usepackage{alltt, amssymb, xspace, setspace,epsfig,multirow,array,color}
+\usepackage[]{algorithm2e}
+\usepackage{hhline}
+\usepackage[draft]{hyperref}
+\usepackage{longtable}
+\usepackage{pifont}
+\usepackage{longtable}
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\usepackage[T1]{fontenc}     
+\usepackage{babel}
+
+\usepackage{tabularx}
+
+\usepackage[threshold=0]{csquotes}
+
+\newcommand{\quoteRFC}[1]{\blockquote{\textit{{\sffamily\scriptsize``#1''}}}}
+
+\makeatletter
+\def\textSq#1{%
+\begingroup% make boxes and lengths local
+\setlength{\fboxsep}{0.3ex}% SET ANY DESIRED PADDING HERE
+\setbox1=\hbox{#1}% save the contents
+\setlength{\@tempdima}{\maxof{\wd1}{\ht1+\dp1}}% size of the box
+\setlength{\@tempdimb}{(\@tempdima-\ht1+\dp1)/2}% vertical raise
+\raise-\@tempdimb\hbox{\fbox{\vbox to \@tempdima{%
+  \vfil\hbox to \@tempdima{\hfil\copy1\hfil}\vfil}}}%
+\endgroup%
+}
+\def\Sq#1{\textSq{\ensuremath{#1}}}%
+\makeatother
+
+
+\newcommand{\sbskip}{\vspace*{0.02in}}
+\newcommand{\mbskip}{\vspace*{0.04in}}
+%\newcommand{\nsubsubsection}[1]{\mbskip\subsubsection{#1}\sbskip}
+\newcommand{\nsubsubsection}[1]{\subsubsection{#1}}
+
+\usepackage[caption=false]{subfig}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multicol} 
+\usepackage{smartdiagram} 
+\usepackage[shortlabels]{enumitem}
+\usepackage{cleveref}
+
+\usepackage[normalem]{ulem}
+
+%%%%%%% General stuff
+\newcommand{\etal}{\textit{et al.}\xspace}
+\newcommand{\ie}{\textit{i.e.}\xspace}
+\newcommand{\eg}{\textit{e.g.}\xspace}
+\newcommand{\viz}{\textit{viz.}\xspace}
+\newcommand{\etc}{\textit{etc.}\xspace}
+
+\newcommand{\pred}[1]{\ensuremath{\mathsf{#1}}\xspace}
+
+\newcommand{\XFiveOhNine}{X.509\xspace}
+\newcommand{\XSixNineOh}{X.690\xspace}
+
+% \newcommand{\todo}[1]{\vspace*{0.05in}\noindent\textcolor{red}{\textbf{Todo}}\textcolor{blue}{:
+% 		#1.}\xspace}
+
+\newcommand{\says}[2]{\noindent\textcolor{orange}{\textbf{#1 says: 
+		}}\textcolor{blue}{#2.}\xspace}
+	
+\newcommand{\cU}{\ensuremath{\mathcal{C}}\xspace}
+\newcommand{\iproblem}{\pred{CVEq}}
+\newcommand{\cproblem}{\pred{CVCor}}
+\newcommand{\rimplementation}{\ensuremath{I_\pred{ref}}\xspace}
+\newcommand{\idom}{\ensuremath{\mathcal{I}}\xspace}
+\newcommand{\QFFOL}{\pred{QFFOL}}
+
+\newcommand{\ceres}{\ensuremath{\mathsf{CERES}}\xspace}
+% \newcommand{\says}[2]{\noindent\textcolor{red}{\textbf{#1 says: }}\textcolor{blue}{#2.}\xspace}
+
+\newcommand{\censys}{\ensuremath{\mathsf{Censys}}\xspace}
+\newcommand{\frankencert}{\ensuremath{\mathsf{Frankencert}}\xspace}
+\newcommand{\mbedtls}{\ensuremath{\mathsf{mbedTLS}}\xspace}
+\newcommand{\openssl}{\ensuremath{\mathsf{OpenSSL}}\xspace}
+\newcommand{\gnutls}{\ensuremath{\mathsf{GnuTLS}}\xspace}
+
+\newcommand{\parsec}{\ensuremath{\mathsf{Parsec}}\xspace}
+\newcommand{\antlr}{\ensuremath{\mathsf{ANTLR}}\xspace}
+
+\newcommand{\python}{\ensuremath{\mathsf{Python}}\xspace}
+\newcommand{\haskell}{\ensuremath{\mathsf{Haskell}}\xspace}
+\newcommand{\cvcfour}{\ensuremath{\mathsf{CVC4}}\xspace}
+\newcommand{\lfsc}{\ensuremath{\mathsf{LFSC}}\xspace}
+\newcommand{\stringprep}{\ensuremath{\mathsf{stringprep}}\xspace}
+
+\newcommand{\parser}{\ensuremath{\mathsf{Parser}}\xspace}
+\newcommand{\sem}{\ensuremath{\mathsf{Semantic\mhyphen checker}}\xspace}
+\newcommand{\chain}{\ensuremath{\mathsf{Chain\mhyphen builder}}\xspace}
+\newcommand{\driver}{\ensuremath{\mathsf{Driver}}\xspace}
+
+\newcommand{\pysmt}{\ensuremath{\mathsf{PySMT}}\xspace}
+\newcommand{\smtlib}{\ensuremath{\mathsf{SMT\mhyphen LIB}}\xspace}
+\newcommand{\certchainres}{\ensuremath{\mathsf{cert\mhyphen chain \mhyphen resolver}}\xspace}
+
+\mathchardef\mhyphen="2D % Define a "math hyphen"
+
+\lstdefinestyle{customc}{
+	belowcaptionskip=0.5\baselineskip,
+	breaklines=true,
+	tabsize=2,
+	xleftmargin=\parindent,
+	language=Python,
+	showstringspaces=false,
+	basicstyle=\scriptsize\ttfamily\bfseries,
+	keywordstyle=\color{purple!75!black}\slshape,
+	commentstyle=\itshape\color{orange!65!black}\mdseries,
+	identifierstyle=\color{blue!60!black},
+	stringstyle=\color{green!60!yellow!50!black},
+	numbers=left, numberstyle=\scriptsize, numbersep=3pt, framexleftmargin=10pt, captionpos=b
+}
+
+%%% <=== Code listing style definitions
+
+
+\setcounter{secnumdepth}{3}
+
+\pagestyle{plain}
+
+\newcommand{\comment}[1]{}
+
+\def\UrlBreaks{\do\/\do-}
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%
@@ -325,26 +466,26 @@
 
 \begin{document}
 
-\title{Your Title}
+\title{A Formally Verified X.509 Implementation: AERES and its Application in Differential Testing}
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Michael Shell}
-  \IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
-    Georgia Institute of Technology\\
-    Atlanta, Georgia 30332--0250\\
-    Email: http://www.michaelshell.org/contact.html}
-  \and
-  \IEEEauthorblockN{Homer Simpson}
-  \IEEEauthorblockA{Twentieth Century Fox\\
-    Springfield, USA\\
-    Email: homer@@thesimpsons.com}
-  \and
-  \IEEEauthorblockN{James Kirk\\ and Montgomery Scott}
-  \IEEEauthorblockA{Starfleet Academy\\
-    San Francisco, California 96678-2391\\
-    Telephone: (800) 555--1212\\
-    Fax: (888) 555--1212}}
+% \author{\IEEEauthorblockN{Michael Shell}
+%   \IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
+%     Georgia Institute of Technology\\
+%     Atlanta, Georgia 30332--0250\\
+%     Email: http://www.michaelshell.org/contact.html}
+%   \and
+%   \IEEEauthorblockN{Homer Simpson}
+%   \IEEEauthorblockA{Twentieth Century Fox\\
+%     Springfield, USA\\
+%     Email: homer@@thesimpsons.com}
+%   \and
+%   \IEEEauthorblockN{James Kirk\\ and Montgomery Scott}
+%   \IEEEauthorblockA{Starfleet Academy\\
+%     San Francisco, California 96678-2391\\
+%     Telephone: (800) 555--1212\\
+%     Fax: (888) 555--1212}}
 
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -377,9 +518,7 @@
 
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
-\begin{abstract}
-  The abstract goes here.
-\end{abstract}
+
 
 % no keywords
 
@@ -399,11 +538,33 @@
 %
 % Body
 %
-%include src/body.lhs
-\lhsinclude{body.lhs}
+%include src/abstract.lhs
+\lhsinclude{abstract}
+%include src/introduction.lhs
+\lhsinclude{introduction} 
+%include src/background.lhs
+\lhsinclude{background}
+%include src/overview.lhs
+\lhsinclude{overview}
+%include src/approach-details.lhs
+\lhsinclude{approach-details}
+%include src/implementation.lhs
+\lhsinclude{implementation}
+%include src/evaluation.lhs
+\lhsinclude{evaluation}
+%include src/discussion.lhs
+\lhsinclude{discussion}
+%include src/related-work.lhs
+\lhsinclude{related-work}
+%include src/conclusion.lhs
+\lhsinclude{conclusion}
+
+%include src/appendix.lhs
+\lhsinclude{appendix}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
+\bibliographystyle{IEEEtran}
 %% \bibliography{references}
 \end{document}
