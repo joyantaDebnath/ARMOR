@@ -66,3 +66,50 @@
     \multicolumn{1}{||c||}{{\color[HTML]{00009B} \textit{AERES}}}         & Agda              &                     & \multicolumn{1}{c||}{67591}          & \multicolumn{1}{c||}{{\color[HTML]{00009B} 30.98}}                              & \multicolumn{1}{c||}{{\color[HTML]{00009B} 88.49}}                              & \multicolumn{1}{c||}{{\color[HTML]{00009B} 46.77}}                               & \multicolumn{1}{c||}{{\color[HTML]{00009B} 45.99}}                                 & 3.77                                                       & \multirow{-14}{*}{} & \multicolumn{1}{c||}{32409}          & \multicolumn{1}{c||}{{\color[HTML]{00009B} 17.95}}                              & \multicolumn{1}{c||}{{\color[HTML]{00009B} 63.00}}                              & \multicolumn{1}{c||}{{\color[HTML]{00009B} 32.81}}                               & \multicolumn{1}{c||}{{\color[HTML]{00009B} 24.35}}                                 & 12.95                                                      \\ \hline
     \end{tabular}
 \end{table*}
+
+
+
+\begin{table*}[]
+   \centering
+    \sffamily\footnotesize
+        \setlength\extrarowheight{1.5pt}
+        \setlength{\tabcolsep}{1.5pt}
+        \caption{Analysis on 2000000 Certificate Chains}
+        \vspace{4pt}
+        \label{t1}
+        \tiny
+        \sffamily\footnotesize
+    \centering
+\begin{tabular}{||c||c||c||c||c||}
+\hline
+\textbf{AERES vs Others} & \textbf{Accept-Accept} & \textbf{Accept-Reject} & \textbf{Reject-Accept} & \textbf{Reject-Reject} \\ \hline
+\textit{BoringSSL}       & 1512660                & 0                      & 10989                  & 476351                 \\ \hline
+\textit{GnuTLS}          & 1512660                & 0                      & 10989                  & 476351                 \\ \hline
+\textit{MatrixSSL}       & 1512660                & 0                      & 5414                   & 481926                 \\ \hline
+\textit{mbed TLS}        & 1512660                & 0                      & 10989                  & 476351                 \\ \hline
+\textit{OpenSSL}         & 1512660                & 0                      & 10989                  & 476351                 \\ \hline
+\textit{WolfSSL}         & 1512660                & 0                      & 5412                   & 481928                 \\ \hline
+\textit{Crypto}          & 1512658                & 2                      & 10986                  & 476354                 \\ \hline
+\textit{Bouncy Castle}   & 1512660                & 0                      & 5412                   & 481928                 \\ \hline
+\textit{Sun}             & 1512660                & 0                      & 5412                   & 481928                 \\ \hline
+\textit{Certvalidator}   & 1512556                & 104                    & 10989                  & 476351                 \\ \hline
+\textit{CERES}           & 1512314                & 346                    & 0                      & 487340                 \\ \hline
+\end{tabular}
+\end{table*}
+
+
+\subsection{Comments}
+
+\begin{itemize}
+\item TODO: CERES key usage parsring is more restrictive than AERES (e.g., 1000) {346} cert\_1002784543.pem-chain.pem
+\item certvalidator missing some standard extensions (SAN, IAN). Leads to unhandled critical extension. {104}
+\item TODO: for GO Crypto, certificate specifies an incompatible key usage. Key Usage parsing may have some issue. Need to check source code. cert\_1043974659.pem-chain.pem
+
+\item certval, gnu, mbed, open, boring -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {5589}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+
+\item mat -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {14}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+
+\item wolf, bouncy, sun -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {12}, Sub (13) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+
+\item go crypto -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {5586}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+\end{itemize}
