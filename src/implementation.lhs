@@ -1,2 +1,9 @@
 \section{Implementation}
-\says{joyanta}{in this section, we need to discuss low-level details involving Agda theorem prover. Basically, we need to show how we proved soundness and completeness.}
+
+\subsection{Modules}
+
+\subsection{Challenges}
+\subsubsection{Chain Building}
+\subsubsection{Cryptography} public key, hash, signature validation
+
+\subsection{Supported Features}

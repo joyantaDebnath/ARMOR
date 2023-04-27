@@ -1,6 +1,6 @@
 \section{Discussion}
 
-\subsection{Practical Deployment}
+\subsection{Deployability}
 
 \subsection{Threat to Validity}
 

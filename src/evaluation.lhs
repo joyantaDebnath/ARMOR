@@ -1,11 +1,10 @@
 \section{Evaluation and Results}
 
+\subsection{Evaluation Questions}
+
 \subsection{Certificate Dataset} \says{joyanta}{data collection (censys, badssl, everparse)}
 
 \subsection{Experimental Setup} \says{joyanta}{experimental setup for differential testing, runtime and memory consumption}
-
-
-\subsection{Evaluation Questions}
 
 \subsection{Findings}
 

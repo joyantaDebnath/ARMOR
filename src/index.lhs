@@ -548,6 +548,8 @@
 \lhsinclude{related-work}
 %include src/overview.lhs
 \lhsinclude{overview}
+%include src/approach.lhs
+\lhsinclude{approach}
 %include src/implementation.lhs
 \lhsinclude{implementation}
 %include src/evaluation.lhs
