@@ -1,7 +1,7 @@
 ## The LaTeX command to use; it is a good idea to make
 ## sure you can specify the output-directory to be 'dist';
 ## it helps keeping the whole development organized.
-LATEX=xelatex -shell-escape -output-directory=dist
+LATEX=pdflatex -shell-escape -output-directory=dist
 ## LATEX=latexmk -lualatex -auxdir=dist
 
 ## The target name and full name (with extension)
@@ -39,6 +39,7 @@ BUILD_DEPENDS=$(addprefix src/,$(BUILD_DEPENDS_TEX)) \
 ## If your main file is a tex file, it should be
 ## the actual file in src.
 MAIN_FILE=dist/$(TGT).tex
+BIB_FILE=dist/$(TGT).aux
 
 LHSOPTS=--poly -v
 
@@ -51,6 +52,9 @@ dist/%.tex: src/%.lhs $(addprefix src/,$(LHS_DEPENDENCIES))
 default : $(BUILD_DEPENDS) 
 	@mkdir -p dist
 	export TEXMFHOME=".:$(TEXMFHOME)" && \
+	$(LATEX) $(MAIN_FILE)
+	bibtex $(BIB_FILE)
+	$(LATEX) $(MAIN_FILE)
 	$(LATEX) $(MAIN_FILE)
 
 dist/$(TGT).aux: default
