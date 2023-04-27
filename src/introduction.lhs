@@ -1,25 +1,22 @@
 \section{Introduction}
 
-X.509 certificates play a crucial role in ensuring the security and reliability of communication and authentication in a wide range of applications. They provide a secure way of establishing trust between parties involved in a communication or authentication process. X.509 certificates contain information about the identity of the certificate owner, such as a person or an organization, and are issued by a trusted third party known as a certificate authority (CA). The certificate authority verifies the identity of the certificate owner and signs the certificate to confirm its validity. By using X.509 certificates, parties involved in communication or authentication can verify each other's identity and establish secure communication. This is particularly important in applications where sensitive information is being exchanged, such as online banking, e-commerce transactions, and secure email communication.
+X.509 Public Key Infrastructure (PKI) is a widely used authentication and key distribution mechanism that plays a critical role in establishing trust in secure communication. X.509 PKI utilizes a chain of digital certificates, each containing a binding between an entity and its public key. Moreover, the certificate chain validation is crucial since it entails that an end-user certificate presented by an entity is signed by a third-party organization called Certificate Authority (CA) and that the CA's certificate can be chained back to a root CA that the verifier trusts. However, flaws in implementing X.509 certificate chain validation logic (CCVL) are profound in practice and often lead to severe implications, such as the interception and modification of communication by man-in-the-middle (MITM) attackers. Hence, developing a formally verified X.509 CCVL implementation is paramount to ensure that it is compliant with the standard specifications and bolsters confidence in digital communication security.
 
-However, developing a correct X.509 implementation is challenging for several reasons.
+Some notable works have already analyzed the use of fuzzing (e.g., Frankencert, Mucert) and dynamic symbolic execution (e.g., SymCert, RFCCert) to find vulnerabilities in renowned X.509 CCVL implementations. While these previous efforts found numerous instances of noncompliance and implementation flaws, they intrinsically suffer from false negatives. Though there is a recent effort, CERES, which used satisfiability modulo theories (SMT) to formalize the X.509 standard specification and develop a high-assurance reference implementation for X.509 CCVL, it was not formally proven to be functionally correct with respect to the specification. 
 
-\begin{itemize}
-    \item \textbf{Complexity of the standard.} The X.509 standard outlines a complex set of specifications and requirements for digital certificates. Implementing these specifications accurately and securely is a challenging task.
+\textbf{Problem and scope.} \says{joyanta}{write the problem we are trying to solve (implementation flaws -> MITM attack). we can mention the threat model here with client - server example.}
 
-    \item \textbf{Security and reliability.} Digital certificates are a critical part of the secure communication infrastructure and any security issues or vulnerabilities in an X.509 implementation can have serious consequences. Ensuring the security and reliability of an X.509 implementation is therefore of utmost importance.
+\textbf{Challenges.} \says{joyanta}{natural language spec, producer, consumer rules, der context sensitivity for parsing, challenges specific to doing formal verification}
 
-    \item \textbf{Interoperability.} X.509 certificates are widely used, and it is important for different implementations to work together seamlessly. Ensuring interoperability between different X.509 implementations can be challenging, especially when different implementations have different interpretations of the X.509 standard.
+\textbf{Approach.} \says{joyanta}{mention that we followed the idea of CERES to divide syntactic and semantic requirements, talk about how did we prove soundness and completeness of each module, define soundness completeness, mention Agda, why chose agda, how did you solve the challenges (e.g., backtracking, context sensitivity) -- 2-3 paragraphs}
 
-    \item \textbf{Lack of formal methods.} Many X.509 implementations are developed without the use of formal methods, which can make it difficult to guarantee the correctness and security of the implementation.
-    \end{itemize}
+\textbf{Findings.} \says{joyanta}{mention some noteable findings in one paragraph}
 
-These challenges highlight the importance of using formal methods and interactive theorem proving in the development of X.509 implementations, which can provide a high level of assurance in terms of security and reliability.
+\textbf{Our Contributions.}
+\begin{enumerate}[label=(\arabic*)]
+    \item formally veridied X.509 implementation, AERES
+    \item 2-3 lines about our approach
+    \item evaluation with differential testing of 10 libraries, findings are responsibly disclosed
+\end{enumerate}
 
-
-
-Therefore, we introduce the development of AERES, a formally verified X.509 implementation. This implementation is based on the interactive theorem prover Agda, which provides a high level of assurance in terms of security and reliability. In this paper, we detail the development process, which includes the use of formal methods and interactive theorem proving to guarantee that AERES accurately and securely meets the specifications of the X.509 standard.
-
-In addition to the development of AERES, we also demonstrate its practicality by using it as an oracle to perform differential testing on 10 popular X.509 implementations. Differential testing is a powerful technique that compares the behavior of different implementations to identify differences and potential issues. The results of this differential testing provide valuable insights into the behavior of different X.509 implementations and highlight the significance of AERES as a secure and reliable X.509 implementation.
-
-This paper represents a noteworthy contribution to the field of secure and reliable certificate management. We emphasize the importance of formal verification and differential testing in the development and evaluation of critical security systems, and provide a new, effective approach to verifying X.509 implementations. This paper will be of great interest to researchers and practitioners in the areas of computer security, cryptography, and formal verification.
+\textbf{Organization.}

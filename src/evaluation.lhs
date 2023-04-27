@@ -1,6 +1,17 @@
 \section{Evaluation and Results}
 
-\subsection{Runtime Evaluation}
+\subsection{Certificate Dataset} \says{joyanta}{data collection (censys, badssl, everparse)}
+
+\subsection{Experimental Setup} \says{joyanta}{experimental setup for differential testing, runtime and memory consumption}
+
+
+\subsection{Evaluation Questions}
+
+\subsection{Findings}
+
+\subsubsection{Notable Noncompliance Issues}
+
+\subsubsection{Runtime and Memory Overhead}
 
 \begin{table*}[]
     \centering
@@ -32,10 +43,6 @@
     \end{tabular}
 \end{table*}
 
-
-
-
-\subsection{Memory Evaluation}
 
 \begin{table*}[]
     \centering
@@ -98,18 +105,18 @@
 \end{table*}
 
 
-\subsection{Comments}
+% \subsection{Comments}
 
-\begin{itemize}
-\item TODO: CERES key usage parsring is more restrictive than AERES (e.g., 1000) {346} cert\_1002784543.pem-chain.pem
-\item certvalidator missing some standard extensions (SAN, IAN). Leads to unhandled critical extension. {104}
-\item TODO: for GO Crypto, certificate specifies an incompatible key usage. Key Usage parsing may have some issue. Need to check source code. cert\_1043974659.pem-chain.pem
+% \begin{itemize}
+% \item TODO: CERES key usage parsring is more restrictive than AERES (e.g., 1000) {346} cert\_1002784543.pem-chain.pem
+% \item certvalidator missing some standard extensions (SAN, IAN). Leads to unhandled critical extension. {104}
+% \item TODO: for GO Crypto, certificate specifies an incompatible key usage. Key Usage parsing may have some issue. Need to check source code. cert\_1043974659.pem-chain.pem
 
-\item certval, gnu, mbed, open, boring -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {5589}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+% \item certval, gnu, mbed, open, boring -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {5589}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
 
-\item mat -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {14}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+% \item mat -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {14}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
 
-\item wolf, bouncy, sun -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {12}, Sub (13) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+% \item wolf, bouncy, sun -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {12}, Sub (13) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
 
-\item go crypto -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {5586}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
-\end{itemize}
+% \item go crypto -> scp4 (0 serial) {5386}, Issuer (Ia5String for email) {5586}, Sub (same) {13}, Wrong CRL struct (DistributionPoint has CRLIssuer though issuer is CRL issuer, but need to check policy or crl dist parsing of AERES...something suspicious here..error is coming from parser cert\_61955100.pem-chain.pem) {1}
+% \end{itemize}
