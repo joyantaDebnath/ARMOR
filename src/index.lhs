@@ -464,6 +464,36 @@
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
+% \usepackage[utf8x]{inputenc}
+% \usepackage[T1]{fontenc}
+% \usepackage{graphicx}
+% \usepackage{grffile}
+% \usepackage{longtable}
+% \usepackage{wrapfig}
+% \usepackage{rotating}
+% \usepackage[normalem]{ulem}
+% \usepackage{amsmath}
+% \usepackage{textcomp}
+% \usepackage{amssymb}
+% \usepackage{capt-of}
+% \usepackage{hyperref}
+% \usepackage{bbm}
+% \usepackage[greek, english]{babel}
+% \usepackage{latex/agda}
+\DeclareUnicodeCharacter{7522}{\ensuremath { _i}}
+\DeclareUnicodeCharacter{8337}{\ensuremath { _e}}
+\DeclareUnicodeCharacter{8346}{\ensuremath { _p}}
+\DeclareUnicodeCharacter{7523}{\ensuremath { _r}}
+\DeclareUnicodeCharacter{8321}{\ensuremath { _1}}
+\DeclareUnicodeCharacter{8322}{\ensuremath { _2}}
+\DeclareUnicodeCharacter{955}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{8759}{\ensuremath{::}}
+\DeclareUnicodeCharacter{737}{\ensuremath { ^l}}
+\DeclareUnicodeCharacter{8799}{\ensuremath { \overset{?}{=}}}
+\DeclareUnicodeCharacter{8252}{\ensuremath { !!}}
+\DeclareUnicodeCharacter{8779}{\ensuremath { \cong}}
+
+
 \begin{document}
 
 \title{ARMOR: A Certified Implementation of X.509 Certificate Chain Validation}
