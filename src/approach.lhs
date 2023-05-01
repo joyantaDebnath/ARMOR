@@ -154,9 +154,9 @@
 % (we show a simplified, more intuitive version of this type below)
 \begin{code}
 module DecSimple where
-  data Dec (P : Set) : Set where
-    yes : P → Dec P
-    no  : ¬ P → Dec P
+  data Dec (A : Set) : Set where
+    yes : A -> Dec A
+    no  : not A -> Dec A
 \end{code}
 
 % Let us examine (a slightly simplified version of) the definition of
@@ -470,3 +470,19 @@ module DecSimple where
 %       (no ¬eq) → no λ where refl → contradiction ≋-refl ¬eq
 % \end{code}
 %   \end{AgdaAlign}
+
+
+\begin{figure}[t]
+    \centering
+    \begin{code}
+  prog : (St -> Maybe Wr) -> RWS Unit
+  prog g = pass inner where
+    inner : RWS (Unit times (List Wr -> List Wr))
+    inner = do  m <- gets g
+                maybe  (\ w -> do  tell [ w ]
+                                   return (unit , \ _ -> []))
+                       (return (unit , \ x -> x ++ x)) m
+    \end{code}
+    \caption{An example effectful program}
+    \label{fig:ex-prog1}
+  \end{figure}
