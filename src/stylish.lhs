@@ -92,6 +92,7 @@
 %format Star       = "\HSCon{*}"
 
 %format ::         = "\mathrel{\HSSym{::}}"
+%format !!         = "\mathrel{\HSSym{!!}}"
 %format ->         = "\mathrel{\HSSym{\to}} "
 %format =>         = "\mathrel{\HSSym{\Rightarrow}} "
 %format =          = "\mathrel{\HSSym{=}}"
@@ -142,7 +143,7 @@
 %format `seq`      = "\mathbin{\HSSym{`seq`}}"
 %format !          = "\mathbin{\HSSym{!}}"
 %format //         = "\mathbin{\HSSym{//}}"
-%format undefined  = "\HSSym{\bot} "
+%format bot  = "\HSSym{\bot} "
 %format not	   = "\HSSym{\neg} "
 %format >>>        = "\mathbin{\HSSym{\ggg}}"
 %format >=>        = "\mathbin{\HSSym{> \! = \! >}}"
@@ -270,3 +271,23 @@
 %format z1         = "\HSVar{\mathit{z}_{1}}"
 %format z2         = "\HSVar{\mathit{z}_{2}}"
 %format z3         = "\HSVar{\mathit{z}_{3}}"
+
+%format falser         = "\HSVar{\mathit{false}_{r}}"
+%format truer         = "\HSVar{\mathit{true}_{r}}"
+%format vr         = "\HSVar{\mathit{v}_{r}}"
+%format fromN         = "\HSVar{\mathit{from}\mathbb{N}}"
+
+%format injectivel         = "\HSVar{\mathit{injective}^{l}}"
+%format conicall         = "\HSVar{\mathit{conical}^{l}}"
+%format cancell         = "\HSVar{\mathit{cancel==}^{l}}"
+
+%format xs1         = "\HSVar{\mathit{xs}_{1}}"
+%format xs2         = "\HSVar{\mathit{xs}_{2}}"
+%format ys1         = "\HSVar{\mathit{ys}_{1}}"
+%format ys2         = "\HSVar{\mathit{ys}_{2}}"
+%format p1         = "\HSVar{\mathit{p}_{1}}"
+%format p2         = "\HSVar{\mathit{p}_{2}}"
+%format a1         = "\HSVar{\mathit{a}_{1}}"
+%format a2         = "\HSVar{\mathit{a}_{2}}"
+%format proj2         = "\HSVar{\mathit{proj}_{2}}"
+
