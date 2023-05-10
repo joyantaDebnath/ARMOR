@@ -7,125 +7,104 @@
 \subsubsection{Enforcing Syntactic Checks} parser
 \subsubsection{Enforcing Semantic Checks} string transformation and others
 
-\subsection{Correctness Proofs}
+\section{Correctness Proofs}
 
-
-\subsubsection{Operative Notions}
+\subsection{Correctness Criteria}
 \begin{itemize}
-\item \textbf{soundness} If the parser accepts the string, so does the grammar
-\item \textbf{completeness} If the grammar accepts the string, so does the parser
-\item \textbf{secure completeness} If the grammar accepts the string, so does the parser,
-and there are no two distinct ways for the grammar to accept the string.
+\item \textbf{Soundness:} If the CCVL implementation accepts an input certificate chain, then the formal specification also accepts the certificate chain. 
+\item \textbf{Completeness:} If the formal specification accepts an input certificate chain, then the CCVL implementation also accepts the certificate chain.
+\item \textbf{Secure Completeness:} If the formal specification accepts an input certificate chain and there are no two distinct ways for the specification to accept the input, then the CCVL implementation also accepts the certificate chain.
 \end{itemize}
 
 
-\subsubsection{Design Challenges and Solutions}
+\subsection{Design Challenges and Solutions}
 
-\paragraph{\textbf{Grammar}}
-\textbf{Challenge} Our first and most fundamental question is: how shall we represent
-the grammar?
-Recall that our operative notion of soundness is "if the parser accepts the
-string, then so does the grammar."
-We also wish for our formulation of the grammar to serve as a readable
-formalization of the X.509 and X.690 specification.
+\subsubsection{Represetation of Certificate Grammar} Our primary challenge is determining the most effective method for representing the X.509 certificate grammar. Our goal is to devise a grammar formulation that aligns with the X.509 and X.690 specifications and serves as a comprehensive and readable formalization thereof.
 
-\textbf{Solution} In general purpose functional languages, inductive types are a
-natural choice for expressing the grammar of a language.
-Our choice of formalizing X.509 and X.680 is \emph{inductive families}, the
-generalization of inductive types to a dependently typed setting.
+\textbf{Approach.} In general-purpose functional languages, using inductive types has proven to be an intuitive and effective strategy for articulating the grammar of a language. In light of this, our approach to formalizing the X.509 and X.690 specifications is premised upon applying inductive families, which serve as an extension of inductive types in a dependently typed context.
 
-Let us consider a simple example: X.690 DER Boolean values.
-The BER require that Boolean values consists of a single octet
-with \texttt{FALSE} represented by the setting all bits to 0, and the DER further
-stipulates that \texttt{TRUE} be represented by setting all bits to 1.
-We represent these constraints as follows.
+To illustrate this, consider a straightforward example: the Boolean values in the X.690 Distinguished Encoding Rules (DER). Per the Basic Encoding Rules (BER), Boolean values must comprise a singular octet, with FALSE denoted by setting all bits to 0 and TRUE denoted by setting at least one bit to 1. The DER further mandates that the value TRUE is signified by setting all bits to 1. We capture these constraints in our formal representation as follows.
 
-\begin{code}
-  module BoolExample where
-    data BoolRep : Bool -> UInt8 -> Set where
-      falser : BoolRep false (UInt8.fromN 0)
-      truer  : BoolRep true (UInt8.fromN 255)
-    record BoolValue (@0 bs : List UInt8) : Set where
-      constructor mkBoolValue
-      field
-        v     : Bool
-        @0 b  : UInt8
-        @0 vr : BoolRep v b
-        @0 bs== : bs == [ b ]
-  \end{code}
 
-\begin{enumerate}
-\item First, we define a binary relation |BoolRep| that relates Agda
-|Bool| values to the octet values specified by X.690 DER
-(|UInt8.fromN| converts a non-negative unbounded integer to its
-|UInt8| representation, provided Agda can verify automatically
-the given number is less than 256).
+\begin{figure}[h]
+  \centering
+  \begin{code}
+    module BoolExample where
+      data BoolRep : Bool -> UInt8 -> Set where
+        falser : BoolRep false (UInt8.fromN 0)
+        truer  : BoolRep true (UInt8.fromN 255)
+      record BoolValue (@0 bs : List UInt8) -> Set where
+        constructor mkBoolValue
+        field
+          v     : Bool
+          @0 b  : UInt8
+          @0 vr : BoolRep v b
+          @0 bseq : bs == [ b ]
+    \end{code}
+    \label{code1}
+    \caption{Code Listing 1}
+  \end{figure}
 
-\item Next, we define a record |BoolValue| for the representation of
-the X.690 Boolean value itself.
+
+\begin{enumerate} [(1)]
+\item Here, we establish a binary relation, |BoolRep|, which correlates Boolean values in Agda, denoted as |Bool|, with the octet values stipulated by the X.690 DER. The function |UInt8.fromN| transforms a non-negative unbounded integer into its equivalent |UInt8| representation. It is important to note that this transformation is contingent upon Agda's ability to automatically verify that the provided number is less than 256.
+
+\item Subsequently, we construct a record, |BoolValue|, to represent the Boolean value defined by X.690.
 
 \begin{itemize}
-\item Each production rule of the grammar, such as |BoolValue|, is
-represented by a type family of type |@0 List UInt8 -> Set|,
-which we interpret as the type of predicates over byte-strings (we will
-explain the |@0| business shortly).
+\item Each grammar production rule, such as |BoolValue|, is exemplified by a type family of type |@0 List UInt8 -> Set|. We interpret this as the type of predicates over byte strings.
 
-\item The fields of the record are the Boolean value |v|, its
-byte-string representation |b|, a proof of type
-|BoolRep v b| that |b| is the correct representation of |b|, and a
-proof that the byte-string representation of this terminal of the grammar
-is the singleton list consisting of |b| (written |[ b ]|)
+\item The components of the record consist of the Boolean value |v|, its byte-string representation |b|, a proof |vr| of type |BoolRep v b| validating that |b| is the correct representation of |v|, and a proof |bseq| establishing that the byte string representation of this terminal of the grammar is the singleton list comprising |b| (denoted as |[ b ]|).
+
+\item The |@0| annotations applied to types and fields signify that the respective values are erased at run-time. This approach is implemented for a dual purpose: firstly, to diminish the space and time overhead associated with ARMOR executions; and secondly, to function as a form of machine-enforced documentation that specifies those portions of the formalization that are purely intended for verification purposes.
 \end{itemize}
 \end{enumerate}
 
+\subsubsection{Correctness of Certificate Parser} We aspire to ensure that the construction of the certificate parser intrinsically embodies both soundness and completeness. This means that the parser, by design, should correctly accept all valid certificates (completeness) and reject all invalid ones (soundness), thereby eliminating the need for additional verification steps post-construction.
 
-The |@0| annotations on types and fields indicate that
-the values are \emph{erased at run-time.}
-We do this for two reasons: to reduce the space and time overhead for
-executions of Aeres, and to serve as machine-enforced documentation
-delineating the parts of the formalization that are purely for the purposes of
-verification.
+\textbf{Approach:} In pursuit of a sound parser, we architect it such that upon successful execution, it returns a proof confirming that the byte-string aligns with the grammar. In parallel, to ensure completeness, in cases of failure, the parser provides a refutation - a proof substantiating the impossibility of the grammar accepting the given byte-string. The combination of these characteristics is neatly encapsulated by the concept of decidability, formally defined in the Agda standard library as |Dec|. For clarity, we present a simplified and more intuitive version of this type below.
 
-\paragraph{\textbf{Parser}}
-\textbf{Challenge:} Next, we must design the parser.
-We desire that the parser by sound and complete \emph{by construction}.
-
-\textbf{Solution:} For our parser to be sound, when it succeeds we have it return a
-proof that the byte-string conforms to grammar. For completeness, when it
-fails we have it return a \emph{refutation} --- a proof that there is no possible
-way for the grammar to accept the given byte-string.
-The two of these together are captured nicely by the notion of
-\emph{decidability}, formalized in the Agda standard library as |Dec|
-(we show a simplified, more intuitive version of this type below)
-\begin{code}
-module DecSimple where
-  data Dec (A : Set) : Set where
-    yes : A -> Dec A
-    no  : not A -> Dec A
-\end{code}
+\begin{figure}[h]
+  \centering
+  \begin{code}
+    module DecSimple where
+      data Dec (A : Set) : Set where
+        yes : A -> Dec A
+        no  : not A -> Dec A
+  \end{code}
+  \label{code2}
+  \caption{Code Listing 2}
+\end{figure}
 
 Let us examine (a slightly simplified version of) the definition of
 |Parser| used in Aeres.
 Below, module parameter |S| is the type of the characters of the
 alphabet over which we have defined a grammar.
 
-\begin{code}
-module ParserSimple (S : Set) where
-  record Success (@0 A : List S -> Set) (@0 xs : List S) : Set where
-    constructor success
-    field
-      @0 prefix : List S
-      read   : N
-      @0 read== : read == length prefix
-      value  : A prefix
-      suffix : List S
-      @0 ps==    : prefix ++ suffix == xs
-  record Parser (M : Set -> Set) (@0 A : List S -> Set) : Set where
-    constructor mkParser
-    field
-      runParser : (xs : List S) -> M (Success A xs)
-  open Parser public
+\begin{figure}[h]
+  \centering
+  \begin{code}
+  module ParserSimple (S : Set) where
+    record Success (@0 A : List S -> Set) (@0 xs : List S) 
+        : Set where
+      constructor success
+      field
+        @0 prefix : List S
+        read   : N
+        @0 readeq : read == length prefix
+        value  : A prefix
+        suffix : List S
+        @0 pseq    : prefix ++ suffix == xs
+    record Parser (M : Set -> Set) (@0 A : List S -> Set) 
+        : Set where
+      constructor mkParser
+      field
+        runParser : (xs : List S) -> M (Success A xs)
+    open Parser public
 \end{code}
+\label{code3}
+\caption{Code Listing 3}
+\end{figure}
 
 \begin{itemize}
 \item We first must specify what the parser returns when it succeeds.
@@ -150,7 +129,7 @@ production rule |A|.
 We of course need this at run-time to continue parsing any subsequent
 production rules.
 
-\item Finally, field |ps==| relates |prefix| and
+\item Finally, field |pseq| relates |prefix| and
 |suffix| to the string |xs| that we started with,
 i.e., they really are a prefix and suffix of the input.
 \end{itemize}
@@ -176,7 +155,10 @@ which is a dependently type function taking a character string
 \textbf{Example}
 
 It is helpful to see an example parser.
-    \begin{code}
+
+\begin{figure}[h]
+  \centering
+  \begin{code}
   private
     here' = "X690-DER: Bool"
   
@@ -184,24 +166,33 @@ It is helpful to see an example parser.
   runParser parseBoolValue [] = do  {- 1 -}
     tell $ here' String.++ ": underflow"
     return . no $ \ where
-      (success prefix read read== value suffix ps==) ->
-        contradiction (++-conicall _ suffix ps==) (nonempty value)
+      (success prefix read readeq value suffix pseq) ->
+        contradiction (++-conicall _ suffix pseq) 
+          (nonempty value)
   runParser parseBoolValue (x :: xs) {- 2 -}
-    with x ==? UInt8.fromN 0 {- 3 -}
+    with x =? UInt8.fromN 0 {- 3 -}
   ... | yes refl =
-    return (yes (success _ _ refl (mkBoolValue _ _ falser refl) xs refl))
+    return (yes (success _ _ refl 
+              (mkBoolValue _ _ falser refl) xs refl))
   ... | no x/=0
-    with x ==? UInt8.fromN 255 {- 3 -}
+    with x =? UInt8.fromN 255 {- 3 -}
   ... | yes refl =
-    return (yes (success _ _ refl (mkBoolValue _ _ truer refl) xs refl))
+    return (yes (success _ _ refl 
+              (mkBoolValue _ _ truer refl) xs refl))
   ... | no  x/=255 = do {- 4 -}
     tell $ here' String.++ ": invalid boolean rep"
     return . no $ \ where
-      (success prefix _ _ (mkBoolValue v _ vr refl) suffix ps==) -> !!
+      (success prefix _ _ 
+              (mkBoolValue v _ vr refl) suffix pseq) -> !!
         (case vr of \ where
-          falser -> contradiction (::-injectivel (sym ps==)) x/=0
-          truer  -> contradiction (::-injectivel (sym ps==)) x/=255)
-    \end{code}
+          falser -> contradiction 
+              (::-injectivel (sym pseq)) x/=0
+          truer  -> contradiction 
+              (::-injectivel (sym pseq)) x/=255)
+  \end{code}
+  \label{code4}
+  \caption{Code Listing 4}
+  \end{figure}
 
 \begin{enumerate}
 \item When the input string is empty, we emit an error message, then return a
@@ -247,14 +238,14 @@ to conform to each of these.
     no not utf8 <- runParser (parseTLVLenBound 1 200 parseUTF8String) xs
       where yes u -> return (yes (mapSuccess (\ {bs} -> utf8String{bs}) u))
     return . no $ \ where
-      (success prefix read read== (ia5String x) suffix ps==) ->
-        contradiction (success _ _ read== x _ ps==) notia5String
-      (success prefix read read== (visibleString x) suffix ps==) ->
-        contradiction (success _ _ read== x _ ps==) notvisibleString
-      (success prefix read read== (bmpString x) suffix ps==) ->
-        contradiction (success _ _ read== x _ ps==) notbmp
-      (success prefix read read== (utf8String x) suffix ps==) ->
-        contradiction (success _ _ read== x _ ps==) notutf8
+      (success prefix read readeq (ia5String x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) notia5String
+      (success prefix read readeq (visibleString x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) notvisibleString
+      (success prefix read readeq (bmpString x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) notbmp
+      (success prefix read readeq (utf8String x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) notutf8
       \end{code}
 
 \subsubsection{Complete and Secure Parsing}

@@ -76,6 +76,8 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \usepackage[T1]{fontenc}     
 \usepackage{babel}
+\usepackage{caption}
+\captionsetup[figure]{skip=0pt} % Adjust for your preferred distance
 
 \usepackage{tabularx}
 
