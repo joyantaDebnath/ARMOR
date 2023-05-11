@@ -114,7 +114,7 @@
 
 %format _          = "\mathbin{\HSSym{\anonymous}} "
 %format <-         = "\mathbin{\HSSym{\leftarrow}} "
-%format \          = "\HSSym{\lambda} "
+%format \          = "\mathbin{\HSSym{\lambda}} "
 %format |          = "\mathbin{\HSSym{\mid}} "
 %format {          = "\HSSym{\{\mskip1.5mu} "
 %format }          = "\HSSym{\mskip1.5mu\}}"
@@ -293,4 +293,4 @@
 %format bseq         = "\HSVar{\mathit{bs}_{eq}}"
 %format readeq         = "\HSVar{\mathit{read}_{eq}}"
 %format pseq         = "\HSVar{\mathit{ps}_{eq}}"
-
+%format eqrefl         = "\HSVar{\mathit{eq}_{refl}}"

@@ -19,9 +19,9 @@
 
 \subsection{Design Challenges and Solutions}
 
-\subsubsection{Represetation of Certificate Grammar} Our primary challenge is determining the most effective method for representing the X.509 certificate grammar. Our goal is to devise a grammar formulation that aligns with the X.509 and X.690 specifications and serves as a comprehensive and readable formalization thereof.
+\subsubsection{Represetation of Certificate Grammar} Our main challenge is determining the most effective method for representing the X.509 certificate grammar. Our goal is to devise a grammar formulation that aligns with the X.509 and X.690 specifications and serves as a comprehensive and readable formalization thereof.
 
-\textbf{Approach.} In general-purpose functional languages, using inductive types has proven to be an intuitive and effective strategy for articulating the grammar of a language. In light of this, our approach to formalizing the X.509 and X.690 specifications is premised upon applying inductive families, which serve as an extension of inductive types in a dependently typed context.
+\textbf{Approach:} In general-purpose functional languages, using inductive types has proven to be an intuitive and effective strategy for articulating the grammar of a language. In light of this, our approach to formalizing the X.509 and X.690 specifications is premised upon applying inductive families, which serve as an extension of inductive types in a dependently typed context.
 
 To illustrate this, consider a straightforward example: the Boolean values in the X.690 Distinguished Encoding Rules (DER). Per the Basic Encoding Rules (BER), Boolean values must comprise a singular octet, with FALSE denoted by setting all bits to 0 and TRUE denoted by setting at least one bit to 1. The DER further mandates that the value TRUE is signified by setting all bits to 1. We capture these constraints in our formal representation as follows.
 
@@ -76,10 +76,7 @@ To illustrate this, consider a straightforward example: the Boolean values in th
   \caption{Code Listing 2}
 \end{figure}
 
-Let us examine (a slightly simplified version of) the definition of
-|Parser| used in Aeres.
-Below, module parameter |S| is the type of the characters of the
-alphabet over which we have defined a grammar.
+Let us delve into a somewhat streamlined version of the definition of |Parser| utilized in ARMOR. In the following representation, the module parameter |S| corresponds to the type of characters in the alphabet, over which we have delineated a grammar.
 
 \begin{figure}[h]
   \centering
@@ -106,55 +103,30 @@ alphabet over which we have defined a grammar.
 \caption{Code Listing 3}
 \end{figure}
 
-\begin{itemize}
-\item We first must specify what the parser returns when it succeeds.
-This is given by the record |Success|.
+Let us break down the components of the above code.
+\begin{enumerate}[(1)]
+
+\item Initially, we must stipulate what the parser returns when it succeeds. This is denoted by the record |Success|.
 
 \begin{itemize}
-\item Parameter |A| is the production rule (e.g.,
-|BoolValue|), and |xs| is the generic-character
-string which we parsed.
-Both are marked erased from run-time
-
-\item Field |prefix| is the prefix of our input string consumed by
-the parser.
-We do not need to keep this at run-time, however for the purposes of
-length-bounds checking we do keep its length |read| available
-at run-time.
-
-\item Field |value| is a proof that the prefix conforms to the
-production rule |A|.
-
-\item Field |suffix| is what remains of the string after parsing.
-We of course need this at run-time to continue parsing any subsequent
-production rules.
-
-\item Finally, field |pseq| relates |prefix| and
-|suffix| to the string |xs| that we started with,
-i.e., they really are a prefix and suffix of the input.
+\item The parameter |A| represents the production rule (e.g., |BoolValue|), and |xs| represents the generic-character string we have parsed. Both of these are marked to be erased from runtime.
+\item The field |prefix| is the prefix of our input string that the parser consumes. While we do not need to retain this at runtime, we maintain its length |read| available at runtime for the sake of length-bound checking.
+\item The field |value| proves the prefix adheres to the production rule |A|.
+\item The field |suffix| corresponds to the remainder of the string post-parsing. We need this at runtime to continue parsing any subsequent production rules.
+\item Finally, the field |pseq| correlates |prefix| and |suffix| to the string |xs| that we started with, substantiating that they genuinely are a prefix and a suffix of the input.
 \end{itemize}
 
-\item Next, we define the type |Parser| for parsers.
+\item Following this, we define the type |Parser| for parsers.
 \begin{itemize}
-\item Parameter |M| is used to give us some flexibility in the type
-of the values returned by the parser.
-Almost always, it is instantiated with
-|Logging . Dec|,
-where |Logging| provides us lightweight debugging
-information.
-Parameter |A| is, again, the production rule we wish to parse.
-
-\item |Parser| consists of a single field |runParser|,
-which is a dependently type function taking a character string
-|xs| and returning
-|M (Success A xs)|
-(again, usually |Logging (Dec (Success A xs))|)
-\end{itemize}
+\item The parameter |M| provides some flexibility in the type of values the parser returns. In most cases, it is instantiated with |Logging . Dec|, where |Logging| offers us lightweight debugging information. The parameter |A| is, once again, the production rule we wish to parse.
+\item |Parser| comprises a single field |runParser|, which is a dependently typed function that takes a character string |xs| and returns |M (Success A xs)| (typically |Logging (Dec (Success A xs))|).
 \end{itemize}
 
-\textbf{Example}
+\end{enumerate}
 
-It is helpful to see an example parser.
+This representation encapsulates the essential elements of the parser's structure and function, providing a basis for sound and complete parsing of the specified grammar.
+
+\paragraph{\textbf{An Example Parser for Boolean:}}
 
 \begin{figure}[h]
   \centering
@@ -194,87 +166,94 @@ It is helpful to see an example parser.
   \caption{Code Listing 4}
   \end{figure}
 
-\begin{enumerate}
-\item When the input string is empty, we emit an error message, then return a
-proof that there is no parse of a |BoolValue| for the empty
-string
+  Here is an explanation of the actions taken in different scenarios:
+  \begin{enumerate}[(1)]
+  
+  \item If the input string is devoid of any characters (empty), we first generate an error message, then return a proof establishing that there is no possible parse of a |BoolValue| for an empty string. We employ Agda's |do|-notation for sequencing our operations.
+  \item If there is at least one character present in the input string, we proceed with the following checks.
+  \begin{itemize}
+  \item We ascertain whether the character is equal to either 0 or 255. If it is, we affirm that this complies with the grammar.
+  \item If the character does not equal either 0 or 255, we generate an error message and then return a parse refutation. This indicates that in order to adhere to the |BoolValue| requirement, our byte must be either 0 or 255.
+  \end{itemize}
+  \end{enumerate}
 
-We use Agda's |do|-notation to sequence our operations
+  In summary, these steps ensure the parser correctly identifies valid and invalid input strings, confirming its soundness and completeness.
 
-\item If there is at least one character, we check
-\item whether it is equal to 0 or 255.
-If so, we affirm that this conforms to the grammar.
-\item If it is not equal to either, we emit an error message then return a
-parse refutation: to conform to |BoolValue|, our byte must
-be either 0 or 255.
-\end{enumerate}
+\subsubsection{Backtracking}
 
-\paragraph{\textbf{Backtracking}}
-
-Although backtracking is not required to parse X.509, our parser has been
-implemented with some backtracking to facilitate the formalization.
-For an example, the X.690 specification for |DisplayText|
-states it may comprise an |IA5String|,
-|VisibleString|, |VisibleString|, or
-|UTF8String|.
-In the case that the give byte-string does not conform to |DisplayTex|
-providing a refutation is easier when we have direct evidence that it fails
-to conform to each of these.
+Although the parsing of X.509 does not necessitate backtracking, our parser has been designed with some backtracking features to aid in the formalization process. For instance, the X.690 specification for |DisplayText| states that it may constitute an |IA5String|, |VisibleString|, |VisibleString|, or |UTF8String|. If the given byte-string does not conform to |DisplayText|, furnishing a refutation becomes more straightforward when we have direct evidence demonstrating its failure to comply with each possible type. This approach, while possibly adding complexity to the implementation, allows for more precise and verifiable proof of non-conformance. It also provides a more detailed understanding of the reasons for parsing failure, facilitating potential debugging or refinement of the input data.
 
 
 
-    \begin{code}
+\begin{figure}[h]
+  \centering
+  \begin{code}
   private
     here' = "X509: DisplayText"
   
   parseDisplayText : Parser (Logging . Dec) DisplayText
   runParser parseDisplayText xs = do
-    no not ia5String <- runParser (parseTLVLenBound 1 200 parseIA5String) xs
-      where yes b -> return (yes (mapSuccess (\ {bs} -> ia5String{bs}) b))
-    no not visibleString <- runParser (parseTLVLenBound 1 200 parseVisibleString) xs
-      where yes b -> return (yes (mapSuccess (\ {bs} -> visibleString{bs}) b))
-    no not bmp <- runParser (parseTLVLenBound 1 200 parseBMPString) xs
-      where yes b -> return (yes (mapSuccess (\ {bs} -> bmpString{bs}) b))
-    no not utf8 <- runParser (parseTLVLenBound 1 200 parseUTF8String) xs
-      where yes u -> return (yes (mapSuccess (\ {bs} -> utf8String{bs}) u))
+    no not ia5Str <- runParser 
+        (parseTLVLenBound 1 200 parseIA5String) xs
+      where yes b -> return (yes (mapSuccess 
+                      (\ {bs} -> ia5Str{bs}) b))
+    no not visibleStr <- runParser 
+        (parseTLVLenBound 1 200 parseVisibleString) xs
+      where yes b -> return (yes (mapSuccess
+                      (\ {bs} -> visibleStr{bs}) b))
+    no not bmpStr <- runParser 
+        (parseTLVLenBound 1 200 parseBMPString) xs
+      where yes b -> return (yes (mapSuccess 
+                      (\ {bs} -> bmpStr{bs}) b))
+    no not utf8Str <- runParser 
+        (parseTLVLenBound 1 200 parseUTF8String) xs
+      where yes u -> return (yes (mapSuccess 
+                      (\ {bs} -> utf8Str{bs}) u))
     return . no $ \ where
-      (success prefix read readeq (ia5String x) suffix pseq) ->
-        contradiction (success _ _ readeq x _ pseq) notia5String
-      (success prefix read readeq (visibleString x) suffix pseq) ->
-        contradiction (success _ _ readeq x _ pseq) notvisibleString
-      (success prefix read readeq (bmpString x) suffix pseq) ->
-        contradiction (success _ _ readeq x _ pseq) notbmp
-      (success prefix read readeq (utf8String x) suffix pseq) ->
-        contradiction (success _ _ readeq x _ pseq) notutf8
+      (success prefix read readeq (ia5Str x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) not ia5Str
+      (success prefix read readeq (visibleStr x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) not visibleStr
+      (success prefix read readeq (bmpStr x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) not bmpStr
+      (success prefix read readeq (utf8Str x) suffix pseq) ->
+        contradiction (success _ _ readeq x _ pseq) not utf8Str
       \end{code}
+      \label{code5}
+      \caption{Code Listing 5}
+      \end{figure}
 
 \subsubsection{Complete and Secure Parsing}
-Completeness of the parser is by construction, and straightforward to explain:
-given a byte-string, if it conforms to the grammar then the parser accepts the
-byte-string. The heart of the proof is proof by contradiction (which is
-constructively valid, since the parser is itself evidence that conformance to
-the grammar is decidable): suppose the parser rejects a string which conforms
-to the grammar. Then, this rejection comes with a refutation of the
-possibility that the string conforms with the grammar, contradicting our
-assumption.
-When it comes to security, we also care that the grammar is \emph{unambiguous},
-by which we mean that there is at most one way in which the grammar might be
-parsed.
-This is formalized as |UniqueParse| below
+The completeness of the parser is constructively ensured, and its rationale is relatively straightforward. Given a byte-string, if it complies with the grammar, the parser will accept the byte-string. The crux of this proof lies in proof by contradiction (which is constructively valid, given that the parser itself serves as evidence that the conformance to the grammar is decidable). Let us assume the parser rejects a string that actually conforms to the grammar. This rejection, however, comes bundled with a refutation of the possibility that the string aligns with the grammar, thereby contradicting our initial assumption.
+
+When focusing on secure completeness, it is also crucial that the grammar is unambiguous, implying that there is a maximum of one way in which the grammar could be parsed. This concept is formally embodied as |UniqueParse| in the subsequent text. This is formalized as |UniqueParse| below.
+
+% This combination of proof for both the soundness and completeness of the parser, alongside the formalization of unambiguity, ensures the robustness and security of our X.509 certificate chain validation implementation.
+
+
+\begin{figure}[h]
+  \centering
   \begin{code}
   Unique : Set -> Set
-  Unique P = (p1 p2 : P) -> p1 == p2
+  Unique A = (p1 p2 : A) -> p1 == p2
+
+
   UniqueParse : (List S -> Set) -> Set
   UniqueParse A = forall {@0 xs} -> Unique (Success A xs)
-  \end{code}
-  We have a lemma that establishes a sufficient condition for when
-  |UniqueParse| holds, whose premises are stated only in terms of
-  properties of the grammar itself.
-  These properties are:
-  1. Any two witness[fn|::|By which we mean inhabitants of a type, when we interpret that type as a proposition under the Curry-Howard isomorphism]
-     that a given string conforms to the grammar are equal (|Unambiguous|), and
-  2. If two prefixes of the same string conform to the grammar, those prefixes are equal (|NonNesting|)
-  \begin{code}
+\end{code}
+\label{code6}
+\caption{Code Listing 6}
+\end{figure}
+
+We have derived a lemma that elucidates a sufficient condition for holding |UniqueParse|. The premises of this lemma are articulated solely in terms of the properties of the grammar itself. These properties include:
+\begin{itemize}
+\item Any two witnesses (under the Curry-Howard isomorphism, we interpret inhabitants of a type as witnesses when that type is taken as a proposition) that a specified string adheres to the grammar are equivalent. This is termed as |Unambiguous|.
+\item If two prefixes of the identical string comply with the grammar, those prefixes are equal. This is referred to as |NonNesting|.
+\end{itemize}
+  
+  \begin{figure}[h]
+    \centering
+    \begin{code}
   Unambiguous : (A : List S -> Set) -> Set
   Unambiguous A = forall {xs} -> Unique (A xs)
   NonNesting : (A : List S -> Set) -> Set
@@ -282,76 +261,80 @@ This is formalized as |UniqueParse| below
     forall {xs1 ys1 xs2 ys2}
     -> (prefixSameString : xs1 ++ ys1 == xs2 ++ ys2)
     -> (a1 : A xs1) (a2 : A xs2) -> xs1 == xs2
-  module _ {A : List S -> Set} (uA : Unambiguous A) (nnA : NonNesting A) where
+  module _ {A : List S -> Set} (uA : Unambiguous A) 
+        (nnA : NonNesting A) where
     @0 uniqueParse : UniqueParse A
     uniqueParse p1 p2
     {- = ... -}
-    \end{code}
+  \end{code}
+  \label{code7}
+  \caption{Code Listing 7}
+  \end{figure}
   
   This finally brings us to the statement and proof of complete and secure parsing.
-  \begin{code}
-  Yes_And_ : {P : Set} -> Dec P -> (P -> Set) -> Set
+  \begin{figure}[h]
+    \centering
+    \begin{code}
+  Yes_And_ : {A : Set} -> Dec A -> (A -> Set) -> Set
   Yes (yes pf) And Q = Q pf
-  Yes (no notpf) And Q = bot
+  Yes (no not pf) And Q = bot
+  
+  
   CompleteParse : (A : List S -> Set) -> Parser Dec A -> Set
   CompleteParse A p =
-    forall {bs} -> (v : Success A bs) -> Yes (runParser p bs) And (v ==_)
+    forall {bs} -> (v : Success A bs) -> 
+        Yes (runParser p bs) And (v ==_)
   module _ {A : List S -> Set}
-    (uA : Unambiguous A) (nnA : NonNesting A) (parser : Parser Dec A)
+    (uA : Unambiguous A) (nnA : NonNesting A) 
+      (parser : Parser Dec A)
     where
     @0 completeParse : CompleteParse A parser
     completeParse{bs} v
       with runParser parser bs
     ... | (yes v')  = uniqueParse uA nnA v v'
-    ... | no notv     = contradiction v notv
+    ... | no not v     = contradiction v not v
   \end{code}
+  \label{code8}
+  \caption{Code Listing 8}
+  \end{figure}
 
-\begin{enumerate}
-\item We define an auxiliary predicate |Yes\_And\_| over decisions,
-expressing that the decision is |yes| and
-the predicate |Q| holds for the affirmative proof that comes with
-it.
-\item The predicate |CompleteParse| is defined in terms of
-|Yes\_And\_|, expressing that if |v| is a witness that
-some prefix of |bs| conforms to |A|, then the parser
-returns in the affirmative and the witness it returns is equal to
-|v|.
-\item We then prove the property |CompleteParse| under the
-assumption that |A| is |Unambiguous| and
-|NonNesting|.
-The proof proceeds by cases on the result of running the parser on the
-given string.
-\begin{itemize}
-\item If the parser produces an affirmation, we appeal to lemma
-|uniqueParse|.
-\item If the parser produces a refutation, we have a
-|contradiction|
-\end{itemize}
+  \begin{enumerate}[(1)]
+  \item We first define an auxiliary predicate |Yes_And_| over decisions, signifying that the decision is |yes| and the predicate |Q| holds for the affirmative proof accompanying it.
+  \item Next, we define the predicate |CompleteParse| in terms of |Yes_And_|. This expresses that if |v| serves as a witness that some prefix of |bs| complies with |A|, then the parser returns in the affirmative, and the witness it returns matches |v|.
+  \item We then prove the property |CompleteParse| under the presupposition that |A| is |Unambiguous| and |NonNesting|. The proof follows a case-by-case analysis based on the result of running the parser on the given string.
+
+  \begin{itemize}
+  \item If the parser produces an affirmation, we appeal to the lemma |uniqueParse|.
+  \item If the parser produces a refutation, we encounter a |contradiction|.
+  \end{itemize}
 \end{enumerate}
 
+  Through these steps, we demonstrate that the parser is complete, meaning it correctly recognizes all strings that conform to the grammar. This ensures the correctness of the parser and provides a robust foundation for the formal verification of our X.509 certificate chain validation implementation.
 
-\paragraph{\textbf{Semantic Checks}}
-Some properties that we wish to verify are not as suitable for formalization
-as part of the grammar.
-For example, the X.509 specification requires that the signature algorithm
-field of the TBS certificate matches the signature algorithm listed in the
-outer certificate --- a highly non-local property.
-Aeres checks such properties after parsing.
-For each of these, we first write a specification of the property, then a
-proof that that property is \emph{decidable}.
-This proof is itself the function that we call to check whether the property
-holds, and interpreted as such, it is sound and complete by construction for
-the same reasons that our parser is.
 
-% \begin{code}
-%   SCP1 : forall {@0 bs} -> Cert bs -> Set
-%   SCP1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
-%   scp1 :  forall {@0 bs} (c : Cert bs) -> Dec (SCP1 c)
-%   scp1 c =
-%     case (proj2 (Cert.getTBSCertSignAlg c) ===? proj2 (Cert.getCertSignAlg c)) ret (const _) of \ where
-%       (yes === -refl) -> yes refl
-%       (no noteq) -> no \ where refl -> contradiction === -refl noteq
-% \end{code}
+\subsubsection{Semantic Checks}
+Certain properties we wish to verify may not lend themselves well to formalization as part of the grammar. For instance, the X.509 specification mandates that the signature algorithm field of the TBS (To-Be-Signed) certificate aligns with the signature algorithm outlined in the outer certificate - a highly non-local property. Aeres performs checks for such properties post-parsing.
+
+We first draft a property specification for each of these properties, followed by proof that this property is decidable. The proof serves as the function we employ to ascertain whether the property holds. When interpreted in this manner, it is sound and complete by construction, paralleling the reasoning that ensures the soundness and completeness of our parser.
+
+This method allows us to formally verify properties beyond the immediate grammar rules, providing a more comprehensive and robust verification of our X.509 certificate chain validation implementation. This approach ensures adherence to the syntactic rules of the certificate format and the fulfillment of broader, semantically meaningful properties.
+
+\begin{figure}[h]
+  \centering
+  \begin{code}
+  SCP1 : forall {@0 bs} -> Cert bs -> Set
+  SCP1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
+  
+  scp1 :  forall {@0 bs} (c : Cert bs) -> Dec (SCP1 c)
+  scp1 c =
+    case (proj2 (Cert.getTBSCertSignAlg c) =? 
+        proj2 (Cert.getCertSignAlg c)) ret (const _) of \ where
+      (yes eqrefl) -> yes refl
+      (no not eq) -> no \ where refl -> contradiction eqrefl not eq
+    \end{code}
+    \label{code9}
+    \caption{Code Listing 9}
+    \end{figure}
 
 
 \subsection{Executable Extraction}
