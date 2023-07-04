@@ -498,7 +498,7 @@
 
 \begin{document}
 
-\title{ARMOR: A Certified Implementation of X.509 Certificate Chain Validation}
+\title{ARMOR: A Verified Implementation of X.509 Certificate Chain Validation}
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
