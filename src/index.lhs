@@ -576,18 +576,18 @@
 \lhsinclude{introduction} 
 %include src/background.lhs
 \lhsinclude{background}
-%include src/related-work.lhs
-\lhsinclude{related-work}
-%include src/overview.lhs
-\lhsinclude{overview}
-%include src/approach.lhs
-\lhsinclude{approach}
-%include src/implementation.lhs
-\lhsinclude{implementation}
+%include src/problem.lhs
+\lhsinclude{problem}
+%include src/architecture.lhs
+\lhsinclude{architecture}
+%include src/verification.lhs
+\lhsinclude{verification}
 %include src/evaluation.lhs
 \lhsinclude{evaluation}
 %include src/discussion.lhs
 \lhsinclude{discussion}
+%include src/related-work.lhs
+\lhsinclude{related-work}
 %include src/conclusion.lhs
 \lhsinclude{conclusion}
 %include src/appendix.lhs

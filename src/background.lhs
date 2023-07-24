@@ -1,10 +1,6 @@
-\section{Preliminaries}
+\section{Background}
 
-\subsection{X.509 Certificate}
-
-\subsection{X.509 Certificate Chain}
+\subsection{X.509 PKI and Certificate Chain}
 
 \subsection{Certificate Chain Validation Logic}
 
-
-\says{joy}{Concepts needed to understand the paper: formal methods, differential testing, etc. Explanation of the X.509 standard and certificate chain validation process.}
