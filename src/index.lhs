@@ -576,8 +576,6 @@
 \lhsinclude{introduction} 
 %include src/background.lhs
 \lhsinclude{background}
-%include src/problem.lhs
-\lhsinclude{problem}
 %include src/architecture.lhs
 \lhsinclude{architecture}
 %include src/verification.lhs

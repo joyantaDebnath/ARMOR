@@ -1,3 +1,10 @@
 \section{Related Work}
-% \says{joyanta}{need to cover fuzzing, symbolic execution and CERES. Also, talk about everparse, DICE, ASN1-star, evercrypt, nqsb-tls, tls interception, state machine learning, works on parser generators, etc.}
-% \says{joy}{Current approaches to X.509 certificate chain validation. Existing efforts for verification, and their limitations.}
+
+
+\subsection{Testing for Finidng Implementation Flaws} fuzzing, symbolic execution
+
+\subsection{High-assurance Implementations} others and ceres, dice, asn1*, everparse
+
+\subsection{Measurement Studies on Incorrect and Insecure Deployment} tls interception, api usage, usability
+
+\subsection{Trust Model Enhancements and Alternatives} certificate misissuance, log, blockchain, revocation
