@@ -11,31 +11,6 @@
 
 % \subsubsection{Writing the Specification} The specification for X.509 syntactic requirements serves as a rigorous and unambiguous description of the structure of X.509 certificate and its parser, which can then be used in the subsequent verification stage. Particularly, we devise a grammar formulation that aligns with the X.509 and X.690 specifications and serves as a comprehensive and readable formalization of the X.509 certificate. In general-purpose functional languages, using inductive types has proven to be an intuitive and effective strategy for articulating the grammar of a language. In light of this, our approach to formalizing the X.509 and X.690 specifications is premised upon applying inductive families, which serve as an extension of inductive types in a dependently typed context. 
 
-% To illustrate this, consider a straightforward example: the Boolean values in the X.690 Distinguished Encoding Rules (DER). As per the Basic Encoding Rules (BER), Boolean values must comprise a singular octet, with FALSE denoted by setting all bits to 0 and TRUE denoted by setting at least one bit to 1. The DER further mandates that the value TRUE is signified by setting all bits to 1. We capture these syntactic requirements of Boolean in our formal representation as follows.
-
-% \begin{figure}[h]
-%   \centering
-%   \begin{code}
-%     module BoolExample where
-%       data BoolRep : Bool -> UInt8 -> Set where
-%         falser : BoolRep false (UInt8.fromN 0)
-%         truer  : BoolRep true (UInt8.fromN 255)
-
-%       record BoolValue (@0 bs : List UInt8) : Set where
-%         constructor mkBoolValue
-%         field
-%           v     : Bool
-%           @0 b  : UInt8
-%           @0 vr : BoolRep v b
-%           @0 bseq : bs == [ b ]
-%     \end{code}
-%     \label{code1}
-%     \caption{Code Listing 1}
-%   \end{figure}
-
-% In this example, |BoolRep| is a dependent type representing a binary relationship between Agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned integers or octet values stipulated by the X.690 DER), where the |falser| constructor associates the false boolean value with 0, and the |truer| constructor associates true with 255. The function |UInt8.fromN| transforms a non-negative unbounded integer into its equivalent |UInt8| representation. It is important to note that this transformation is contingent upon Agda's ability to automatically verify that the provided number is less than 256. Also, the keyword |Set| (referred to as type of types) is used to define the type of |BoolRep|, indicating that |BoolRep| maps specific pairs of |Bool| and |UInt8| values to unique types. Subsequently, we construct a dependent and parameterized record type, |BoolValue|, to represent the boolean value defined by X.690. This record type, essentially a predicate over byte-strings, includes the boolean value |v|, its byte-string representation |b|, a proof |vr| that |b| is the correct representation of |v|, and a proof |bseq| that the byte-string representation |bs| of this grammatical terminal is a singleton list containing |b|. The |@0| annotations applied to types and fields specify that these values are erased at runtime to minimize execution overhead and to mark parts of the formalization used solely for verification purposes. In short, |BoolRep| verifies the correct mapping between boolean values and their numerical representations, while |BoolValue| holds the a boolean value, its numerical representation, and the proof of the correctness of this representation, return by the |BoolRep|.
-
-
 
 
 
