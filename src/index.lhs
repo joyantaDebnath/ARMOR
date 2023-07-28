@@ -112,6 +112,7 @@
 \usepackage{smartdiagram} 
 \usepackage[shortlabels]{enumitem}
 \usepackage{cleveref}
+\usepackage{tabularx}
 
 \usepackage[normalem]{ulem}
 

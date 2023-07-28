@@ -8,15 +8,15 @@ X.509 certificate is a digitally signed document that binds a public key to a sp
 
 \subsubsection{Certificate Chain} A certificate chain, also known as a certification path, is a sequence of X.509 certificates originating from an end-entity certificate (the one being authenticated) and ending with a root CA certificate. This chain is based on the concept of trust transitivity that means if Certificate A is trusted by Certificate B and Certificate B is trusted by Certificate C, then Certificate A is inherently trusted by Certificate C. Each certificate in the chain is signed by the owner of the subsequent certificate, and the process continues until reaching the root certificate. These root certificates are self-signed certificates issued by trusted CAs, which form the root of trust in the X.509 ecosystem.
 
-\begin{figure*}[h]
+\begin{figure}[h]
 \centering
 \scriptsize
-\includegraphics[scale=0.7]{img/cert_chain.pdf} \\
+\includegraphics[scale=0.53]{img/cert_chain.pdf} \\
 Fields marked with * are optional \\
 \vspace{0.2cm}
-\caption{Typical structures of X.509 certificate and certificate chain}
+\caption{Graphical representation of X.509 certificate chain}
 \label{cert_chain}
-\end{figure*}
+\end{figure}
 
 \subsubsection{Certificate Chain Validation Process} 
 \label{cert_val_proc}
@@ -44,7 +44,9 @@ Soundness and completeness together ensure that an implementation behaves exactl
 There are several challenges to our work. In general, interpreting the RFC 5280 specification, which is written in natural language (English), presents a significant challenge due to its inherent inconsistencies, ambiguities, and potential for misinterpretation. Prior studies have also identified these issues~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}, pointing out several problematic clauses in RFC 5280. Moreover, RFC 5280 does not only encompass rules for certificate issuers but also for the applications that validate certificates. This intertwined set of rules further complicates the specification, making it challenging to determine how the CCVL implementations should respond in certain cases (whether to accept or reject an input). We now describe additional challenges specific to parsing, semantic checks, and formal verification.
 
 
-\subsubsection{Parsing Challenges} The internal data structure of an X.509 certificate, while described in the Abstract Syntax Notation One (ASN.1), is eventually serialized based on the X.690 Distinguished Encoding Rules (DER)~\cite{rec2002x}. To make this binary data more human-readable and easier to debug, it is then encoded into the Privacy Enhanced Mail (PEM)~\cite{balenson1993privacy} format using base64 encoding. Upon receiving such a certificate in the PEM format, one must reverse the whole encoding process to extract and interpret the information stored within it. Firstly, the base64 decoding must be applied to convert the textual PEM certificate back into its original binary format. This DER-encoded binary data then needs to be parsed using a DER certificate parser, which extracts all the information from the certificate and transforms it into an intermediate representation for the subsequent semantic validation phase. This intermediate representation provides detailed information contained within a certificate and has a one-to-one correspondence with its ASN.1 certificate representation. Figure~\ref{encoding} clearly shows the encoding and decoding steps of an X.509 certificate.
+\subsubsection{Parsing Challenges} 
+\label{parse}
+The internal data structure of an X.509 certificate, while described in the Abstract Syntax Notation One (ASN.1), is eventually serialized based on the X.690 Distinguished Encoding Rules (DER)~\cite{rec2002x}. To make this binary data more human-readable and easier to debug, it is then encoded into the Privacy Enhanced Mail (PEM)~\cite{balenson1993privacy} format using base64 encoding. Upon receiving such a certificate in the PEM format, one must reverse the whole encoding process to extract and interpret the information stored within it. Firstly, the base64 decoding must be applied to convert the textual PEM certificate back into its original binary format. This DER-encoded binary data then needs to be parsed using a DER certificate parser, which extracts all the information from the certificate and transforms it into an intermediate representation for the subsequent semantic validation phase. This intermediate representation provides detailed information contained within a certificate and has a one-to-one correspondence with its ASN.1 certificate representation. Figure~\ref{encoding} clearly shows the encoding and decoding steps of an X.509 certificate.
 
 \begin{figure}[h]
     \centering
@@ -58,9 +60,20 @@ However, this DER representation of the certificate internally follows a $<T, L,
 
 In some cases, the parsing process also involves correctly interpreting the parsed data. Take the example of the UTCTime format used for certificate validity periods. It uses a two-digit year representation, $YY$, and here lies the potential for misinterpretation. In this format, values from $00$ to $49$ are deemed to belong to the 21st century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the 20th century and are consequently translated into $19YY$. This peculiarity of the UTCTime format allows the representation of years from $1950$ to $2049$. Therefore, when constructing a valid internal representation of a certificate, the DER parser must correctly interpret this two-digit year to avoid potential validation errors.
 
-\subsubsection{Semantic Validation Challenges} One advantage of using the PEM format is that the server can include its own certificate as well as the associated issuer CA certificates in one single file. Once these certificates are parsed into their corresponding intermediate representations, the client application must undertake a series of semantic checks, as mentioned in Section~\ref{cert_val_proc}. However, the CA certificates can come out-of-order or miss one or more required certificates. This is why prior to enforcing the semantic checks, a valid certificate chain should be constructed from the end-entity certificate to the root CA certificate. In addition, string canonicalization needs to be performed for each certificate, which is a type of string transformation to ensure ll the strings in a certificate are in normalized form. We can move to the semantic validation only after such intermediate steps.
+\subsubsection{Semantic Validation Challenges} 
+\label{sem}
+One advantage of using the PEM format is that the server can include its own certificate as well as the associated issuer CA certificates in one single file. Once these certificates are parsed into their corresponding intermediate representations, the client application must undertake a series of semantic checks, as mentioned in Section~\ref{cert_val_proc}. However, the CA certificates can come out-of-order or miss one or more required certificates. This is why prior to enforcing the semantic checks, a valid certificate chain should be constructed from the end-entity certificate to the root CA certificate. In addition, string canonicalization needs to be performed for each certificate, which is a type of string transformation to ensure ll the strings in a certificate are in normalized form. We can move to the semantic validation only after such intermediate steps. Figure~\ref{cert_validation} shows the stages for certificate chain validation.
+
+\begin{figure}[h]
+    \centering
+    \scriptsize
+    \includegraphics[scale=0.7]{img/cert_validation.pdf} \\
+    \caption{Sequential stages for certificate chain validation}
+    \label{cert_validation}
+    \end{figure}
 
 However, each of these intermediate steps presents challenges. For example, building a valid chain can be difficult due to the lack of specific directions as well as the possibility of having multiple valid certificate chains since a single certificate can be cross-signed by more than one CA. In addition, converting strings to normalized form is also a complex process since the number of character sets is humongous considering all the languages worldwide. Finally, before signature verification, the implementation needs to carefully parse the contents of the \texttt{SignatureValue} field to prevent attacks based on the RSA signature forgery~\cite{finney2006bleichenbacher, bleichenbacher1998chosen}. While these intermediate steps are conceptually straightforward, implementing them in a robust and secure manner is a significant challenge.
+
 
 \subsubsection{Formal Verification Challenges} 
 X.509 CCVL involves cryptographic operations, particularly during signature verification. Such cryptographic operations are based on mathematical theories and are computationally complex, making them challenging to formally model and verify. In addition, guaranteeing soundness and completeness of the implementation further intensifies the task. Soundness, ensuring that every certificate chain the process marks as valid is indeed valid according to RFC 5280 specifications, demands a comprehensive approach that leaves no corner case or unusual behavior unchecked, a significant challenge given the complexity of the X.509 standard. Completeness, however, requires the system to confirm the validity of all genuinely valid certificate chains per RFC 5280. Achieving completeness necessitates an exhaustive exploration of all potential valid states and configurations, a daunting endeavor given the broad parameter space and flexibility in the X.509 standard.
