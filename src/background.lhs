@@ -11,7 +11,7 @@ X.509 certificate is a digitally signed document that binds a public key to a sp
 \begin{figure}[h]
 \centering
 \scriptsize
-\includegraphics[scale=0.53]{img/cert_chain.pdf} \\
+\includegraphics[scale=0.5]{img/cert_chain.pdf} \\
 Fields marked with * are optional \\
 \vspace{0.2cm}
 \caption{Graphical representation of X.509 certificate chain}
@@ -31,10 +31,8 @@ Certificate chain validation logic (CCVL) defines the process to verify the auth
 While the aforementioned checks gives an overview of the certificate chain validation, the actual implementation encompasses more restrictions and steps, which we discuss in detail in the subsequent sections.
 
 \subsection{Our Objective}
-The overarching objective of this work is to develop a formally verified reference implementation for the X.509 CCVL. This goal entails formulating a precise formal specification that aligns with the requirements of RFC 5280, ensuring its logical consistency, developing an implementation capable of enforcing all the requirements, and, lastly, applying some formal verification techniques to confirm the implementation's adherence to the formalized specification. For the verification step, we aim to prove the soundness and completeness of our implementation as the top-level properties, which are defined below.
-
-\textbf{Soundness:} If the CCVL implementation ($I$) accepts an input certificate chain ($cc$), then the formal specification ($FS$) also accepts the certificate chain (cc). That means, $\forall cc, I(cc) \implies FS(cc)$.
-
+The overarching objective of this work is to develop a formally verified reference implementation for the X.509 CCVL. This goal entails formulating a precise formal specification that aligns with the requirements of RFC 5280, ensuring its logical consistency, developing an implementation capable of enforcing all the requirements, and, lastly, applying some formal verification techniques to confirm the implementation's adherence to the formalized specification. For the verification step, we aim to prove the soundness and completeness of our implementation as the top-level properties, which are defined below. \\
+\textbf{Soundness:} If the CCVL implementation ($I$) accepts an input certificate chain ($cc$), then the formal specification ($FS$) also accepts the certificate chain (cc). That means, $\forall cc, I(cc) \implies FS(cc)$. \\
 \textbf{Completeness:} If the formal specification ($FS$) accepts an input certificate chain ($cc$), then the CCVL implementation ($I$) also accepts the certificate chain (cc). That means, $\forall cc, FS(cc) \implies \exists I(cc)$.
 
 Soundness and completeness together ensure that an implementation behaves exactly as specified. A sound system does not produce false positives (invalid inputs presented as valid), and a complete system does not produce false negatives (valid inputs presented as invalid). Thus, these properties guarantee that the implementation will always behave as expected.
