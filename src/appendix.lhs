@@ -1,13 +1,13 @@
 \appendix
 \section{Appendix}
-
+\label{app}
 
 \begin{table*}[h]
   \setlength\extrarowheight{1.2pt}
   \setlength{\tabcolsep}{1.5pt}
   \centering
   \sffamily\scriptsize
-  \caption{Semantic properties for a single X.509 certificate.}
+  \caption{Semantic properties for a single X.509 certificate. [TODO : Fix]}
   SCP = Single Certificate Property\enskip
   \vspace{0.5em}
   \sffamily\scriptsize
@@ -42,7 +42,7 @@
   \setlength{\tabcolsep}{1.5pt}
   \centering
   \sffamily\scriptsize
-  \caption{Semantic properties for a chain of X.509 certificates}
+  \caption{Semantic properties for a chain of X.509 certificates. [TODO : Fix]}
   CCP = Certificate Chain Property
   \vspace{0.5em}
   \sffamily\scriptsize
