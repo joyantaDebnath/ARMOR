@@ -134,13 +134,21 @@
 
 
 \section{Empirical Evaluation}
+This section evaluates ARMOR's efficiency, robustness, and applicability in real-world scenarios. Particularly, we conduct differential testing against 11 open-source X.509 implementations to evaluate the performance of ARMOR.
 
 \subsection{Evaluation Questions and Metrics}
+We aim to find answers to the following questions. \\
+\textbf{Accucary of Specification's Interpretation:} How accurate is our interpretation of the CCVL specification? This can be demonstrated by comparing the certificate chain validation results of ARMOR with the results from the test libraries. \\
+\textbf{Performance as Oracle:} How well does ARMOR perform as an oracle? This can be evaluated by examining the discrepancies found in the test libraries' certificate chain validation results compared to ARMOR. \\
+\textbf{Runtime and Memory Overhead:} What is the overhead for runtime and memory when using ARMOR? This can be assessed by comparing the execution times and memory consumption of each test library with those of ARMOR to determine if ARMOR introduces significant runtime and memory overhead or is comparable with the test libraries.
 
-\subsection{Experimental Setup}
-\subsubsection{Differenential Testing}
-\subsubsection{Machine Speicification}
-\subsubsection{Dataset}
-\subsubsection{System Clock Adjustment}
 
-\subsection{Results}
+
+\subsection{Experimental Setup and Dataset}
+Our experimental setup comprises an Intel Core-i7 2.1 Ghz Linux-operated server machine, with Docker~\cite{} as the virtualization layer to facilitate effective parallelization. The dataset used for our experiments is derived from Censys~\cite{censys}, a large-scale certificate database, and consists of a snapshot of 5 billion real certificates downloaded in January 2022. We randomly selected a sample of 2 million certificates from this snapshot, which we divided into 100 subsets to allow for efficient concurrent processing. As the original dataset contained only leaf certificates, we used the ``cert\_chain\_resolver''~\cite{} tool to retrieve the associated intermediate and root CA certificates, thereby constructing valid certificate chains for each leaf certificate. Our differential testing against ARMOR involved the latest versions (as of June 2023) of the following 11 open-source X.509 implementations: OpenSSL~\cite{}, GnuTLS~\cite{}, mbedTLS~\cite{}, BoringSSL~\cite{}, MatrixSSL~\cite{}, wolfSSL~\cite{}, SUN~\cite{}, BoucnyCastle~\cite{}, Certvalidator~\cite{}, Crypto~\cite{}, and CERES~\cite{}. 
+
+Our experimental methodology also includes the development of individual test harnesses for each of the 11 open-source X.509 implementations, guided by their respective standard documentation. For every library, we input the test certificate chains into the associated test harness, capturing data on chain validation outcomes, execution time, and memory consumption for subsequent manual analysis. It is essential to note the time gap of approximately 1.5 years between the collection of the certificate dataset and our actual evaluation, resulting in the expiration of many certificates. To account for this, we implemented a probabilistic approach within our experimental setup. Specifically, in $95\%$ of cases, we adjusted the system time to an older date falling within the validity period of the leaf certificate. In the remaining $5\%$ of cases, we maintained the current system time. This strategy allowed us to evaluate all the semantic rules while navigating the issue of certificate expiration, ensuring a comprehensive and realistic assessment of the certificate validation process.
+
+
+
+\subsection{Findings}

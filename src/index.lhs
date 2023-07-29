@@ -54,7 +54,9 @@
 %include polycode.fmt
 
 \usepackage{multirow}
+\usepackage[T1]{fontenc} 
 \usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage[normalem]{ulem}
 \useunder{\uline}{\ul}{}
 \usepackage[usenames, dvipsnames, table, xcdraw]{xcolor}
@@ -65,7 +67,6 @@
 \usepackage{alltt, amssymb, xspace, setspace,epsfig,multirow,array,color}
 \usepackage[]{algorithm2e}
 \usepackage{hhline}
-\usepackage[draft]{hyperref}
 \usepackage{longtable}
 \usepackage{pifont}
 \usepackage{longtable}
