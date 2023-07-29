@@ -5,6 +5,7 @@ In this section, we present the required toolchain for our formally verified CCV
 We use the Agda theorem prover~\cite{bove2009brief} for formally verifying the CCVL implementation and the formally verified oracle of Morpheus~\cite{yahyazadeh2021morpheus} for signature verification. Now, we present a brief overview of these tools.
 
 \subsubsection{Agda Theorem Prover}
+\label{sec:design-agda}
 Agda~\cite{bove2009brief} is a powerful and expressive programming language that combines functional programming and formal verification. At its core, Agda is a dependently-typed functional programming language, which allows types to be predicated on values. This capability helps express rich properties in types and ensures that the programs conform to these properties. In other words, if a program compiles, it is also proven to meet the specifications described by the types. Another important feature is that Agda supports interactive theorem proving. Programmers can write proofs interactively by filling in parts of proofs, referred to as ``proof holes'' while the Agda compiler checks that every step is correct. This makes Agda a powerful tool for ensuring the correctness of an implementation. 
 
 % Note that we can generate an executable binary of the implementation by first compiling the Agda source code into Haskell and then using a Haskell compiler to compile the generated Haskell code into a binary. 

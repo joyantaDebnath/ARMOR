@@ -1,3 +1,84 @@
+\section{Verification and Correctness Proofs}
+
+\subsection{Sound and Complete Parsing}
+Our approach to verifying our X.509 CCVL parser is to make it \emph{correct by
+  construction}, meaning that there is no distinction between implementation
+and verification as the type of the parser is strong enough to guarantee
+soundness and completeness.
+Taking |BoolValue| as our running example (and simplifying), the type of the
+parser is |Parser BoolValue|, where |Parser| is defined below.
+
+\begin{figure}[h]
+  \centering
+  \begin{code}
+    record Success 
+      (G : List UInt8 -> Set) (xs : List UInt8) : Set where
+      constructor success
+      field
+        @0 prefix : List UInt8
+        suffix : List UInt8
+        @0 pseq : prefix ++ suffix == xs
+        read : Nat
+        @0 readeq : read == length prefix
+        value : G prefix
+
+    data Dec (A : Set) : Set where
+      yes : A -> Dec A
+      no  : not A -> Dec A
+        
+    Parser : (List UInt8 -> Set) -> Set
+    Parser G = (xs : List UInt8) -> Dec (Success G xs)
+  \end{code}
+  \caption{Definition of |Parser|}
+  \label{fig:parser-def}
+\end{figure}
+
+We start by explaining the meaning of |Success|, which expresses what it means
+for the parser to succeed.
+\begin{itemize}
+\item Record |Success| is parameterized by |G : List UInt8 -> Set|, the
+  production rule for the grammar (e.g., |BoolValue|), and |xs : List UInt8|,
+  the bytestring input of the parser.
+  
+\item The parser consumes some |prefix| of the string, with a |suffix|
+  remaining.
+  Field |pseq| captures the relation between the original input and the |prefix|
+  and |suffix| fields: |prefix ++ suffix == xs|.
+  
+\item For parsing TLV-encoded values, it is useful to record the number of bytes
+  consumed in parsing.
+  Since the |prefix| is erased, the field |read| (an unbounded nonnegative
+  integer) stores this number, and field |readeq| enforces that |read| really is
+  this number.
+  
+\item Finally, field |value| is a proof that the |prefix| conforms to the
+  production rule |G|.
+\end{itemize}
+
+With |Success|, we have already \emph{soundness}: whenever the parser succeeds,
+we produce a proof (field |value|) that a prefix of the bytestring is in the
+language denoted by the production rule we parsed.
+Of course, parsing can fail, and a parser that \textbf{always} fails is
+trivially sound.
+To prove \emph{completeness}, we need to know that failure of our parser means
+\emph{no prefix of the input is in the language}.
+This is the role played by |Dec| (which is part of Agda's standard library,
+and whose name refers to \emph{decidability} of a proposition).
+Constructor |yes| is used when the parser succeeds, as it takes a proof of e.g.,
+|Success BoolValue xs|); constructor |no| is used when the parser fails, as it
+takes a proof of e.g., |not Success BoolValue xs| (that is, a proof that the
+truth of |Success BoolValue xs| would entail a contradiction).
+
+With these definitions understood, we can turn to the definition of |Parser|
+itself.
+Concretely, understand |Parser BoolValue| as the proposition that, for all
+bytestring |xs|, it is decidable whether some prefix of |xs| is in the language
+denoted by |BoolValue|.
+
+\subsubsection{Completeness and Secure Completeness}
+% (see Section~\ref{sec:design-agda}).
+% As discussed in Section~\ref{sec:overview-agda}, 
+
 % \section{Detailed Approach} 
 % Our method to formally verify the syntactic and semantic requirements of X.509 CCVL consists of two stages. Initially, we develop formal specifications of the syntactic and semantic requirements. Subsequently, we employ theorem-proving techniques to verify that each formalized specification indeed satisfies the expected properties, which are stated below.
 
@@ -16,7 +97,7 @@
 
 
 
-% % \subsection{Formalization of Specification}
+% % \subsection{ization of Specification}
 
 % % \subsection{Development of X.509 CCVL Implementation}
 % % \subsubsection{Input Pre-processing} pem to base64 decoding
@@ -306,5 +387,3 @@
 % % \subsection{Executable Extraction}
 
 
-
-\section{Verification and Correctness Proofs}
