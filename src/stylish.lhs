@@ -77,6 +77,9 @@
 %subst comment a = "\HSComment{ -\! -" a "}"
 
 %format family     = "\HSKeyword{family}"
+%format record     = "\HSKeyword{record}"
+%format constructor = "\HSKeyword{constructor}"
+%format field      = "\HSKeyword{field}"
 %format pattern    = "\HSKeyword{pattern}"
 %format forall     = "\HSSym{\forall}"
 
