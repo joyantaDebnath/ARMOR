@@ -1,13 +1,30 @@
 \section{Verification and Correctness Proofs}
+We saw in Section~\ref{sec:design-agda} that Agda allows us to write precise
+specifications of X.690 DER and X.509 encoding.
+These specifications are themselves one of our contributions, as they are
+rigorous formalizations of the natural-language descriptions of these encodings.
+The other contributions of our verification efforts are our sound and complete
+parser, proofs of \emph{uniqueness} and \emph{unambiguousness} of the
+specification, and the specifications of, and correct implementations for, the
+semantic validations. 
+
 
 \subsection{Sound and Complete Parsing}
-Our approach to verifying our X.509 CCVL parser is to make it \emph{correct by
-  construction}, meaning that there is no distinction between implementation
-and verification as the type of the parser is strong enough to guarantee
-soundness and completeness.
-Taking |BoolValue| as our running example (and simplifying), the type of the
-parser is |Parser BoolValue|, where |Parser| is defined below.
+Recall that, for a language \(G\), \emph{soundness} of a parser means that every
+bytestring it accepts is in the language, and \emph{completeness} means that it
+accepts every bytestring in the language.
+Our approach to verifying these properties for our X.509 CCVL parser is to make
+it \emph{correct by construction}, meaning that when the parser executes, it
+returns a proof.
+If the parser is successful, this is a proof that some prefix of its input is in
+the language, and if the parser fails, it returns a proof that \emph{no} prefix
+of its input is (we will see later in this section how this treatment of the
+failure case, along with a couple of proofs about the language itself,
+establishes completeness).
 
+Taking |BoolValue| as our running example, the type of the
+parser is |Parser BoolValue|, where |Parser| (a simplified version of our actual
+parser type) is defined below.
 \begin{figure}[h]
   \centering
   \begin{code}
@@ -18,8 +35,6 @@ parser is |Parser BoolValue|, where |Parser| is defined below.
         @0 prefix : List UInt8
         suffix : List UInt8
         @0 pseq : prefix ++ suffix == xs
-        read : Nat
-        @0 readeq : read == length prefix
         value : G prefix
 
     data Dec (A : Set) : Set where
@@ -36,7 +51,7 @@ parser is |Parser BoolValue|, where |Parser| is defined below.
 We start by explaining the meaning of |Success|, which expresses what it means
 for the parser to succeed.
 \begin{itemize}
-\item Record |Success| is parameterized by |G : List UInt8 -> Set|, the
+\item Record |Success| is parameterized by |G : List UInt8 -> Set|, which is the
   production rule for the grammar (e.g., |BoolValue|), and |xs : List UInt8|,
   the bytestring input of the parser.
   
@@ -45,11 +60,11 @@ for the parser to succeed.
   Field |pseq| captures the relation between the original input and the |prefix|
   and |suffix| fields: |prefix ++ suffix == xs|.
   
-\item For parsing TLV-encoded values, it is useful to record the number of bytes
-  consumed in parsing.
-  Since the |prefix| is erased, the field |read| (an unbounded nonnegative
-  integer) stores this number, and field |readeq| enforces that |read| really is
-  this number.
+% \item For parsing TLV-encoded values, it is useful to record the number of bytes
+%   consumed in parsing.
+%   Since the |prefix| is erased, the field |read| (an unbounded nonnegative
+%   integer) stores this number, and field |readeq| enforces that |read| really is
+%   this number.
   
 \item Finally, field |value| is a proof that the |prefix| conforms to the
   production rule |G|.
@@ -65,17 +80,95 @@ To prove \emph{completeness}, we need to know that failure of our parser means
 This is the role played by |Dec| (which is part of Agda's standard library,
 and whose name refers to \emph{decidability} of a proposition).
 Constructor |yes| is used when the parser succeeds, as it takes a proof of e.g.,
-|Success BoolValue xs|); constructor |no| is used when the parser fails, as it
+|Success BoolValue xs|; constructor |no| is used when the parser fails, as it
 takes a proof of e.g., |not Success BoolValue xs| (that is, a proof that the
 truth of |Success BoolValue xs| would entail a contradiction).
 
-With these definitions understood, we can turn to the definition of |Parser|
-itself.
-Concretely, understand |Parser BoolValue| as the proposition that, for all
-bytestring |xs|, it is decidable whether some prefix of |xs| is in the language
+With these definitions understood, we turn to the definition of |Parser|
+itself, which we can read two complementary ways.
+As programmers, we can read |Parser BoolValue| as the type for functions which
+type a bytestring |xs| and returns a tagged union type, where one tag
+corresponds to a successful parse and the other corresponds to a parse failure.
+Reading as mathematicians, |Parser BoolValue| is the proposition that, for all
+bytestrings |xs|, it is decidable whether some prefix of |xs| is in the language
 denoted by |BoolValue|.
 
-\subsubsection{Completeness and Secure Completeness}
+\subsubsection{Completeness}
+While soundness comes as a direct consequence of the definition of |Success|,
+for completeness we need to know some properties hold for the language itself.
+Specifically, the grammar may be ambiguous, meaning multiple prefixes of the
+same input may be in the language; by their types, however, our parser can
+choose only one possibility.
+The challenge that this poses to proving completeness is that if we assume some
+prefix of a bytestring is in the language, even though we can conclude that the
+parser will succeed (by contradiction: if the parser fails, no prefix is in the
+language, contradicting our assumption), we \emph{cannot} know that what we
+parsed was in fact the bytestring we were give (we only know \emph{some} prefix
+was parsed).
+
+An issue related to this concern the specifications themselves, which serve as
+an internal representation of the X.509 certificate.
+If the specification leaves any degrees of freedom in how the parser populates
+this internal data structure, this becomes a source of bugs that undermine the
+very purpose of verification.
+It is desirable to know, therefore, that there is \emph{at most one way} to
+populate these fields.
+
+We call the two properties discussed above \emph{unambiguousness} and
+\emph{uniqueness}, and there meaning is expressed formally in Agda by the
+definitions below.
+\begin{figure}[h]
+  \centering
+  \begin{code}
+Unambiguous : (List UInt8 -> Set) -> Set
+Unambiguous G =  forall {ws xs ys zs} -> ws ++ xs == ys ++ zs
+                 -> G ws -> G ys -> ws == ys
+Unique : (List UInt8 -> Set) -> Set
+Unique G = forall {xs} -> (g h : G xs) -> g == h
+  \end{code}
+  \caption{Definition of unambiguousness and uniqueness}
+  \label{fig:unambig-uniq}
+\end{figure}
+
+Continuing with |BoolValue| as the example, our proofs of |Unambiguous BoolValue|
+and |Unique BoolValue| enable us to prove a lemma that there is only one way to
+successfully parse a Boolean value.
+This lemma is in turn used to prove completeness.
+The statements for both properties, as well as the proof of completeness, are
+shown below.
+\begin{figure}[h]
+  \centering
+  \begin{code}
+uniqueParse : Unique (Success BoolValue)
+uniqueParse = ...
+
+YesAnd : forall {A} -> Dec A -> (A -> Set)
+YesAnd (yes x) Q = Q x
+YesAnd (no x) = False
+
+completeParse :  forall xs -> (v : Success BoolValue xs)
+                 -> YesAnd (parseBoolValue xs) \ x -> x == v
+completeParse xs unique v
+  with parseBoolValue xs
+... | yes x = uniqueParse x v
+... | no  x = contradiction v x
+  \end{code}
+  \caption{Unique parse and completeness}
+  \label{fig:parse-unique-complete}
+\end{figure}
+
+The type of |completeParse| is a bit tricky for those unfamiliar with Agda, so
+we endeavor to explain only the big picture.
+Definition |YesAnd| expresses that a yes-no decision (of type |Dec A|) is
+actually a |yes|, \emph{and} an additional property |Q| holds for the proof
+carried with that |yes|.
+So, |completeParse| says that if some prefix of |xs| is in the language denoted
+by |BoolValue|, then not only will |parseBoolValue| succeed, the |BoolValue| it
+returns is identical to the arbitrary one we have been given.
+In particular, this means we parsed the same prefix as the one assumed to be in
+the language.
+
+\subsection{Semantic Validation}
 % (see Section~\ref{sec:design-agda}).
 % As discussed in Section~\ref{sec:overview-agda}, 
 

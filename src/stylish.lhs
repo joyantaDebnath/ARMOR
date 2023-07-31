@@ -77,6 +77,9 @@
 %subst comment a = "\HSComment{ -\! -" a "}"
 
 %format family     = "\HSKeyword{family}"
+%format record     = "\HSKeyword{record}"
+%format constructor = "\HSKeyword{constructor}"
+%format field      = "\HSKeyword{field}"
 %format pattern    = "\HSKeyword{pattern}"
 %format forall     = "\HSSym{\forall}"
 
@@ -91,6 +94,8 @@
 %%% in kind annotations, it thinks it is a multiplication.
 %format Star       = "\HSCon{*}"
 
+%format Top        = "\HSSym{\top}"
+%format Bot        = "\HSSym{\bot}"
 %format ::         = "\mathrel{\HSSym{::}}"
 %format !!         = "\mathrel{\HSSym{!!}}"
 %format ->         = "\mathrel{\HSSym{\to}} "
