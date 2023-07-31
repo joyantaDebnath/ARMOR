@@ -100,13 +100,13 @@ Specifically, the grammar may be ambiguous, meaning multiple prefixes of the
 same input may be in the language; by their types, however, our parser can
 choose only one possibility.
 The challenge that this poses to proving completeness is that if we assume some
-prefix of a bytestring is in the language, while we can conclude that the
+prefix of a bytestring is in the language, even though we can conclude that the
 parser will succeed (by contradiction: if the parser fails, no prefix is in the
 language, contradicting our assumption), we \emph{cannot} know that what we
 parsed was in fact the bytestring we were give (we only know \emph{some} prefix
 was parsed).
 
-An issue related to this concerns the specifications themselves, which serve as
+An issue related to this concern the specifications themselves, which serve as
 an internal representation of the X.509 certificate.
 If the specification leaves any degrees of freedom in how the parser populates
 this internal data structure, this becomes a source of bugs that undermine the
@@ -130,6 +130,45 @@ Unique G = forall {xs} -> (g h : G xs) -> g == h
   \label{fig:unambig-uniq}
 \end{figure}
 
+Continuing with |BoolValue| as the example, our proofs of |Unambiguous BoolValue|
+and |Unique BoolValue| enable us to prove a lemma that there is only one way to
+successfully parse a Boolean value.
+This lemma is in turn used to prove completeness.
+The statements for both properties, as well as the proof of completeness, are
+shown below.
+\begin{figure}[h]
+  \centering
+  \begin{code}
+uniqueParse : Unique (Success BoolValue)
+uniqueParse = ...
+
+YesAnd : forall {A} -> Dec A -> (A -> Set)
+YesAnd (yes x) Q = Q x
+YesAnd (no x) = False
+
+completeParse :  forall xs -> (v : Success BoolValue xs)
+                 -> YesAnd (parseBoolValue xs) \ x -> x == v
+completeParse xs unique v
+  with parseBoolValue xs
+... | yes x = uniqueParse x v
+... | no  x = contradiction v x
+  \end{code}
+  \caption{Unique parse and completeness}
+  \label{fig:parse-unique-complete}
+\end{figure}
+
+The type of |completeParse| is a bit tricky for those unfamiliar with Agda, so
+we endeavor to explain only the big picture.
+Definition |YesAnd| expresses that a yes-no decision (of type |Dec A|) is
+actually a |yes|, \emph{and} an additional property |Q| holds for the proof
+carried with that |yes|.
+So, |completeParse| says that if some prefix of |xs| is in the language denoted
+by |BoolValue|, then not only will |parseBoolValue| succeed, the |BoolValue| it
+returns is identical to the arbitrary one we have been given.
+In particular, this means we parsed the same prefix as the one assumed to be in
+the language.
+
+\subsection{Semantic Validation}
 % (see Section~\ref{sec:design-agda}).
 % As discussed in Section~\ref{sec:overview-agda}, 
 
