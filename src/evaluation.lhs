@@ -3,7 +3,7 @@ This section evaluates ARMOR's efficiency, robustness, and applicability in real
 
 \subsection{Evaluation Questions and Metrics}
 We aim to find answers to the following questions. \\
-\textbf{Q1. Accucary of Specification's Interpretation:} How accurate is our interpretation of the specification? This can be shown by comparing the certificate chain validation results of ARMOR with the results from the test libraries. \\
+\textbf{Q1. Accuracy of Specification's Interpretation:} How accurate is our interpretation of the specification? This can be shown by comparing the certificate chain validation results of ARMOR with the results from the test libraries. \\
 \textbf{Q2. Performance as Oracle:} How well does ARMOR perform as an oracle? This can be evaluated by examining the discrepancies found in the test libraries' certificate chain validation results compared to ARMOR. \\
 \textbf{Q3. Runtime and Memory Overhead:} What is the overhead for runtime and memory when using ARMOR? This can be assessed by comparing the runtime and memory consumption of each test library with those of ARMOR to determine if ARMOR introduces significant runtime and memory overhead or is comparable with the test libraries.
 
