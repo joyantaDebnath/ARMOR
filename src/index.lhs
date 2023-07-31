@@ -54,7 +54,9 @@
 %include polycode.fmt
 
 \usepackage{multirow}
+\usepackage[T1]{fontenc} 
 \usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage[normalem]{ulem}
 \useunder{\uline}{\ul}{}
 \usepackage[usenames, dvipsnames, table, xcdraw]{xcolor}
@@ -65,7 +67,6 @@
 \usepackage{alltt, amssymb, xspace, setspace,epsfig,multirow,array,color}
 \usepackage[]{algorithm2e}
 \usepackage{hhline}
-\usepackage[draft]{hyperref}
 \usepackage{longtable}
 \usepackage{pifont}
 \usepackage{longtable}
@@ -112,6 +113,7 @@
 \usepackage{smartdiagram} 
 \usepackage[shortlabels]{enumitem}
 \usepackage{cleveref}
+\usepackage{tabularx}
 
 \usepackage[normalem]{ulem}
 
@@ -576,18 +578,16 @@
 \lhsinclude{introduction} 
 %include src/background.lhs
 \lhsinclude{background}
-%include src/related-work.lhs
-\lhsinclude{related-work}
-%include src/overview.lhs
-\lhsinclude{overview}
-%include src/approach.lhs
-\lhsinclude{approach}
-%include src/implementation.lhs
-\lhsinclude{implementation}
+%include src/architecture.lhs
+\lhsinclude{architecture}
+%include src/verification.lhs
+\lhsinclude{verification}
 %include src/evaluation.lhs
 \lhsinclude{evaluation}
 %include src/discussion.lhs
 \lhsinclude{discussion}
+%include src/related-work.lhs
+\lhsinclude{related-work}
 %include src/conclusion.lhs
 \lhsinclude{conclusion}
 %include src/appendix.lhs
