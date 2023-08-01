@@ -56,6 +56,7 @@
 \usepackage{multirow}
 \usepackage[T1]{fontenc} 
 \usepackage{graphicx}
+\usepackage[british]{babel}
 \usepackage{hyperref}
 \usepackage[normalem]{ulem}
 \useunder{\uline}{\ul}{}
@@ -590,13 +591,15 @@
 \lhsinclude{related-work}
 %include src/conclusion.lhs
 \lhsinclude{conclusion}
-%include src/appendix.lhs
-\lhsinclude{appendix}
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
+
+%include src/appendix.lhs
+\lhsinclude{appendix}
 
 \end{document}
