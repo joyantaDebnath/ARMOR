@@ -591,13 +591,15 @@
 \lhsinclude{related-work}
 %include src/conclusion.lhs
 \lhsinclude{conclusion}
-%include src/appendix.lhs
-\lhsinclude{appendix}
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
+
+%include src/appendix.lhs
+\lhsinclude{appendix}
 
 \end{document}
