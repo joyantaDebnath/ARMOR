@@ -31,6 +31,7 @@ Certificate chain validation logic (CCVL) defines the process to verify the auth
 While the aforementioned checks gives an overview of the certificate chain validation, the actual implementation encompasses more restrictions and steps, which we discuss in detail in the subsequent sections.
 
 \subsection{Our Objective}
+\label{sec:our-objective}
 The overarching objective of this work is to develop a formally verified reference implementation for the X.509 CCVL. This goal entails formulating a precise formal specification that aligns with the requirements of RFC 5280, ensuring its logical consistency, developing an implementation capable of enforcing all the requirements, and, lastly, applying some formal verification techniques to confirm the implementation's adherence to the formalized specification. For the verification step, we aim to prove the soundness and completeness of our implementation as the top-level properties, which are defined below. \\
 \textbf{Soundness:} If the CCVL implementation ($I$) accepts an input certificate chain ($cc$), then the formal specification ($FS$) also accepts the certificate chain (cc). That means, $\forall cc, I(cc) \implies FS(cc)$. \\
 \textbf{Completeness:} If the formal specification ($FS$) accepts an input certificate chain ($cc$), then the CCVL implementation ($I$) also accepts the certificate chain (cc). That means, $\forall cc, FS(cc) \implies \exists I(cc)$.

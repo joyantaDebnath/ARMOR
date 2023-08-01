@@ -28,7 +28,7 @@ As an example of Agda's syntax, consider representing the Agda boolean values in
           @0 vr : BoolRep v b
           @0 bseq : bs == [ b ]
     \end{code}
-    \label{code1}
+    \label{fig:code1}
     \caption{Agda example for representing DER boolean type}
   \end{figure}
 

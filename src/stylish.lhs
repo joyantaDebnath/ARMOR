@@ -81,6 +81,7 @@
 %format constructor = "\HSKeyword{constructor}"
 %format field      = "\HSKeyword{field}"
 %format pattern    = "\HSKeyword{pattern}"
+%format with       = "\HSKeyword{with}"
 %format forall     = "\HSSym{\forall}"
 
 %%% A Handy placeholder symbol to have

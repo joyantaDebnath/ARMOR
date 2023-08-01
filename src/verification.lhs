@@ -1,30 +1,100 @@
 \section{Verification and Correctness Proofs}
-We saw in Section~\ref{sec:design-agda} that Agda allows us to write precise
-specifications of X.690 DER and X.509 encoding.
-These specifications are themselves one of our contributions, as they are
-rigorous formalizations of the natural-language descriptions of these encodings.
-The other contributions of our verification efforts are our sound and complete
-parser, proofs of \emph{uniqueness} and \emph{unambiguousness} of the
-specification, and the specifications of, and correct implementations for, the
-semantic validations. 
+This section describes our verification goals and how we achieved them.
+In Section~\ref{sec:our-objective}, we gave a high-level description of our
+primary objectives for verified parsing, \emph{soundness} and
+\emph{completeness}.
+We now explain concretely how this is expressed in Agda (specifically, how
+language membership and parser acceptance are defined) and detail the challenges
+faced for obtaining soundness and completeness.
+We also describe our approach to semantic validation.
+% We saw in Section~\ref{sec:design-agda} that Agda allows us to write precise
+% specifications of X.690 DER and X.509 encoding.
+% These specifications are themselves one of our contributions, as they are
+% rigorous formalizations of the natural-language descriptions of these encodings.
+% The other contributions of our verification efforts are our sound and complete
+% parser, proofs of \emph{uniqueness} and \emph{unambiguousness} of the
+% specification, and the specifications of, and correct implementations for, the
+% semantic validations. 
 
+\subsection{X.509 Specification}
+Our first challenge concerns how the specification is represented, that is,
+answering the question ``soundness and completeness \emph{with respect to
+  what?}''
+Figure~\ref{fig:code1} (Section~\ref{sec:design-agda}) shows the essence of our
+approach: for each production rule |G| of the X.509 and X.690 grammar we
+support, we define a predicate |G : List UInt8 -> Set| over bytestrings (such as
+|BoolValue|).
+Membership of a bytestring |xs| in the language denoted by |G| corresponds to
+the truth of the proposition |G xs|.
+
+For each defined |G| we are careful to document which components are ``data''
+and which are ``specification.''
+For example, field |v| of |BoolValue| is data and the remaining fields are
+specification.
+One of the primary advantages of Agda is that there is one language for both
+programs and proofs, but this strength becomes a challenge when trying to
+enforce this distinction.
+Our approach is to use erasure annotations (|@0|) on components serving
+specificational purposes only.
+This not only improves the performance of ARMOR, as these components are removed
+by the Agda's GHC backend, but it also gives programmers using ARMOR as a reference
+assurance that that those components need not be present in implementations
+designed to run in resource-constrained environments.
+
+\subsubsection{Properties}
+A major advantage of our approach to specifying X.509 is that we can prove
+properties \emph{about} these specifications, increasing trust that we have
+accurately captured the meaning of the natural language descriptions.
+In addition, two properties in particular are essential to our proof of parser
+completeness.
+\begin{itemize}
+\item \textbf{Unambiguous:} at most one prefix of a bytestring can belong to
+  |G|.
+  That means, \(\forall \mathit{ws}\, \mathit{xs}\, \mathit{ys}\, \mathit{zs},
+  \mathit{ws} +\!\!\!+ \mathit{xs} = \mathit{ys} +\!\!\!+ \mathit{zs} \land
+  |G ws| \land |G ys| \implies \mathit{ws} = \mathit{ys}\).
+  
+\item \textbf{Uniqueness:} the internal representation of |G xs| is uniquely
+  determined by |xs|.
+  That means (using \(\mathit{Rep}_{|G|}(x,\mathit{xs})\) to express ``\(x\) is the
+  internal representation of |G xs|''),
+  \(\forall x\, y\, \mathit{xs}, \mathit{Rep}_{|G|}(x,\mathit{xs}) \land
+  \mathit{Rep}_{|G|}(y,\mathit{xs}) \implies x = y\).
+\end{itemize}
+\noindent Both of these properties have been proven for our specification of
+X.509 certificates.
+In Agda, predicates |Unambiguous| and |Unique| are defined as follow.
+\begin{figure}[h]
+  \centering
+  \begin{code}
+    Unambiguous : (List UInt8 -> Set) -> Set
+    Unambiguous G =  forall {ws xs ys zs} -> ws ++ xs == ys ++ zs
+                     -> G ws -> G ys -> ws == ys
+    Unique : (List UInt8 -> Set) -> Set
+    Unique G = forall {xs} -> (g h : G xs) -> g == h
+  \end{code}
+  \caption{Definition of unambiguousness and uniqueness}
+  \label{fig:unambig-uniq}
+\end{figure}
 
 \subsection{Sound and Complete Parsing}
 Recall that, for a language \(G\), \emph{soundness} of a parser means that every
 bytestring it accepts is in the language, and \emph{completeness} means that it
 accepts every bytestring in the language.
 Our approach to verifying these properties for our X.509 CCVL parser is to make
-it \emph{correct by construction}, meaning that when the parser executes, it
-returns a proof.
+it \emph{correct by construction}, meaning that the parser does not merely
+indicate success or failure as a Boolean or integer code, but returns a proof.
 If the parser is successful, this is a proof that some prefix of its input is in
 the language, and if the parser fails, it returns a proof that \emph{no} prefix
-of its input is (we will see later in this section how this treatment of the
-failure case, along with a couple of proofs about the language itself,
-establishes completeness).
+of its input is.
 
-Taking |BoolValue| as our running example, the type of the
-parser is |Parser BoolValue|, where |Parser| (a simplified version of our actual
-parser type) is defined below.
+\subsubsection{Parser Success and Soundness}
+Our first step is to formally define what it means for the parser to be
+successful.
+In FOL, we would express the condition for the parser's success on a prefix of
+|xs| as \(\exists \mathit{ys}\, \mathit{zs}, \mathit{xs} = \mathit{ys} +\!\!\!+
+\mathit{zs} \land |G ys|\).
+In Agda, we express this as the parameterized record |Success|, shown below.
 \begin{figure}[h]
   \centering
   \begin{code}
@@ -36,138 +106,100 @@ parser type) is defined below.
         suffix : List UInt8
         @0 pseq : prefix ++ suffix == xs
         value : G prefix
+  \end{code}
+  \caption{Success conditions for parsing}
+  \label{fig:parser-success}
+\end{figure}
 
-    data Dec (A : Set) : Set where
-      yes : A -> Dec A
-      no  : not A -> Dec A
-        
-    Parser : (List UInt8 -> Set) -> Set
-    Parser G = (xs : List UInt8) -> Dec (Success G xs)
+Note that fields |prefix| (the consumed prefix) and |pseq| (relating the prefix
+and suffix to the original bytestring) are erased from runtime; the data carried
+at runtime is the remaining bytestring to parse, |suffix|, and the parsed value,
+|value|, a proof that |prefix| is in the language denoted by |G|.
+As a consequence, \textbf{soundness is immediate}.
+
+\subsubsection{Parser Failure and Completeness}
+Our next step is to define what parser failure means.
+We define this to be the condition that \emph{no} prefix of the input |xs| is in
+the language of |G|, which is to say the failure condition is the
+\emph{negation} of the success condition: |not Success G xs|.
+
+To have the parser return |Success G xs| on success and |not Success G xs| on
+failure, we turn datatype |Dec| in the Agda standard library, shown below.
+\begin{code}
+data Dec (A : Set) : Set where
+  yes : A -> Dec A
+  no  : not A -> Dec A
+\end{code}
+Reading |Dec| as programmers, |Dec A| is a tagged union type which can be
+populated using either values of type |A| or type |not A|; as mathematicians, we
+read it as the type of proofs that |A| is \emph{decidable}.
+Expressed as a formula of FOL, |Dec A| is simply \(A \lor \neg A\); however,
+note that constructive logic (upon which Agda is based) does not admit LEM, so
+this disjunction must be proven on a case-by-case basis for each |A| in
+question, as there are some propositions which can neither be proven nor refuted.
+
+We are now able to complete the definition of the type of parsers, shown below.
+\begin{figure}[h]
+  \centering
+  \begin{code}
+Parser : (List UInt8 -> Set) -> Set
+Parser G = (xs : List UInt8) -> Dec (Success G xs)    
   \end{code}
   \caption{Definition of |Parser|}
   \label{fig:parser-def}
-\end{figure}
+\end{figure}%
+|Parser| is a family of types, where for each language |G| family member
+|Parser G| is the proposition that, for all bytestrings |xs|, it is decidable
+whether some prefix of |xs| is in |G|; alternatively, we can (as programmers)
+read it as the type of functions with take a bytestring and possibly return a
+parsed data structure and remaining bytestring to continue parsing.
 
-We start by explaining the meaning of |Success|, which expresses what it means
-for the parser to succeed.
-\begin{itemize}
-\item Record |Success| is parameterized by |G : List UInt8 -> Set|, which is the
-  production rule for the grammar (e.g., |BoolValue|), and |xs : List UInt8|,
-  the bytestring input of the parser.
-  
-\item The parser consumes some |prefix| of the string, with a |suffix|
-  remaining.
-  Field |pseq| captures the relation between the original input and the |prefix|
-  and |suffix| fields: |prefix ++ suffix == xs|.
-  
-% \item For parsing TLV-encoded values, it is useful to record the number of bytes
-%   consumed in parsing.
-%   Since the |prefix| is erased, the field |read| (an unbounded nonnegative
-%   integer) stores this number, and field |readeq| enforces that |read| really is
-%   this number.
-  
-\item Finally, field |value| is a proof that the |prefix| conforms to the
-  production rule |G|.
-\end{itemize}
+\textbf{Completeness:} To finish, we now explain how our setup guarantees
+completeness.
+Assuming |G| is a language that satisfies |Unambiguous| and |Unique|
+(Figure~\ref{fig:unambig-uniq}) (in particular, our specification
+of X.509 certificates satisfies both), we are given a bytestring |xs| such that
+some prefix of |xs| is in |G| (i.e., a value of type |Success G xs|), and must
+show that our parser accepts precisely the same prefix of |xs|.
+We analyze the two possible results of running the parser.
+If the parser fails, that means \emph{no} prefix of |xs| is in |G|, but this
+contradicts our assumption, so it must be that the parser succeeds, giving us
+another value of type |Success G xs|
+By a lemma, that |G| satisfies |Unambiguous| and |Unique| gives us that
+|Success G| is also unique, meaning in particular that the two prefixes are the same.
 
-With |Success|, we have already \emph{soundness}: whenever the parser succeeds,
-we produce a proof (field |value|) that a prefix of the bytestring is in the
-language denoted by the production rule we parsed.
-Of course, parsing can fail, and a parser that \textbf{always} fails is
-trivially sound.
-To prove \emph{completeness}, we need to know that failure of our parser means
-\emph{no prefix of the input is in the language}.
-This is the role played by |Dec| (which is part of Agda's standard library,
-and whose name refers to \emph{decidability} of a proposition).
-Constructor |yes| is used when the parser succeeds, as it takes a proof of e.g.,
-|Success BoolValue xs|; constructor |no| is used when the parser fails, as it
-takes a proof of e.g., |not Success BoolValue xs| (that is, a proof that the
-truth of |Success BoolValue xs| would entail a contradiction).
-
-With these definitions understood, we turn to the definition of |Parser|
-itself, which we can read two complementary ways.
-As programmers, we can read |Parser BoolValue| as the type for functions which
-type a bytestring |xs| and returns a tagged union type, where one tag
-corresponds to a successful parse and the other corresponds to a parse failure.
-Reading as mathematicians, |Parser BoolValue| is the proposition that, for all
-bytestrings |xs|, it is decidable whether some prefix of |xs| is in the language
-denoted by |BoolValue|.
-
-\subsubsection{Completeness}
-While soundness comes as a direct consequence of the definition of |Success|,
-for completeness we need to know some properties hold for the language itself.
-Specifically, the grammar may be ambiguous, meaning multiple prefixes of the
-same input may be in the language; by their types, however, our parser can
-choose only one possibility.
-The challenge that this poses to proving completeness is that if we assume some
-prefix of a bytestring is in the language, even though we can conclude that the
-parser will succeed (by contradiction: if the parser fails, no prefix is in the
-language, contradicting our assumption), we \emph{cannot} know that what we
-parsed was in fact the bytestring we were give (we only know \emph{some} prefix
-was parsed).
-
-An issue related to this concern the specifications themselves, which serve as
-an internal representation of the X.509 certificate.
-If the specification leaves any degrees of freedom in how the parser populates
-this internal data structure, this becomes a source of bugs that undermine the
-very purpose of verification.
-It is desirable to know, therefore, that there is \emph{at most one way} to
-populate these fields.
-
-We call the two properties discussed above \emph{unambiguousness} and
-\emph{uniqueness}, and there meaning is expressed formally in Agda by the
-definitions below.
+The preceding proof sketch is formalized in our Agda development.
+Figure~\ref{fig:parse-unique-complete} shows a simplified version of the proof.
 \begin{figure}[h]
   \centering
   \begin{code}
-Unambiguous : (List UInt8 -> Set) -> Set
-Unambiguous G =  forall {ws xs ys zs} -> ws ++ xs == ys ++ zs
-                 -> G ws -> G ys -> ws == ys
-Unique : (List UInt8 -> Set) -> Set
-Unique G = forall {xs} -> (g h : G xs) -> g == h
-  \end{code}
-  \caption{Definition of unambiguousness and uniqueness}
-  \label{fig:unambig-uniq}
-\end{figure}
-
-Continuing with |BoolValue| as the example, our proofs of |Unambiguous BoolValue|
-and |Unique BoolValue| enable us to prove a lemma that there is only one way to
-successfully parse a Boolean value.
-This lemma is in turn used to prove completeness.
-The statements for both properties, as well as the proof of completeness, are
-shown below.
-\begin{figure}[h]
-  \centering
-  \begin{code}
-uniqueParse : Unique (Success BoolValue)
+uniqueParse : Unique (Success G)
 uniqueParse = ...
 
-YesAnd : forall {A} -> Dec A -> (A -> Set)
-YesAnd (yes x) Q = Q x
-YesAnd (no x) = False
+SucceedsAndEq : forall {A} -> Dec A -> A -> Set
+SucceedsAndEq (yes x) v = x == v
+SucceedsAndEq (no x) v = False
 
-completeParse :  forall xs -> (v : Success BoolValue xs)
-                 -> YesAnd (parseBoolValue xs) \ x -> x == v
-completeParse xs unique v
-  with parseBoolValue xs
-... | yes x = uniqueParse x v
+completeParse :  forall xs -> (v : Success Q xs)
+                 -> SucceedsAndEq (parse xs) v
+completeParse xs v
+  with parse xs
 ... | no  x = contradiction v x
+... | yes x = uniqueParse x v
   \end{code}
   \caption{Unique parse and completeness}
   \label{fig:parse-unique-complete}
 \end{figure}
-
-The type of |completeParse| is a bit tricky for those unfamiliar with Agda, so
-we endeavor to explain only the big picture.
-Definition |YesAnd| expresses that a yes-no decision (of type |Dec A|) is
-actually a |yes|, \emph{and} an additional property |Q| holds for the proof
-carried with that |yes|.
-So, |completeParse| says that if some prefix of |xs| is in the language denoted
-by |BoolValue|, then not only will |parseBoolValue| succeed, the |BoolValue| it
-returns is identical to the arbitrary one we have been given.
-In particular, this means we parsed the same prefix as the one assumed to be in
-the language.
-
+The code listing of the figure has as parameters |G : List UInt8 -> Set| (the
+language), proofs that |G| satisfies |Unambiguous| and |Unique|, and a parser
+|parse : Parser G|.
+Lemma |uniqueParse| gives the result that successful parses are unique, and the
+binary relation |SucceedsAndEq| expresses that our parser succeeds and returns a
+value equal to a specified |v| (|False| is the trivially false proposition).
+Finally, |completeParse| is the proof of completeness, which proceeds by running
+|parse xs| and inspecting the result: the case that the parser fails contradicts
+our assumption, and in the case that the parser succeeds, we invoke the lemma
+|uniqueParse|.
 \subsection{Semantic Validation}
 % (see Section~\ref{sec:design-agda}).
 % As discussed in Section~\ref{sec:overview-agda}, 
