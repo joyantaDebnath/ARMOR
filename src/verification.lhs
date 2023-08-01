@@ -200,7 +200,72 @@ Finally, |completeParse| is the proof of completeness, which proceeds by running
 |parse xs| and inspecting the result: the case that the parser fails contradicts
 our assumption, and in the case that the parser succeeds, we invoke the lemma
 |uniqueParse|.
+
 \subsection{Semantic Validation}
+
+Our approach to semantic validation, as outlined in
+Section~\ref{sec:semantic-checker}, is separating those properties that should
+be verified for a single certificate and those that concern the entire chain.
+For each property to validate, we formulate in Agda a predicate expressing
+satisfaction of the property by a given certificate or chain, then prove that
+these predicates are decidable.
+These decidability proofs then serve as the functions called after parsing to
+check whether the certificate or chain satisfies the property.
+
+We consider two concrete examples, one each for a single-certificate and
+certificate chain property.
+For a single certificate, it must be the case that the \texttt{SignatureAlgorithm} field
+must contain the same algorithm identifier as the \texttt{Signature} field of
+the \texttt{TbsCertificate} (SCP1 in Table~\ref{scp} of the Appendix).
+As a formula of FOL, we could express this property with respect to
+certificate \(c\) as
+\[
+  \forall s_1\, s_2, \mathit{SignAlg}(s_1,c) \land \mathit{TbsCertSignAlg}(s_2,c)
+  \implies s_1 = s_2
+\]
+where \(\mathit{SignAlg}(s_1,c)\) and \(\mathit{TbsCertSignAlg}(s_2,c)\) express
+respectively the properties that \(s_1\) is the signature algorithm identifier
+of \(c\) and that \(s_2\) is the signature algorithm identifier of the
+\texttt{TbsCertificate} of \(c\).
+In Agda, we express this property, and its corresponding decidability proof, as
+follows.
+
+\begin{code}
+SCP1 : forall {@0 bs} -> Cert bs -> Set
+SCP1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
+
+scp1 : forall {@0 bs} (c : Cert bs) -> Dec (SCP1 c)
+scp1 c = ...  
+\end{code}
+
+For a certificate chain, it must be the case that a certificate does not appear
+more than once in a prospective certificate path (CCP5 in Table~\ref{ccp}).
+As a formula of FOL, we could express this property with respect to a
+certificate chain \(\mathit{cc}\) as
+\[
+  \begin{array}{l}
+    \forall c_1\, c_2\, i_1\, i_2, \mathit{InChain}(c_1,i_1,\mathit{cc}) \land
+    \mathit{InChain}(c_2,i_2,\mathit{cc}) \land i_1 \neq i_2
+    \\ \quad \implies c_1 \neq c_2
+  \end{array}
+\]
+where \(\mathit{InChain}(c_1,i_1,\mathit{cc})\) is the property that certificate
+\(c_1\) is at index \(i_1\) in chain \(\mathit{cc}\).
+The Agda standard library provides a definition of the property that all entries
+of a list are distinct from each other, written below as |List.Unique|, as well
+as a proof that this property is decidable, written |List.unique?|, provided
+that the type of the list's elements support decidable equality.
+We have proven equality is decidable for certificates, so we can express this
+property and corresponding decidability proof in Agda as
+\begin{code}
+CCP5 : forall {@0 bs} -> Chain bs -> Set
+CCP5 c = List.Unique (chainToList c)
+
+ccp5 : forall {@0 bs} (c : Chain bs) -> Dec (CCP5 c)
+ccp5 c = List.unique?  (chainToList c)
+\end{code}
+where we have defined function |chainToList| to convert a certificate chain to a
+list of certificates.
 % (see Section~\ref{sec:design-agda}).
 % As discussed in Section~\ref{sec:overview-agda}, 
 

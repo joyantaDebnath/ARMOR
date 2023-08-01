@@ -15,22 +15,22 @@ As an example of Agda's syntax, consider representing the Agda boolean values in
 \begin{figure}[h]
   \centering
   \begin{code}
-      data BoolRep : Bool -> UInt8 -> Set where
-        falser : BoolRep false (UInt8.fromN 0)
-        truer  : BoolRep true (UInt8.fromN 255)
+data BoolRep : Bool -> UInt8 -> Set where
+  falser : BoolRep false (UInt8.fromN 0)
+  truer  : BoolRep true (UInt8.fromN 255)
 
 
-      record BoolValue (@0 bs : List UInt8) : Set where
-        constructor mkBoolValue
-        field
-          v     : Bool
-          @0 b  : UInt8
-          @0 vr : BoolRep v b
-          @0 bseq : bs == [ b ]
-    \end{code}
-    \label{fig:code1}
-    \caption{Agda example for representing DER boolean type}
-  \end{figure}
+record BoolValue (@0 bs : List UInt8) : Set where
+  constructor mkBoolValue
+  field
+    v     : Bool
+    @0 b  : UInt8
+    @0 vr : BoolRep v b
+    @0 bseq : bs == [ b ]
+  \end{code}
+  \caption{Agda example for representing DER boolean type}
+  \label{fig:code1}
+\end{figure}
 
 Here, |BoolRep| is a dependent type representing a binary relationship between Agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned integers or octet values stipulated by the X.690 DER), where the |falser| constructor associates the false boolean value with 0, and the |truer| constructor associates true with 255. The function |UInt8.fromN| transforms a non-negative unbounded integer into its equivalent |UInt8| representation. It is important to note that this transformation is contingent upon Agda's ability to automatically verify that the provided number is less than 256. Also, the keyword |Set| (referred to as the type of types) defines the type of |BoolRep|, indicating that |BoolRep| maps specific pairs of |Bool| and |UInt8| values to unique types. Subsequently, we can construct a dependent and parameterized record type, |BoolValue|, to represent the boolean value defined by X.690. This record type, essentially a predicate over byte-strings, includes the boolean value |v|, its byte-string representation |b|, a proof |vr| that |b| is the correct representation of |v|, and a proof |bseq| that the byte-string representation |bs| of this grammatical terminal is a singleton list containing |b|. The |@0| annotations applied to types and fields specify that these values are erased at runtime to minimize execution overhead and to mark parts of the formalization used solely for verification purposes. In short, |BoolRep| verifies the correct mapping between boolean values and their numerical representations, while |BoolValue| holds the boolean value, its numerical representation, and the proof of the correctness of this representation, returned by the |BoolRep|.
 
@@ -86,7 +86,9 @@ Now we provide details on our implementation, including the reasons behind speci
 
 \subsubsection{String Transformer Module} To verify the semantic check related to name chaining, our approach involves matching the issuer-distinguished name from one certificate with the subject name present in the issuer CA certificate. This matching algorithm is defined in Section 7.1 of RFC 5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP StringPrep profile, as described in RFC 4518~\cite{zeilenga2006lightweight}. However, the wide variety of languages and character sets present many cases to cover, leading to considerable complexity. Our initial implementation, which encapsulated all the transformations in a single Agda module, overwhelmed the compiler due to the sheer volume of cases. As a solution, we have divided the transformations across 16 sub-modules, allowing for their sequential compilation, thereby enhancing the system's efficiency and manageability without compromising the comprehensiveness of the transformations.
 
-\subsubsection{Semantic Checker Module} We currently support 28 semantic properties; Of these, 18 properties are applicable for verifying compliance within a single certificate, while the remaining ten are related to checking properties across different certificates in a chain. The specific semantic properties we cover are listed in Table~\ref{scp} and~\ref{ccp} of the Appendix~\ref{app}. Note that we conduct the signature verification and trust anchor check outside the verified Agda code due to the computational complexity of these tasks and the requirements of external cryptographic libraries. \\
+\subsubsection{Semantic Checker Module}
+\label{sec:semantic-checker}
+We currently support 28 semantic properties; Of these, 18 properties are applicable for verifying compliance within a single certificate, while the remaining ten are related to checking properties across different certificates in a chain. The specific semantic properties we cover are listed in Table~\ref{scp} and~\ref{ccp} of the Appendix~\ref{app}. Note that we conduct the signature verification and trust anchor check outside the verified Agda code due to the computational complexity of these tasks and the requirements of external cryptographic libraries. \\
 \textbf{Signature Verification:} We currently support only RSA signature verification, primarily because over $95\%$ of certificates employ RSA public keys, corroborated by our measurement studies on 5 billion real certificates in the Censys dataset~\cite{censys}. However, the RSA Signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the Agda code, we utilize Python's cryptography library and Morpheus's formally verified code to perform the signature verification externally. This approach allows us to focus on leveraging Agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in Python and Morpheus. \\
 \textbf{Trust Anchor Check:} The trust anchor check generally involves verifying if the root CA certificate is present in the trusted CA store of the verifier's system. However, in practice, this root store can also include intermediate CA certificates or even the end-entity certificate itself. This allows the validation process to proceed in reverse order, starting from the end-entity certificate and moving toward the root CA certificate until a match is found in the trusted CA store. Given that this process can be accomplished by directly mapping the DER bytestring of the input certificates to those in the trusted store, we delegate this task to our driver module as the final step in the validation process. This division of labor allows us to leave the straightforward task of bytestring comparison to the driver module.
 
