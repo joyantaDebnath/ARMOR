@@ -59,30 +59,30 @@ Figure~\ref{armor} shows the high-level architecture of ARMOR, which consists of
 Now we provide details on our implementation, including the reasons behind specific design choices.
 
 
-\subsubsection{Parser Module} The parser module includes both a Base64 decoder and a DER certificate parser. In our current configuration, we offer support for ten certificate extensions. These extensions have been selected based on their frequency of occurrence as indicated by previous research~\cite{debnath2021re}. The complete list of these supported extensions are shown in Table~\ref{ext_freq}. This suite of extensions provides comprehensive coverage for the most common scenarios encountered in certificate parsing and decoding.
+\subsubsection{Parser Module} The parser module includes both a Base64 decoder and a DER certificate parser. In our current configuration, we support 10 certificate extensions, similar to previous study~\cite{debnath2021re}. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. The list of extensions supported by ARMOR are-- Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Acces.
 
-\begin{table}[h]
-  \setlength\extrarowheight{1.2pt}
-  \setlength{\tabcolsep}{1.5pt}
-  \centering
-  \sffamily\tiny
-  \caption{TODO: Fix this table}
-  \sffamily\tiny
-  \begin{tabular}{||l||c||c||l||c||c||}
-  \hline
-  \textbf{Extension}                                  & \textbf{Freq.} & \textbf{Perc.} & \textbf{Extension}                              & \multicolumn{1}{||c||}{\textbf{Freq.}} & \multicolumn{1}{||c||}{\textbf{Perc.}} \\ \hline
-  {\color[HTML]{00009B} Basic Constraints}            & 1,182,963,794           & 95.85\%             & {\color[HTML]{00009B} Issuer Alternative Names} & 1,577,915                                   & 0.12\%                                   \\ \hline
-  {\color[HTML]{00009B} Authority Key Identifier}     & 1,179,639,634           & 95.57\%             & Subject Directory Attributes                    & 14,881                                     & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} Subject Alternative Name}     & 1,172,888,944           & 95.03\%             & Name Constraints                                & 7,600                                      & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} Subject Key Identifier}       & 1,170,590,756           & 94.85\%             & Freshest CRL                                    & 6,587                                      & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} Key Usage}                    & 1,155,599,607           & 93.63\%             & Policy Constraints                              & 451                                       & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} Extended Key Usage}           & 1,151,884,357           & 93.33\%             & Policy Mapping                                  & 347                                       & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} Authority Information Access} & 1,141,133,734           & 92.46\%             & Subject Information Access                      & 337                                       & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} Certificate Policy}           & 1,138,776,440           & 92.27\%             & Inhibit Policy                                  & 253                                       & 0\%                                      \\ \hline
-  {\color[HTML]{00009B} CRL Distribution Points}      & 278,689,659            & 22.58\%             & \multicolumn{3}{l}{}     \\ \hline                                                                                                           
-  \end{tabular}
-  \label{ext_freq}
-  \end{table}
+% \begin{table}[h]
+%   \setlength\extrarowheight{1.2pt}
+%   \setlength{\tabcolsep}{1.5pt}
+%   \centering
+%   \sffamily\tiny
+%   \caption{TODO: Fix this table}
+%   \sffamily\tiny
+%   \begin{tabular}{||l||c||c||l||c||c||}
+%   \hline
+%   \textbf{Extension}                                  & \textbf{Freq.} & \textbf{Perc.} & \textbf{Extension}                              & \multicolumn{1}{||c||}{\textbf{Freq.}} & \multicolumn{1}{||c||}{\textbf{Perc.}} \\ \hline
+%   {\color[HTML]{00009B} Basic Constraints}            & 1,182,963,794           & 95.85\%             & {\color[HTML]{00009B} Issuer Alternative Names} & 1,577,915                                   & 0.12\%                                   \\ \hline
+%   {\color[HTML]{00009B} Authority Key Identifier}     & 1,179,639,634           & 95.57\%             & Subject Directory Attributes                    & 14,881                                     & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} Subject Alternative Name}     & 1,172,888,944           & 95.03\%             & Name Constraints                                & 7,600                                      & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} Subject Key Identifier}       & 1,170,590,756           & 94.85\%             & Freshest CRL                                    & 6,587                                      & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} Key Usage}                    & 1,155,599,607           & 93.63\%             & Policy Constraints                              & 451                                       & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} Extended Key Usage}           & 1,151,884,357           & 93.33\%             & Policy Mapping                                  & 347                                       & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} Authority Information Access} & 1,141,133,734           & 92.46\%             & Subject Information Access                      & 337                                       & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} Certificate Policy}           & 1,138,776,440           & 92.27\%             & Inhibit Policy                                  & 253                                       & 0\%                                      \\ \hline
+%   {\color[HTML]{00009B} CRL Distribution Points}      & 278,689,659            & 22.58\%             & \multicolumn{3}{l}{}     \\ \hline                                                                                                           
+%   \end{tabular}
+%   \label{ext_freq}
+%   \end{table}
 
 \subsubsection{String Transformer Module} To verify the semantic check related to name chaining, our approach involves matching the issuer-distinguished name from one certificate with the subject name present in the issuer CA certificate. This matching algorithm is defined in Section 7.1 of RFC 5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP StringPrep profile, as described in RFC 4518~\cite{zeilenga2006lightweight}. However, the wide variety of languages and character sets present many cases to cover, leading to considerable complexity. Our initial implementation, which encapsulated all the transformations in a single Agda module, overwhelmed the compiler due to the sheer volume of cases. As a solution, we have divided the transformations across 16 sub-modules, allowing for their sequential compilation, thereby enhancing the system's efficiency and manageability without compromising the comprehensiveness of the transformations.
 
