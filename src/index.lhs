@@ -145,6 +145,7 @@
 \newcommand{\xsno}{X.690\xspace}
 \newcommand{\der}{DER\xspace}
 \newcommand{\pem}{PEM\xspace}
+\newcommand{\ber}{BER\xspace}
 \newcommand{\asnone}{ASN.1\xspace}
 \newcommand{\basesf}{Base64\xspace}
 
@@ -167,9 +168,14 @@
 \newcommand{\bouncycastle}{\ensuremath{\mathsf{BouncyCastle}}\xspace}
 \newcommand{\crypto}{\ensuremath{\mathsf{Crypto}}\xspace}
 
+\newcommand{\cryptography}{\ensuremath{\mathsf{Cryptography}}\xspace}
+
 
 \newcommand{\censys}{\ensuremath{\mathsf{Censys}}\xspace}
 \newcommand{\frankencert}{\ensuremath{\mathsf{Frankencert}}\xspace}
+\newcommand{\morpheus}{\ensuremath{\mathsf{Morpheus}}\xspace}
+\newcommand{\coq}{\ensuremath{\mathsf{Coq}}\xspace}
+\newcommand{\ghc}{\ensuremath{\mathsf{GHC}}\xspace}
 
 \newcommand{\stringprep}{\ensuremath{\mathsf{StringPrep}}\xspace}
 
