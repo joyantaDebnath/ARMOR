@@ -149,11 +149,18 @@
 \newcommand{\asnone}{ASN.1\xspace}
 \newcommand{\basesf}{Base64\xspace}
 
+\newcommand{\sdsi}{SDSI\textbackslash SPKI\xspace}
+\newcommand{\pgp}{PGP\xspace}
+\newcommand{\dns}{DNS\xspace}
+\newcommand{\dane}{DANE\xspace}
+\newcommand{\dnssec}{DNSSEC\xspace}
+\newcommand{\tlsa}{TLSA\xspace}
+
 \newcommand{\soundness}{\textit{Soundness}\xspace}
 \newcommand{\completeness}{\textit{Completeness}\xspace}
 
-\newcommand{\fuzzing}{\textit{fuzzing}\xspace}
-\newcommand{\symex}{\textit{symbolic execution}\xspace}
+\newcommand{\fuzzing}{\textit{Fuzzing}\xspace}
+\newcommand{\symex}{\textit{Symbolic Execution}\xspace}
 
 \newcommand{\armor}{\ensuremath{\mathsf{ARMOR}}\xspace}
 \newcommand{\ceres}{\ensuremath{\mathsf{CERES}}\xspace}
@@ -165,7 +172,7 @@
 \newcommand{\wolfssl}{\ensuremath{\mathsf{WolfSSL}}\xspace}
 \newcommand{\certvalidator}{\ensuremath{\mathsf{Certvalidator}}\xspace}
 \newcommand{\sun}{\ensuremath{\mathsf{Sun}}\xspace}
-\newcommand{\bouncycastle}{\ensuremath{\mathsf{BouncyCastle}}\xspace}
+\newcommand{\bouncycastle}{\ensuremath{\mathsf{Bouncy\mspace{4mu} Castle}}\xspace}
 \newcommand{\crypto}{\ensuremath{\mathsf{Crypto}}\xspace}
 
 \newcommand{\cryptography}{\ensuremath{\mathsf{Cryptography}}\xspace}
@@ -176,8 +183,17 @@
 \newcommand{\morpheus}{\ensuremath{\mathsf{Morpheus}}\xspace}
 \newcommand{\coq}{\ensuremath{\mathsf{Coq}}\xspace}
 \newcommand{\ghc}{\ensuremath{\mathsf{GHC}}\xspace}
+\newcommand{\libfaketime}{\ensuremath{\mathsf{Libfaketime}}\xspace}
+\newcommand{\docker}{\ensuremath{\mathsf{Docker}}\xspace}
 
 \newcommand{\stringprep}{\ensuremath{\mathsf{StringPrep}}\xspace}
+
+\newcommand{\crl}{\ensuremath{\mathsf{CRL}}\xspace}
+\newcommand{\ocsp}{\ensuremath{\mathsf{OCSP}}\xspace}
+\newcommand{\crlsets}{\ensuremath{\mathsf{CRLSets}}\xspace}
+\newcommand{\onecrl}{\ensuremath{\mathsf{OneCRL}}\xspace}
+\newcommand{\crlite}{\ensuremath{\mathsf{CRLite}}\xspace}
+\newcommand{\ocspstapling}{\ensuremath{\mathsf{OCSP\mhyphen Stapling}}\xspace}
 
 \newcommand{\python}{\texttt{Python}\xspace}
 \newcommand{\cpp}{\texttt{C\textbackslash C++}\xspace}
