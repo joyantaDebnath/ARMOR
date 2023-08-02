@@ -59,37 +59,44 @@ Figure~\ref{armor} shows the high-level architecture of \armor, which consists o
 Now we provide details on our implementation, including the reasons behind specific design choices.
 
 
-\subsubsection{Parser Module} The \parser module includes both a \basesf decoder and a \der certificate parser. In our current configuration, we support $10$ certificate extensions, similar to previous study~\cite{debnath2021re}. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. The list of extensions supported by \armor are-- Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
+\subsubsection{Parser Module} The \parser module includes both a \basesf decoder and a \der certificate parser. In our current configuration, we support $10$ certificate extensions. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. When any other extension is present, we only consume the corresponding bytes of the extension to continue parsing rest of the certificate fields.
+Table~\ref{extfreq} shows our analysis on the frequency of different extensions based on $1.5$ billion real certificates collected from the \censys~\cite{censys} certificate repository in January $2022$. Based on this measurement study, we support the following extensions-- Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
 
-% \begin{table}[h]
-%   \setlength\extrarowheight{1.2pt}
-%   \setlength{\tabcolsep}{1.5pt}
-%   \centering
-%   \sffamily\tiny
-%   \caption{TODO: Fix this table}
-%   \sffamily\tiny
-%   \begin{tabular}{||l||c||c||l||c||c||}
-%   \hline
-%   \textbf{Extension}                                  & \textbf{Freq.} & \textbf{Perc.} & \textbf{Extension}                              & \multicolumn{1}{||c||}{\textbf{Freq.}} & \multicolumn{1}{||c||}{\textbf{Perc.}} \\ \hline
-%   {\color[HTML]{00009B} Basic Constraints}            & 1,182,963,794           & 95.85\%             & {\color[HTML]{00009B} Issuer Alternative Names} & 1,577,915                                   & 0.12\%                                   \\ \hline
-%   {\color[HTML]{00009B} Authority Key Identifier}     & 1,179,639,634           & 95.57\%             & Subject Directory Attributes                    & 14,881                                     & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} Subject Alternative Name}     & 1,172,888,944           & 95.03\%             & Name Constraints                                & 7,600                                      & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} Subject Key Identifier}       & 1,170,590,756           & 94.85\%             & Freshest CRL                                    & 6,587                                      & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} Key Usage}                    & 1,155,599,607           & 93.63\%             & Policy Constraints                              & 451                                       & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} Extended Key Usage}           & 1,151,884,357           & 93.33\%             & Policy Mapping                                  & 347                                       & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} Authority Information Access} & 1,141,133,734           & 92.46\%             & Subject Information Access                      & 337                                       & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} Certificate Policy}           & 1,138,776,440           & 92.27\%             & Inhibit Policy                                  & 253                                       & 0\%                                      \\ \hline
-%   {\color[HTML]{00009B} CRL Distribution Points}      & 278,689,659            & 22.58\%             & \multicolumn{3}{l}{}     \\ \hline                                                                                                           
-%   \end{tabular}
-%   \label{ext_freq}
-%   \end{table}
+
+\begin{table}[h]
+  \captionsetup{font=footnotesize}
+  \centering
+       \setlength\extrarowheight{1.5pt}
+       \setlength{\tabcolsep}{1.5pt}
+       \sffamily\scriptsize
+  \caption{Frequencies of extensions in \censys certificates}
+  \sffamily\scriptsize
+  Freq = Frequency \quad  Perc = Percentage \enskip
+        \vspace{0.5em}
+        \label{extfreq}
+        \sffamily\tiny
+    \centering
+  \begin{tabular}{||l||c||c||l||c||c||}
+  \hline
+  \textbf{Extension}                                  & \textbf{Freq} & $\approx$ \textbf{Perc} & \textbf{Extension}                              & \multicolumn{1}{||c||}{\textbf{Freq}} & \multicolumn{1}{||c||}{$\approx$ \textbf{Perc}} \\ \hline
+  {\color[HTML]{00009B} Basic Constraints}            & 1,381,870,876           & 92\%             & {\color[HTML]{00009B} Issuer Alternative Names} & 2,36,050                                   & 0\%                                   \\ \hline
+  {\color[HTML]{00009B} Authority Key Identifier}     & 1,292,396,530           & 86\%             & Subject Directory Attributes                    & 5,090                                     & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} Subject Alternative Name}     & 1,415,148,751           & 94\%             & Name Constraints                                & 33,821                                      & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} Subject Key Identifier}       & 1,305,739,909           & 87\%             & Freshest CRL                                    & 1,171                                      & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} Key Usage}                    & 1,335,398,382           & 89\%             & Policy Constraints                              & 34                                       & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} Extended Key Usage}           & 1,357,755,474           & 91\%             & Policy Mapping                                  & 9                                       & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} Authority Information Access} & 1,257,051,609           & 84\%             & Subject Information Access                      & 19                                       & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} Certificate Policy}           & 1,272,318,842           & 85\%             & Inhibit Policy                                  & 7                                       & 0\%                                      \\ \hline
+  {\color[HTML]{00009B} CRL Distribution Points}      & 1,45,932,655            & 9\%             & \multicolumn{3}{c||}{\textbf{Total Certificates} = 1,500,000,000}     \\ \hline                                                                                                          
+  \end{tabular}
+  \end{table}
 
 \subsubsection{String-transformer Module} To verify the semantic check related to name chaining, our approach involves matching the issuer name from a certificate with the subject name present in its issuer CA certificate. This matching algorithm is defined in Section 7.1 of RFC-5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. However, the wide variety of languages and character sets present many cases to cover, leading to considerable complexity. Our initial implementation, which encapsulated all the transformations in a single \agda module, overwhelmed the compiler due to the sheer volume of cases. As a solution, we have divided the transformations across $16$ sub-modules, allowing for their sequential compilation, thereby enhancing the system's efficiency and manageability without compromising the comprehensiveness of the transformations.
 
 \subsubsection{Semantic-checker Module}
 \label{sec:semantic-checker}
 We currently support $28$ semantic properties; see Table~\ref{rules} in Appendix. Of these, $18$ properties (R1-R18) are applicable for verifying compliance within a single certificate, while the remaining $10$ (R19-R28) are related to checking properties across different certificates in a chain. Note that we conduct the signature verification (R26) and trust anchor check (R25) outside the verified \agda code due to the computational complexity of these tasks and the requirements of external cryptographic libraries. \\
-\textbf{Signature Verification:} We currently support only RSA signature verification, primarily because over $95\%$ of certificates employ RSA public keys, corroborated by our measurement studies on $1.5$ billion real certificates in the \censys dataset~\cite{censys}. However, the RSA Signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the \agda code, we utilize \python's \cryptography library and \morpheus's formally verified code to perform the signature verification externally. This approach allows us to focus on leveraging \agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in \python and \morpheus. \\
+\textbf{Signature Verification:} We currently support only RSA signature verification, primarily because over $96\%$ of certificates employ RSA public keys, corroborated by our measurement studies on the $1.5$ billion \censys~\cite{censys} certificates. However, the RSA Signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the \agda code, we utilize \python's \cryptography library and \morpheus's formally verified code to perform the signature verification externally. This approach allows us to focus on leveraging \agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in \python and \morpheus. \\
 \textbf{Trust Anchor Check:} The trust anchor check generally involves verifying if the root CA certificate is present in the trusted CA store of the verifier's system. However, in practice, this root store can also include intermediate CA certificates or even the end-entity certificate itself. This allows the validation process to proceed in reverse order, starting from the end-entity certificate and moving toward the root CA certificate until a match is found in the trusted CA store. Given that this process can be accomplished by directly mapping the \der bytestring of the input certificates to those in the trusted store, we delegate this task to our driver module as the final step in the validation process. This division of labor allows us to leave the straightforward task of bytestring comparison to the \driver module.
 
 
