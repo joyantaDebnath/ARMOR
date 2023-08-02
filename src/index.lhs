@@ -145,6 +145,8 @@
 \newcommand{\xsno}{X.690\xspace}
 \newcommand{\der}{DER\xspace}
 \newcommand{\pem}{PEM\xspace}
+\newcommand{\asnone}{ASN.1\xspace}
+\newcommand{\basesf}{Base64\xspace}
 
 \newcommand{\soundness}{\textit{Soundness}\xspace}
 \newcommand{\completeness}{\textit{Completeness}\xspace}
