@@ -127,47 +127,63 @@
 
 \newcommand{\pred}[1]{\ensuremath{\mathsf{#1}}\xspace}
 
-\newcommand{\XFiveOhNine}{X.509\xspace}
-\newcommand{\XSixNineOh}{X.690\xspace}
-
 % \newcommand{\todo}[1]{\vspace*{0.05in}\noindent\textcolor{red}{\textbf{Todo}}\textcolor{blue}{:
 % 		#1.}\xspace}
 
 \newcommand{\says}[2]{\noindent\textcolor{orange}{\textbf{#1 says: 
 		}}\textcolor{blue}{#2.}\xspace}
 	
-\newcommand{\cU}{\ensuremath{\mathcal{C}}\xspace}
+
+
 \newcommand{\iproblem}{\pred{CVEq}}
 \newcommand{\cproblem}{\pred{CVCor}}
 \newcommand{\rimplementation}{\ensuremath{I_\pred{ref}}\xspace}
 \newcommand{\idom}{\ensuremath{\mathcal{I}}\xspace}
 \newcommand{\QFFOL}{\pred{QFFOL}}
 
+\newcommand{\xfon}{X.509\xspace}
+\newcommand{\xsno}{X.690\xspace}
+\newcommand{\der}{DER\xspace}
+\newcommand{\pem}{PEM\xspace}
+
+\newcommand{\soundness}{\textit{Soundness}\xspace}
+\newcommand{\completeness}{\textit{Completeness}\xspace}
+
+\newcommand{\fuzzing}{\textit{fuzzing}\xspace}
+\newcommand{\symex}{\textit{symbolic execution}\xspace}
+
+\newcommand{\armor}{\ensuremath{\mathsf{ARMOR}}\xspace}
 \newcommand{\ceres}{\ensuremath{\mathsf{CERES}}\xspace}
-% \newcommand{\says}[2]{\noindent\textcolor{red}{\textbf{#1 says: }}\textcolor{blue}{#2.}\xspace}
+\newcommand{\mbedtls}{\ensuremath{\mathsf{Mbed\mspace{4mu} TLS}}\xspace}
+\newcommand{\openssl}{\ensuremath{\mathsf{OpenSSL}}\xspace}
+\newcommand{\gnutls}{\ensuremath{\mathsf{GnuTLS}}\xspace}
+\newcommand{\boringssl}{\ensuremath{\mathsf{BoringSSL}}\xspace}
+\newcommand{\matrixssl}{\ensuremath{\mathsf{MatrixSSL}}\xspace}
+\newcommand{\wolfssl}{\ensuremath{\mathsf{WolfSSL}}\xspace}
+\newcommand{\certvalidator}{\ensuremath{\mathsf{Certvalidator}}\xspace}
+\newcommand{\sun}{\ensuremath{\mathsf{Sun}}\xspace}
+\newcommand{\bouncycastle}{\ensuremath{\mathsf{BouncyCastle}}\xspace}
+\newcommand{\crypto}{\ensuremath{\mathsf{Crypto}}\xspace}
+
 
 \newcommand{\censys}{\ensuremath{\mathsf{Censys}}\xspace}
 \newcommand{\frankencert}{\ensuremath{\mathsf{Frankencert}}\xspace}
-\newcommand{\mbedtls}{\ensuremath{\mathsf{mbedTLS}}\xspace}
-\newcommand{\openssl}{\ensuremath{\mathsf{OpenSSL}}\xspace}
-\newcommand{\gnutls}{\ensuremath{\mathsf{GnuTLS}}\xspace}
 
-\newcommand{\parsec}{\ensuremath{\mathsf{Parsec}}\xspace}
-\newcommand{\antlr}{\ensuremath{\mathsf{ANTLR}}\xspace}
+\newcommand{\stringprep}{\ensuremath{\mathsf{StringPrep}}\xspace}
 
-\newcommand{\python}{\ensuremath{\mathsf{Python}}\xspace}
-\newcommand{\haskell}{\ensuremath{\mathsf{Haskell}}\xspace}
-\newcommand{\cvcfour}{\ensuremath{\mathsf{CVC4}}\xspace}
-\newcommand{\lfsc}{\ensuremath{\mathsf{LFSC}}\xspace}
-\newcommand{\stringprep}{\ensuremath{\mathsf{stringprep}}\xspace}
+\newcommand{\python}{\texttt{Python}\xspace}
+\newcommand{\cpp}{\texttt{C\textbackslash C++}\xspace}
+\newcommand{\haskell}{\texttt{Haskell}\xspace}
+\newcommand{\agda}{\texttt{Agda}\xspace}
 
 \newcommand{\parser}{\ensuremath{\mathsf{Parser}}\xspace}
-\newcommand{\sem}{\ensuremath{\mathsf{Semantic\mhyphen checker}}\xspace}
+\newcommand{\semantic}{\ensuremath{\mathsf{Semantic\mhyphen checker}}\xspace}
 \newcommand{\chain}{\ensuremath{\mathsf{Chain\mhyphen builder}}\xspace}
 \newcommand{\driver}{\ensuremath{\mathsf{Driver}}\xspace}
+\newcommand{\stringtransformer}{\ensuremath{\mathsf{String\mhyphen transformer}}\xspace}
 
-\newcommand{\pysmt}{\ensuremath{\mathsf{PySMT}}\xspace}
 \newcommand{\smtlib}{\ensuremath{\mathsf{SMT\mhyphen LIB}}\xspace}
+\newcommand{\smtsolver}{\ensuremath{\mathsf{SMT\mhyphen Solver}}\xspace}
 \newcommand{\certchainres}{\ensuremath{\mathsf{cert\mhyphen chain \mhyphen resolver}}\xspace}
 
 \mathchardef\mhyphen="2D % Define a "math hyphen"
