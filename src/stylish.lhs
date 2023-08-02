@@ -23,7 +23,7 @@
 %%
 %% https://tex.stackexchange.com/questions/85033/colored-symbols/85035#85035
 %%
-\renewcommand*{\mathcolor}{}
+% \renewcommand*{\mathcolor}{}
 \def\mathcolor#1#{\mathcoloraux{#1}}
 \newcommand*{\mathcoloraux}[3]{%
   \protect\leavevmode

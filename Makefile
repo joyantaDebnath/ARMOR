@@ -44,6 +44,8 @@ BIB_FILE=dist/$(TGT).aux
 LHSOPTS=--poly -v
 
 ## Build all necessary tex files with lhs2TeX
+## /usr/local/bin/lhs2TeX
+## /Users/omar/.cabal/bin/lhs2TeX
 dist/%.tex: src/%.lhs $(addprefix src/,$(LHS_DEPENDENCIES))
 	@mkdir -p dist
 	/Users/omar/.cabal/bin/lhs2TeX $(LHSOPTS) -o $@ $<
