@@ -43,7 +43,9 @@ Interestingly, the \certvalidator library appears to enforce an even stricter va
         \setlength{\tabcolsep}{1.5pt}
         \sffamily\scriptsize
         \caption{Analysis on validation outcomes of 2,000,000 \censys chains}
-        \vspace{4pt}
+        \sffamily\scriptsize
+        Acc = Accept \quad  Rej = Reject\enskip
+        \vspace{0.5em}
         \label{t0}
         \sffamily\scriptsize
     \centering
@@ -61,9 +63,7 @@ Interestingly, the \certvalidator library appears to enforce an even stricter va
 \sun             & 1,424,757                & 0                      & 10,222                   & 5,65,021                 \\ \hline
 \certvalidator   & 1,424,668                & 89                    & 10,222                  & 5,65,021                 \\ \hline
 \ceres           & 1,424,757                & 0                    & 0                      & 5,75,243                 \\ \hline
-\end{tabular} \\
-\vspace{2pt}
-Acc = Accept \quad  Rej = Reject
+\end{tabular}
 \end{table}
 
 
@@ -80,7 +80,9 @@ In the case of \armor, it strikes a reasonable balance between execution time an
         \setlength\extrarowheight{1.5pt}
         \setlength{\tabcolsep}{1.5pt}
         \caption{Runtime analysis on 1,00,000 \censys chains}
-        \vspace{4pt}
+        \sffamily\scriptsize
+        S.D. = Standard Deviation\enskip
+        \vspace{0.5em}
         \label{t1}
         \sffamily\tiny
     \centering
@@ -100,9 +102,7 @@ In the case of \armor, it strikes a reasonable balance between execution time an
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \certvalidator}}    & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,951}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.221}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.855}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.269}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.263}}                                                         & {\color[HTML]{000000} 0.060}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,049}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.143}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1.779}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.254}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.254}}                                                         & {\color[HTML]{000000} 0.061}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \ceres}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.033}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 5.735}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.755}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.821}}                                                         & {\color[HTML]{000000} 0.338}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.151}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 5.621}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.541}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.594}}                                                         & {\color[HTML]{000000} 0.263}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \armor}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.034}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 5.156}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.364}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.351}}                                                         & {\color[HTML]{000000} 0.093}                                                       & \multirow{-14}{*}{{\color[HTML]{000000} }} & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.038}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1.977}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.192}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.180}}                                                         & {\color[HTML]{000000} 0.093}                                                       \\ \hline
-    \end{tabular}\\
-    \vspace{2pt}
-    S.D. = Standard Deviation
+    \end{tabular}
     \end{table}
 
 
@@ -113,7 +113,9 @@ In the case of \armor, it strikes a reasonable balance between execution time an
         \setlength\extrarowheight{1.5pt}
         \setlength{\tabcolsep}{1.5pt}
         \caption{Memory analysis on 1,00,000 \censys chains}
-        \vspace{4pt}
+        \sffamily\scriptsize
+        S.D. = Standard Deviation\enskip
+        \vspace{0.5em}
         \label{t2}
         \sffamily\tiny
     \centering
@@ -133,9 +135,7 @@ In the case of \armor, it strikes a reasonable balance between execution time an
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \certvalidator}}    & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,951}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 26.67}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 28.42}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.06}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.04}}                                                        & {\color[HTML]{000000} 0.14}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,049}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 23.90}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.30}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 26.62}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 26.79}}                                                        & {\color[HTML]{000000} 0.71}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \ceres}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 21.03}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 40.70}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 39.08}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 39.45}}                                                        & {\color[HTML]{000000} 2.24}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 21.02}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 31.79}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.03}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 28.04}}                                                        & {\color[HTML]{000000} 3.23}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \armor}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 30.98}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 88.49}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 46.77}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 45.99}}                                                        & {\color[HTML]{000000} 3.77}                                                       & \multirow{-14}{*}{{\color[HTML]{000000} }} & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 17.95}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 63.00}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 32.81}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 24.35}}                                                        & {\color[HTML]{000000} 12.95}                                                      \\ \hline
-    \end{tabular}\\
-    \vspace{2pt}
-    S.D. = Standard Deviation
+    \end{tabular}
     \end{table}
 
 

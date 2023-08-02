@@ -216,7 +216,7 @@ We consider two concrete examples, one each for a single-certificate and
 certificate chain property.
 For a single certificate, it must be the case that the \texttt{SignatureAlgorithm} field
 must contain the same algorithm identifier as the \texttt{Signature} field of
-the \texttt{TbsCertificate} (SCP1 in Table~\ref{scp} of the Appendix).
+the \texttt{TbsCertificate} (R1 in Table~\ref{rules} of the Appendix).
 As a formula of FOL, we could express this property with respect to
 certificate \(c\) as
 \[
@@ -231,15 +231,15 @@ In Agda, we express this property, and its corresponding decidability proof, as
 follows.
 
 \begin{code}
-SCP1 : forall {@0 bs} -> Cert bs -> Set
-SCP1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
+R1 : forall {@0 bs} -> Cert bs -> Set
+R1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
 
-scp1 : forall {@0 bs} (c : Cert bs) -> Dec (SCP1 c)
-scp1 c = ...  
+r1 : forall {@0 bs} (c : Cert bs) -> Dec (R1 c)
+r1 c = ...  
 \end{code}
 
 For a certificate chain, it must be the case that a certificate does not appear
-more than once in a prospective certificate path (CCP5 in Table~\ref{ccp}).
+more than once in a prospective certificate path (R23 in Table~\ref{rules} of the Appendix).
 As a formula of FOL, we could express this property with respect to a
 certificate chain \(\mathit{cc}\) as
 \[
@@ -258,11 +258,11 @@ that the type of the list's elements support decidable equality.
 We have proven equality is decidable for certificates, so we can express this
 property and corresponding decidability proof in Agda as
 \begin{code}
-CCP5 : forall {@0 bs} -> Chain bs -> Set
-CCP5 c = List.Unique (chainToList c)
+R23 : forall {@0 bs} -> Chain bs -> Set
+R23 c = List.Unique (chainToList c)
 
-ccp5 : forall {@0 bs} (c : Chain bs) -> Dec (CCP5 c)
-ccp5 c = List.unique?  (chainToList c)
+r23 : forall {@0 bs} (c : Chain bs) -> Dec (R23 c)
+r23 c = List.unique?  (chainToList c)
 \end{code}
 where we have defined function |chainToList| to convert a certificate chain to a
 list of certificates.
@@ -559,11 +559,11 @@ list of certificates.
 % % \begin{figure}[h]
 % %   \centering
 % %   \begin{code}
-% %   SCP1 : forall {@0 bs} -> Cert bs -> Set
-% %   SCP1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
+% %   R1 : forall {@0 bs} -> Cert bs -> Set
+% %   R1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
   
-% %   scp1 :  forall {@0 bs} (c : Cert bs) -> Dec (SCP1 c)
-% %   scp1 c =
+% %   r1 :  forall {@0 bs} (c : Cert bs) -> Dec (R1 c)
+% %   r1 c =
 % %     case (proj2 (Cert.getTBSCertSignAlg c) =? 
 % %         proj2 (Cert.getCertSignAlg c)) ret (const _) of \ where
 % %       (yes eqrefl) -> yes refl
