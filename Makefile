@@ -48,7 +48,7 @@ LHSOPTS=--poly -v
 ## /Users/omar/.cabal/bin/lhs2TeX
 dist/%.tex: src/%.lhs $(addprefix src/,$(LHS_DEPENDENCIES))
 	@mkdir -p dist
-	/Users/omar/.cabal/bin/lhs2TeX $(LHSOPTS) -o $@ $<
+	/usr/local/bin/lhs2TeX $(LHSOPTS) -o $@ $<
 
 ## Builds the target.
 default : $(BUILD_DEPENDS) 

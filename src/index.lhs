@@ -199,6 +199,8 @@
 \newcommand{\cpp}{\texttt{C\textbackslash C++}\xspace}
 \newcommand{\haskell}{\texttt{Haskell}\xspace}
 \newcommand{\agda}{\texttt{Agda}\xspace}
+\newcommand{\go}{\texttt{Go}\xspace}
+\newcommand{\java}{\texttt{Java}\xspace}
 
 \newcommand{\parser}{\ensuremath{\mathsf{Parser}}\xspace}
 \newcommand{\semantic}{\ensuremath{\mathsf{Semantic\mhyphen checker}}\xspace}

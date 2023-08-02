@@ -14,7 +14,7 @@ Here we present our experimental setup in detail.
 
 \subsubsection{Dataset} The dataset used for our experiments is collected from the large-scale certificate repository, \censys~\cite{censys}. We took a snapshot of $1.5$ billion real certificates in January $2022$. We then randomly selected $2$ million certificates from this snapshot. As the original dataset contained only leaf certificates, we used the \certchainres~\cite{cert-chain-resolver} tool to retrieve the associated intermediate and root CA certificates, thereby constructing valid certificate chains for each of $2$ million leaf certificates.
 
-\subsubsection{Test Subjects} Our differential testing with \armor involved the latest versions (till June $2023$) of $11$ open-source \xfon implementations-- \openssl~\cite{openssl},\mbedtls~\cite{mbedtls}, \gnutls~\cite{gnutls}, \boringssl~\cite{boringssl}, \matrixssl~\cite{matrixssl}, \wolfssl~\cite{wolfssl}, \sun~\cite{sun}, \certvalidator~\cite{certvalidator}, \crypto~\cite{go-crypto}, \bouncycastle~\cite{bouncy}, and \ceres~\cite{debnath2021re}. We initially considered establishing servers with individual test certificate chain and authoring a client application using each test library to initiate a TLS connection. However, this approach would necessitate terminating, rebooting, and re-configuring the server for each test certificate chain, leading to a time-consuming process that could take months to complete, even with parallelization. To mitigate this, we created our own \textit{test harness} program for each of the $11$ open-source \xfon implementations, consulting the official documentation of their certificate chain validation APIs.
+\subsubsection{Test Subjects} Our differential testing with \armor involved the latest versions (till June $2023$) of $11$ open-source \xfon implementations-- \openssl-v3.1.1~\cite{openssl}, \mbedtls-v3.4.0~\cite{mbedtls}, \gnutls-v3.7.9~\cite{gnutls}, \boringssl-vfips-20220613~\cite{boringssl}, \matrixssl-v4.7.0~\cite{matrixssl}, \wolfssl-v5.6.2~\cite{wolfssl}, \sun-v1.20~\cite{sun}, \certvalidator-v0.11.1~\cite{certvalidator}, \crypto-v1.21rc2~\cite{go-crypto}, \bouncycastle-v1.75~\cite{bouncy}, and \ceres~\cite{debnath2021re}. Among these, \openssl, \mbedtls, \gnutls, \boringssl, \matrixssl, and \wolfssl are written in \cpp, \sun and \bouncycastle are in \java, \certvalidator and \ceres are in \python, and \crypto is in \go. We initially considered establishing servers with individual test certificate chain and authoring a client application using each test library to initiate a TLS connection. However, this approach would necessitate terminating, rebooting, and re-configuring the server for each test certificate chain, leading to a time-consuming process that could take months to complete, even with parallelization. To mitigate this, we created our own \textit{test harness} program for each of the $11$ open-source \xfon implementations, consulting the official documentation of their certificate chain validation APIs.
 
 \subsubsection{Adjustment of System-Time} There is a $1.5$ years of time difference between the collection of our certificate dataset and our actual evaluation. Therefore, using these certificate chains directly in the experiment could result in the expiration of most of the certificate chains. To solve this challenge, we implemented a probabilistic approach within our experimental setup. Specifically, for $95\%$ certificate chains (randomly selected), we adjusted the system-time to older dates falling within the validity periods of the leaf certificates. For the remaining $5\%$ cases, we maintained the current system-time. Our time adjustment process is based on the \libfaketime~\cite{faketime} library, which allows modifying the system-time a program sees without having to change the time system-wide. This strategy allowed us to parallelize, even in \docker~\cite{docker} environment, and evaluate all the semantic rules, not only navigating the issue of certificate expiration but also ensuring a comprehensive and realistic assessment of the certificate validation process.
 
@@ -44,25 +44,25 @@ Interestingly, the \certvalidator library appears to enforce an even stricter va
         \sffamily\scriptsize
         \caption{Analysis on validation outcomes of 2,000,000 \censys chains}
         \sffamily\scriptsize
-        Acc = Accept \quad  Rej = Reject\enskip
+        Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
         \vspace{0.5em}
         \label{t0}
         \sffamily\scriptsize
     \centering
-\begin{tabular}{||c||c||c||c||c||}
+\begin{tabular}{||c||c||c||c||c||c||c||}
 \hline
-\textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} \\ \hline
-\boringssl       & 1,424,757                & 0                      & 10,222                  & 5,65,021                 \\ \hline
-\gnutls          & 1,424,757                & 0                      & 10,222                  & 5,65,021                 \\ \hline
-\matrixssl       & 1,424,757                & 0                      & 10,222                   & 5,65,021                 \\ \hline
-\mbedtls        & 1,424,757                & 0                      & 10,222                  & 5,65,021                 \\ \hline
-\openssl         & 1,424,757                & 0                      & 10,222                  & 5,65,021                 \\ \hline
-\wolfssl         & 1,424,757                & 0                      & 10,222                   & 5,65,021                 \\ \hline
-\crypto          & 1,424,757                & 0                      & 10,222                  & 5,65,021                 \\ \hline
-\bouncycastle   & 1,424,757                & 0                      & 10,222                   & 5,65,021                 \\ \hline
-\sun             & 1,424,757                & 0                      & 10,222                   & 5,65,021                 \\ \hline
-\certvalidator   & 1,424,668                & 89                    & 10,222                  & 5,65,021                 \\ \hline
-\ceres           & 1,424,757                & 0                    & 0                      & 5,75,243                 \\ \hline
+\textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} & \textbf{Sim} & \textbf{Diff}\\ \hline
+\boringssl       & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\gnutls          & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\matrixssl       & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\mbedtls        & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\openssl         & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\wolfssl         & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\crypto          & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\bouncycastle   & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\sun             & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\certvalidator   & 1,424,668                & 89                    & 10,222                  & 5,65,021 & 99.48$\%$ & 0.52$\%$ \\ \hline
+\ceres           & 1,424,757                & 0                    & 0                      & 5,75,243  & 100$\%$    & 0$\%$           \\ \hline
 \end{tabular}
 \end{table}
 
