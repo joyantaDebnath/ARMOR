@@ -139,6 +139,7 @@ In the case of \armor, it strikes a reasonable balance between execution time an
     \end{table}
 
 
+\subsection{Results on Frankencerts based on 5,00,000 chains}
 
 \begin{table}[h]
     \captionsetup{font=footnotesize}
@@ -169,3 +170,36 @@ In the case of \armor, it strikes a reasonable balance between execution time an
 \ceres           & 0                & 0                    & 0                      & 5,00,000  & 100$\%$    & 0$\%$           \\ \hline
 \end{tabular}
 \end{table}
+
+
+
+\begin{table*}[h]
+    \captionsetup{font=footnotesize}
+    \centering
+         \setlength\extrarowheight{1.5pt}
+         \setlength{\tabcolsep}{1.5pt}
+         \sffamily\scriptsize
+         \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
+         \sffamily\scriptsize
+         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+         \vspace{0.5em}
+         \label{t0}
+         \sffamily\scriptsize
+     \centering
+    \begin{tabular}{||c||c||c||c||c||c||c||c||c||c||}
+    \hline
+    \textbf{Supported Features}           & \textbf{\openssl} & \textbf{\gnutls} & \textbf{\boringssl} & \textbf{\wolfssl} & \textbf{\matrixssl} & \textbf{\sun} & \textbf{\bouncycastle} & \textbf{\certvalidator} & \textbf{\crypto} \\ \hline
+    \textit{R}                            & 166                              & 107                             & 80                                 & 105                              & 110                                & 1                            & 1                                     & 5855                                  & 205                             \\ \hline
+    \textit{Subject / Issuer Name}        & 8                                & 4                               & 2                                  & 3                                & 3                                  & 0                            & 0                                     & 345                                   & 24                              \\ \hline
+    \textit{Certificate Policy}           & 8                                & 5                               & 0                                  & 2                                & 2                                  & 0                            & 0                                     & 0                                     & 61                              \\ \hline
+    \textit{CRL Distribution Points}      & 0                                & 3                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 33                              \\ \hline
+    \textit{Authority Information Access} & 4                                & 2                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 88                              \\ \hline
+    \textit{Basic Constraints}            & 0                                & 2                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 94                              \\ \hline
+    \textit{Key Usage}                    & 0                                & 9                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 93                              \\ \hline
+    \textit{Extended Key Usage}           & 0                                & 7                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 98                              \\ \hline
+    \textit{Subject Key Identifier}       & 0                                & 0                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 40                              \\ \hline
+    \textit{Subject Alternative Names}    & 0                                & 0                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 33                              \\ \hline
+    \textit{Issuer Alternative Names}     & 5                                & 0                               & 1                                  & 1                                & 3                                  & 0                            & 0                                     & 4                                     & 106                             \\ \hline
+    \textbf{Total}                        & \textbf{191}                     & \textbf{139}                    & \textbf{83}                        & \textbf{111}                     & \textbf{118}                       & \textbf{1}                   & \textbf{1}                            & \textbf{6204}                         & \textbf{875}                    \\ \hline
+    \end{tabular}
+    \end{table*}
