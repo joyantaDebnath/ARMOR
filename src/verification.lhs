@@ -239,7 +239,7 @@ r1 c = ...
 \end{code}
 
 For a certificate chain, it must be the case that a certificate does not appear
-more than once in a prospective certificate path (R23 in Table~\ref{rules} of the Appendix).
+more than once in a prospective certificate path (R20 in Table~\ref{rules} of the Appendix).
 As a formula of FOL, we could express this property with respect to a
 certificate chain \(\mathit{cc}\) as
 \[
@@ -258,11 +258,11 @@ that the type of the list's elements support decidable equality.
 We have proven equality is decidable for certificates, so we can express this
 property and corresponding decidability proof in Agda as
 \begin{code}
-R23 : forall {@0 bs} -> Chain bs -> Set
-R23 c = List.Unique (chainToList c)
+R20 : forall {@0 bs} -> Chain bs -> Set
+R20 c = List.Unique (chainToList c)
 
-r23 : forall {@0 bs} (c : Chain bs) -> Dec (R23 c)
-r23 c = List.unique?  (chainToList c)
+r20 : forall {@0 bs} (c : Chain bs) -> Dec (R20 c)
+r20 c = List.unique?  (chainToList c)
 \end{code}
 where we have defined function |chainToList| to convert a certificate chain to a
 list of certificates.
