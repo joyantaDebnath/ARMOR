@@ -2,37 +2,127 @@
 In this section, we present the required toolchain for our formally verified CCVL implementation, its high-level architecture, and finally discuss the implementation details.
 
 \subsection{Preliminaries on Toolchain}
-We use the \agda theorem prover~\cite{bove2009brief} for formally verifying the CCVL implementation and the formally verified oracle of \morpheus~\cite{yahyazadeh2021morpheus} for signature verification. Now, we present a brief overview of these tools.
+We use the \agda theorem prover~\cite{bove2009brief} for formally verifying the
+CCVL implementation and the formally verified oracle of
+\morpheus~\cite{yahyazadeh2021morpheus} for signature verification.
+Now, we present a brief overview of these tools.
 
 \subsubsection{Agda Theorem Prover}
 \label{sec:design-agda}
-\agda~\cite{bove2009brief} is a powerful and expressive programming language that combines functional programming and formal verification. At its core, \agda is a \textit{dependently-typed} functional programming language, which allows types to be predicated on values. This capability helps express rich properties in types and ensures that the programs conform to these properties. In other words, if a program compiles, it is also proven to meet the specifications described by the types. Another important feature is that \agda supports interactive theorem proving. Programmers can write proofs interactively by filling in parts of proofs, referred to as ``proof holes'' while the \agda compiler checks that every step is correct. This makes \agda a powerful tool for ensuring the correctness of an implementation. 
+\agda~\cite{bove2009brief} is a powerful and expressive programming language
+that combines functional programming and formal verification.
+At its core, \agda is a \textit{dependently typed} functional programming
+language, which allows types to refer to terms.
+This capability helps express rich properties in types and ensures that the
+programs conform to these properties.
+In other words, if a program compiles, it is also proven to meet the
+specifications described by its type.
+Under the \emph{Curry-Howard}
+correspondence~\cite{SU06_Lectures-on-the-Curry-Howard-Isomorphism}, we can view
+Agda's types as \emph{propositions} and its terms as \emph{proofs} of the
+propositions expressed by their types.
+This makes \agda a powerful tool for both expressing programs and their
+correctness, as the language of programs and proofs is unified.
+
+As an example of \agda's syntax, consider the example shown in
+Figure~\ref{fig:agda-ex} of length-indexed lists, provided as part of the Agda
+standard library as |Vec|. 
+\begin{figure}
+  \centering
+  \begin{code}
+data Vec (A : Set) : Nat -> Set where
+  vnil : Vec A 0
+  vcons : forall {n} -> A -> Vec A n -> Vec A (1 + n)
+
+head : forall {A n} -> Vec A (1 + n) -> Vec A n
+head (vcons hd tl) = hd
+  \end{code}
+  \caption{Length-indexed lists in Agda}
+  \label{fig:agda-ex}
+\end{figure}
+By length-indexed, we mean that the length of the list is itself part of the
+type.
+We now briefly explain the code listing in the figure.
+\begin{itemize}
+\item |Set| is the type of (small) types (the details of Agda's
+  universe hierarchy are unimportant for understanding this paper).
+  
+\item The |data| keyword indicates that we are declaring |Vec| as an \emph{inductive
+    family} indexed by a type |A| and a natural number. By \emph{inductive
+    family}, we mean that for each type |A| and natural number |n|, |Vec A n| is
+  an unique type --- the type for lists with exactly |n| elements of type |A|.
+  
+\item |Vec| has two \emph{constructors}, |vnil| for the empty list and |vcons|
+  for a list with at least one element.
+  The constructors encode the connection between the number of elements and the
+  natural number index: |vnil| has type |Vec A 0| and |vcons| produces a list
+  with one more element than the tail of the list.
+ 
+\item Curly braces indicate function arguments that need not be passed
+  explicitly, leaving \agda to infer their values from the types of other
+  arguments to the function.
+  For example, we can write |vcons 0 vnil|, and \agda will know this has type
+  |Vec Nat 1|, as the only correct instantiation of parameter |n| of |vcons| for
+  is |0|.
+\end{itemize}
 
 % Note that we can generate an executable binary of the implementation by first compiling the \agda source code into \haskell and then using a \haskell compiler to compile the generated \haskell code into a binary. 
 
-As an example of \agda's syntax, consider representing the \agda boolean values in their \xsno \der counterparts. As per the Basic Encoding Rules (\ber)~\cite{rec2002x}, boolean values must comprise a singular octet, with $False$ denoted by setting all bits to $0$ and $True$ denoted by setting at least one bit to $1$. The \der further mandates that the value $True$ is signified by setting all bits to $1$. We capture these requirements of \der boolean in \agda by defining a type that holds not only the boolean value and its $8$-bit numerical representation but also a proof that this representation is correct. To further illustrate, let us look at the \agda code below. 
+% As an example of \agda's syntax, consider representing the \agda boolean values
+% in their \xsno \der counterparts.
+% As per the Basic Encoding Rules (\ber)~\cite{rec2002x}, boolean values must
+% comprise a singular octet, with $False$ denoted by setting all bits to $0$ and
+% $True$ denoted by setting at least one bit to $1$.
+% The \der further mandates that the value $True$ is signified by setting all bits
+% to $1$.
+% We capture these requirements of \der boolean in \agda by defining a type that
+% holds not only the boolean value and its $8$-bit numerical representation but
+% also a proof that this representation is correct.
+% To further illustrate, let us look at the \agda code below.  
 
-\begin{figure}[h]
-  \centering
-  \begin{code}
-data BoolRep : Bool -> UInt8 -> Set where
-  falser : BoolRep false (UInt8.fromN 0)
-  truer  : BoolRep true (UInt8.fromN 255)
+% \begin{figure}[h]
+%   \centering
+%   \begin{code}
+% data BoolRep : Bool -> UInt8 -> Set where
+%   falser : BoolRep false (UInt8.fromN 0)
+%   truer  : BoolRep true (UInt8.fromN 255)
 
 
-record BoolValue (@0 bs : List UInt8) : Set where
-  constructor mkBoolValue
-  field
-    v     : Bool
-    @0 b  : UInt8
-    @0 vr : BoolRep v b
-    @0 bseq : bs == [ b ]
-  \end{code}
-  \caption{\agda example for representing \der boolean type}
-  \label{fig:code1}
-\end{figure}
+% record BoolValue (@0 bs : List UInt8) : Set where
+%   constructor mkBoolValue
+%   field
+%     v     : Bool
+%     @0 b  : UInt8
+%     @0 vr : BoolRep v b
+%     @0 bseq : bs == [ b ]
+%   \end{code}
+%   \caption{\agda example for representing \der boolean type}
+%   \label{fig:code1}
+% \end{figure}
 
-Here, |BoolRep| is a dependent type representing a binary relationship between \agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned integers or octet values stipulated by the \xsno \der), where the |falser| constructor associates the false boolean value with $0$, and the |truer| constructor associates true with $255$. The function |UInt8.fromN| transforms a non-negative unbounded integer into its equivalent |UInt8| representation. It is important to note that this transformation is contingent upon \agda's ability to automatically verify that the provided number is less than $256$. Also, the keyword |Set| (referred to as the type of types) defines the type of |BoolRep|, indicating that |BoolRep| maps specific pairs of |Bool| and |UInt8| values to unique types. Subsequently, we can construct a dependent and parameterized record type, |BoolValue|, to represent the boolean value defined by \xsno. This record type, essentially a predicate over byte-strings, includes the boolean value |v|, its byte-string representation |b|, a proof |vr| that |b| is the correct representation of |v|, and a proof |bseq| that the byte-string representation |bs| of this grammatical terminal is a singleton list containing |b|. The |@0| annotations applied to types and fields specify that these values are erased at runtime to minimize execution overhead and to mark parts of the formalization used solely for verification purposes. In short, |BoolRep| verifies the correct mapping between boolean values and their numerical representations, while |BoolValue| holds the boolean value, its numerical representation, and the proof of the correctness of this representation, returned by the |BoolRep|.
+% Here, |BoolRep| is a dependent type representing a binary relationship between
+% \agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned
+% integers or octet values stipulated by the \xsno \der), where the |falser|
+% constructor associates the false boolean value with $0$, and the |truer|
+% constructor associates true with $255$. The function |UInt8.fromN| transforms
+% a non-negative unbounded integer into its equivalent |UInt8| representation.
+% It is important to note that this transformation is contingent upon \agda's
+% ability to automatically verify that the provided number is less than $256$.
+% Also, the keyword |Set| (referred to as the type of types) defines the type of
+% |BoolRep|, indicating that |BoolRep| maps specific pairs of |Bool| and |UInt8|
+% values to unique types. Subsequently, we can construct a dependent and
+% parameterized record type, |BoolValue|, to represent the boolean value defined
+% by \xsno. This record type, essentially a predicate over byte-strings,
+% includes the boolean value |v|, its byte-string representation |b|, a proof
+% |vr| that |b| is the correct representation of |v|, and a proof |bseq| that
+% the byte-string representation |bs| of this grammatical terminal is a
+% singleton list containing |b|. The |@0| annotations applied to types and
+% fields specify that these values are erased at runtime to minimize execution
+% overhead and to mark parts of the formalization used solely for verification
+% purposes. In short, |BoolRep| verifies the correct mapping between boolean
+% values and their numerical representations, while |BoolValue| holds the
+% boolean value, its numerical representation, and the proof of the correctness
+% of this representation, returned by the |BoolRep|.
 
 \subsubsection{The Oracle of Morpheus}
 \label{mor}
