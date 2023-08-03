@@ -11,10 +11,10 @@ proven using the \agda theorem prover, taking advantage of its advanced type
 system. To achieve better confidence in our formalization of the natural  
 language requirements of X.509 PKI prescribed in RFC 5280, we differentially test \armor with respect 
 to $11$ widely used X.509 PKI libraries. In our evaluation, we observe that \armor agrees 
-with these libraries at least $99.49\%$ of the time. For the remaining $0.51\%$, we notice 
-that \armor strictly follows the requirements in RFC 5280, whereas the other libraries 
-have a more relaxed enforcement of these requirements. Finally, in the context of 
-runtime overhead, we observe that although \armor has a higher overhead than libraries 
+with these libraries most of the times. When it differs, we notice that 
+\armor strictly follows the requirements in RFC 5280, whereas the other libraries 
+have a more relaxed enforcement of these requirements.
+Finally, in the context of runtime overhead, we observe that although \armor has a higher overhead than libraries 
 in our evaluation that are written in C/C++, it has better or comparable performance 
 to the libraries written in Go, Java, and Python.
 
