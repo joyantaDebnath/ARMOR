@@ -140,3 +140,32 @@ In the case of \armor, it strikes a reasonable balance between execution time an
 
 
 
+\begin{table}[h]
+    \captionsetup{font=footnotesize}
+   \centering
+        \setlength\extrarowheight{1.5pt}
+        \setlength{\tabcolsep}{1.5pt}
+        \sffamily\scriptsize
+        \caption{Analysis on validation outcomes of 5,00,000 \frankencert chains}
+        \sffamily\scriptsize
+        Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+        \vspace{0.5em}
+        \label{t0}
+        \sffamily\scriptsize
+    \centering
+\begin{tabular}{||c||c||c||c||c||c||c||}
+\hline
+\textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} & \textbf{Sim} & \textbf{Diff}\\ \hline
+\boringssl       & 0                & 0                      & 83                  & 4,99,917 & 99.98$\%$ & 0.02$\%$ \\ \hline
+\gnutls          & 0                & 0                      & 139                 & 4,99,861 & 99.97$\%$ & 0.03$\%$ \\ \hline
+\matrixssl       & 0                & 0                      & xx                   & xx & 99.49$\%$ & 0.51$\%$ \\ \hline
+\mbedtls        & 0                & 0                      & 0                  & 5,00,000 & 100$\%$ & 0$\%$ \\ \hline
+\openssl         & 0                & 0                      & 191                  & 4,99,809 & 99.96$\%$ & 0.04$\%$ \\ \hline
+\wolfssl         & 0                & 0                      & 111                   & 4,99,889 & 99.97$\%$ & 0.03$\%$ \\ \hline
+\crypto          & 0                & 0                      & 842                  & 4,99,158 & 99.83$\%$ & 0.17$\%$ \\ \hline
+\bouncycastle   & 0                & 0                      & 1                   & 4,99,999 & 99.99$\%$ & 0.01$\%$ \\ \hline
+\sun             & 0                & 0                      & 1                   & 4,99,999 & 99.99$\%$ & 0.01$\%$ \\ \hline
+\certvalidator   & 0                & 0                    & 6,204                  & 4,93,796 & 98.75$\%$ & 1.25$\%$ \\ \hline
+\ceres           & 0                & 0                    & 0                      & 5,00,000  & 100$\%$    & 0$\%$           \\ \hline
+\end{tabular}
+\end{table}

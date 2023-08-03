@@ -8,10 +8,6 @@
 
 
 
-
-
-
-
 \begin{table*}[h]
   \centering
        \setlength\extrarowheight{1.5pt}
