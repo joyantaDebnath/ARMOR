@@ -15,7 +15,7 @@ with these libraries most of the times. When it differs, we notice that
 \armor strictly follows the requirements in RFC 5280, whereas the other libraries 
 have a more relaxed enforcement of these requirements.
 Finally, in the context of runtime overhead, we observe that although \armor has a higher overhead than libraries 
-in our evaluation that are written in C/C++, it has better or comparable performance 
+in our evaluation that are written in \cpp, it has better or comparable performance 
 to the libraries written in Go, Java, and Python.
 
 
