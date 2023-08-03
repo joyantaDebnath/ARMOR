@@ -7,8 +7,8 @@ can result in impersonation attacks and/or interoperability issues. In this pape
 we focus on developing a modular X.509 certificate chain validation library called 
 \armor that avoids such pitfalls by formally verifying its implementation with respect 
 to the requirements in RFC 5280. \armor{}'s guarantees are mechanically 
-proven using \agda's built-in interactive theorem prover while taking advantage of its 
-advanced type system. To achieve better confidence in our formalization of the natural 
+proven using the \agda theorem prover, taking advantage of its advanced type
+system. To achieve better confidence in our formalization of the natural  
 language requirements of X.509 PKI prescribed in RFC 5280, we differentially test \armor with respect 
 to $11$ widely used X.509 PKI libraries. In our evaluation, we observe that \armor agrees 
 with these libraries at least $99.49\%$ of the time. For the remaining $0.51\%$, we notice 
