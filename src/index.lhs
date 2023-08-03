@@ -229,6 +229,8 @@
 	numbers=left, numberstyle=\scriptsize, numbersep=3pt, framexleftmargin=10pt, captionpos=b
 }
 
+% \newcommand{\XFiveOhNine}{X.509\xspace}
+
 %%% <=== Code listing style definitions
 
 
@@ -543,7 +545,8 @@
 
 \begin{document}
 
-\title{ARMOR: A Verified Implementation of X.509 Certificate Chain Validation}
+% \title{ARMOR: A Verified Implementation of X.509 Certificate Chain Validation}
+\title{ARMOR: A Formally Verified Implementation of \xfon Certificate Chain Validation}
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
