@@ -1,30 +1,40 @@
 \section{Verification and Correctness Proofs}
-This section describes our verification goals and how we achieved them.
-In Section~\ref{sec:our-objective}, we gave a high-level description of our
-primary objectives for verified parsing, \emph{soundness} and
-\emph{completeness}.
-We now explain concretely how this is expressed in Agda (specifically, how
-language membership and parser acceptance are defined) and detail the challenges
-faced for obtaining soundness and completeness.
-We also describe our approach to semantic validation.
-% We saw in Section~\ref{sec:design-agda} that Agda allows us to write precise
-% specifications of X.690 DER and X.509 encoding.
-% These specifications are themselves one of our contributions, as they are
-% rigorous formalizations of the natural-language descriptions of these encodings.
-% The other contributions of our verification efforts are our sound and complete
-% parser, proofs of \emph{uniqueness} and \emph{unambiguousness} of the
-% specification, and the specifications of, and correct implementations for, the
-% semantic validations. 
+This section describes the verification goals for our parser and semantic
+checker modules (Figure~\ref{cert_validation}) and how we achieved them.
+For parsing, we give an independent specification of the supported subset of the
+PEM, X.509, and X.690 formats that expresses (independently of the 
+parser) what it means for a bytestring to be in these languages, and our parsers
+are \emph{correct by construction} with respect to the specifications.
+All of our parsers are therefore sound by definition.
+Completeness, which we establish for our X.509 certificate parser, is obtained
+using some additional lemmas concerning the specification of certificates.
 
-\subsection{X.509 Specification}
+The specifications we give are defined using datatype families (indexed by
+input strings), and so serve a dual role as internal data representations of the
+formats they describe.
+For semantic validation, the code performing the semantic checks, which is
+invoked on these internal representations, returns not merely a ``yes-no''
+answer, but \emph{proofs} that the property (expressed as an Agda type) does or
+does not hold.
+
+\subsubsection*{Input Strings}
+Inputs to our parser have types of the form |List A|, where |A| is the type of
+the language alphabet.
+For our PEM parser, this is |Char|, Agda's primitive type for character
+literals.
+For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
+the Agda standard library type |Fin 256| (the type for nonnegative integers
+strictly less than 256).
+The decoding of the base 64 data contained within the PEM certificates 
+
+\subsection{Independent Specification}
 Our first challenge concerns how the specification is represented, that is,
 answering the question ``soundness and completeness \emph{with respect to
   what?}''
-Figure~\ref{fig:code1} (Section~\ref{sec:design-agda}) shows the essence of our
-approach: for each production rule |G| of the X.509 and X.690 grammar we
-support, we define a predicate |G : List UInt8 -> Set| over bytestrings (such as
-|BoolValue|).
-Membership of a bytestring |xs| in the language denoted by |G| corresponds to
+Our answer is that for each production rule |G| of the supported subset of the
+PEM, X.690, and X.509 grammars, we define a predicate |G : List A -> Set| over
+the input strings.
+Membership of an input string |xs| in the language denoted by |G| corresponds to
 the truth of the proposition |G xs|.
 
 For each defined |G| we are careful to document which components are ``data''
