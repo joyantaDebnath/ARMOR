@@ -58,6 +58,26 @@
     difficult. For now, the representation of integer values is the literal byte
     string (this can and probably should change in the future)
 *** TODO Accept and parse root store, check membership                :@code:
+** Non-malleability
+*** TODO Define injective spec -> data maps
+    - Note taken on [2023-08-15 Tue 13:22] \\
+      Non-malleable means:
+      - /unique:/ there is only one value /v/ to be read from a bytestring /bs/
+        This is already handled by the proofs that the grammar is /Unique/
+      - /injective:/ should /v1/ be encoded by /bs1/, and /v2/ encoded by /bs/, and
+        /v1 = v2/, then /bs1 = bs2/
+      
+      
+      Currently, we can't state injectiveness because the specification includes the
+      bytestring as part of the type. So, we need a non-indexed version of "value" so
+      we can state this second part of /malleable/.
+** Total Correctness
+
+   Ideally, all {-# TERMINATING #-} pragmas should be removed. I (Christa)
+   believe the ones that call into question whether the /parser itself/ (rather
+   than the runtime-irrelevant proofs) should be prioritized.
+*** TODO Remove termination pragmas in the executable code
+*** TODO Remove all remaining termination pragmas
 
 ** Chain Building
     - Note taken on [2022-05-03 Tue 16:07] \\
