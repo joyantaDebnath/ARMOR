@@ -1,6 +1,10 @@
 #+TITLE: AERES Project Management
 
-* AERES Project Status                                                 :work:
+* PROJ AERES Project Status                                            :work:
+  :PROPERTIES:
+  :CATEGORY: Aeres
+  :NOBLOCKING: t
+  :END:
 ** Cryptography
    - Note taken on [2022-02-11 Fri 12:38] \\
      After a discussion, it was decided we will outsource cryptographic checks,
@@ -22,31 +26,39 @@
       cryptographic checks) or [[https://github.com/Morpheus-Repo/Morpheus][Morpehus]] (for full PKCS checks)
 
 ** General
-*** TODO Make AERES executable run semantic checks                    :@code:
+*** DONE Make AERES executable run semantic checks                    :@code:
+    CLOSED: [2022-12-07 Wed 21:07]
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
-*** TODO [0/2] Review semantic checks                                 :@code:
+    - State "DONE"       from "TODO"       [2022-12-07 Wed 21:07]
+*** WONT [0/2] Review semantic checks                                 :@code:
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
+    - State "NEXT"       from "TODO"       [2023-02-07 Tue 17:14]
+    - Note taken on [2023-02-07 Tue 17:14] \\
+      It's fine for now, just note which semantic checks are high confidence and which
+      are not.
 **** TODO Review CCP7 from spec                                       :@code:
      :PROPERTIES:
-     :Assignee: Joy
+     :ASSIGNEE: Joy
      :END:
 **** TODO Update SCP18 to use total ordering for time                 :@code:
      :PROPERTIES:
-     :ASSIGNEE: Chris
+     :ASSIGNEE: Christa
      :END:
 *** DONE Change Int specification                                     :@code:
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
 
     This came up when we realized we needed a serializer for parsing public key
     fields. The previous specification for IntegerValue made serialization
     difficult. For now, the representation of integer values is the literal byte
     string (this can and probably should change in the future)
+*** TODO Accept and parse root store, check membership                :@code:
+
 ** Chain Building
     - Note taken on [2022-05-03 Tue 16:07] \\
       Was not truly finished --- requires parsing PEM first, then decoding.
@@ -65,7 +77,7 @@
 *** DONE Parse Base64                                                 :@code:
     CLOSED: [2022-07-08 Fri 17:09]
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
     - State "DONE"       from "TODO"       [2022-07-08 Fri 17:09] \\
       Finished, with some tests. There is now particular care taken to the last
@@ -74,10 +86,19 @@
       Had to return to base64 parsing because the spec was not quite right (too lax
       when it comes to input whose bit length is not a multiple of 24)
     - State "DONE"       from "TODO"       [2022-06-02 Thu 17:24]
-*** TODO Parse PEM                                                    :@code:
+*** TODO [#A] Parse PEM                                               :@code:
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
+    - Note taken on [2022-08-28 Sun 19:08] \\
+      <2022-08-29 Mon 12:00>
+    - Note taken on [2022-08-28 Sun 19:06] \\
+      <2022-08-29 Mon 18:00>
+    - Note taken on [2022-08-28 Sun 19:06] \\
+      <2022-08-29 Mon 13:00>
+**** DONE Finish PEM property postulates
+     CLOSED: [2022-12-07 Wed 21:07]
+     - State "DONE"       from "TODO"       [2022-12-07 Wed 21:07]
 ** Cert parsing
 *** DONE Parse public key extensions                                  :@code:
     CLOSED: [2022-07-11 Mon 17:54]
@@ -88,7 +109,7 @@
 **** DONE Lemmas for public key extensions parser                     :@code:
      CLOSED: [2022-07-11 Mon 17:54]
      :PROPERTIES:
-     :ASSIGNEE: Chris
+     :ASSIGNEE: Christa
      :END:
      - State "DONE"       from "TODO"       [2022-07-11 Mon 17:54]
      - Note taken on [2022-06-14 Tue 18:29] \\
@@ -124,7 +145,7 @@
 *** MAYBE Custom ordering for UTF8Char                                :@code:
     CLOSED: [2022-06-02 Thu 18:33]
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
 
     A custom ordering for UTF8Char may be needed if comparisons (needed for
@@ -136,19 +157,19 @@
 *** DONE Define UTF8 spec                                             :@code:
     CLOSED: [2022-03-22 Tue 13:17]
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
     - State "DONE"       from "TODO"       [2022-03-22 Tue 13:17]
 *** TODO Prove StringPrep algorithm is idempotent                     :@code:
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
 
 ** Presentation
   
 *** TODO Note =--sized-types= =--guardedness= inconsistency        :@typeset:
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
 
    See the remark in the documentation [[https://agda.readthedocs.io/en/v2.6.1/language/safe-agda.html][here]], and the filed issue [[https://github.com/agda/agda/issues/1209][here]].
@@ -162,7 +183,7 @@
    
 *** TODO Rename grammar properties                                    :@code:
     :PROPERTIES:
-    :ASSIGNEE: Chris
+    :ASSIGNEE: Christa
     :END:
 
     The names of properties for the grammar elements should, where possible, be
@@ -179,10 +200,38 @@
 
 *** TODO Remove postulates, =--allow-unsolved-metas=                  :@code:
 
+*** TODO [#A] Write-up explanation of Aeres architecture              :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Christa
+    :END:
+
 ** Building and running
 *** TODO Move tests to their own directory                            :@code:
 
     This will also speed-up typechecking and compilation time during development
+* PROJ AERES Paper
+** [2/5] Christa
+
+   - [ ] Double-check S3.1.1
+   - [ ] Double-check S3.3.6
+   - [ ] Finish S4.3 revisions
+   - [X] Double-check termination
+   - [X] [2/2] ASN1STAR
+     - [X] check accuracy of claim that ASN1Star proves mutual correctness wrt
+       encoder / decoder
+     - [X] contrast unambiguous and uniqueness with non-malleability
+
+       This is not nearly as strong as the non-malleability property of ASN1*,
+       because our specifications are not equipped to even *state* the property
+       that different bytestring representations of ASN.1 are equal (because the
+       bytestring is part of the type, and to even state the property that two
+       terms are equal they must have the same type).
+
+       What would have to be done is either make separate, non-indexed datatypes
+       capturing the "mere data", write functions that convert the indexed
+       specification to the mere data, and prove non-malleability for the
+       results (or the mere data could be fields, and we can use lenses)
+
 * Misc Notes
 
 *** 2022 May 31 Tue 20:33
