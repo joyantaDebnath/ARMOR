@@ -196,7 +196,7 @@
 \newcommand{\ocspstapling}{\ensuremath{\mathsf{OCSP\mhyphen Stapling}}\xspace}
 
 \newcommand{\python}{\texttt{Python}\xspace}
-\newcommand{\cpp}{\texttt{C\textbackslash C++}\xspace}
+\newcommand{\cpp}{\texttt{C/C++}\xspace}
 \newcommand{\haskell}{\texttt{Haskell}\xspace}
 \newcommand{\agda}{\texttt{Agda}\xspace}
 \newcommand{\go}{\texttt{Go}\xspace}
