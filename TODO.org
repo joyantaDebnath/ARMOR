@@ -4,6 +4,7 @@
   :PROPERTIES:
   :CATEGORY: Aeres
   :NOBLOCKING: t
+  :toggl-project: Aeres
   :END:
 ** Cryptography
    - Note taken on [2022-02-11 Fri 12:38] \\
@@ -32,7 +33,7 @@
     :ASSIGNEE: Christa
     :END:
     - State "DONE"       from "TODO"       [2022-12-07 Wed 21:07]
-*** WONT [0/2] Review semantic checks                                 :@code:
+*** WONT [1/2] Review semantic checks                                 :@code:
     :PROPERTIES:
     :ASSIGNEE: Christa
     :END:
@@ -44,10 +45,15 @@
      :PROPERTIES:
      :ASSIGNEE: Joy
      :END:
-**** TODO Update SCP18 to use total ordering for time                 :@code:
+**** DONE Update SCP18 to use total ordering for time                 :@code:
+     CLOSED: [2023-10-23 Mon 11:05]
      :PROPERTIES:
      :ASSIGNEE: Christa
      :END:
+     - State "DONE"       from "TODO"       [2023-10-23 Mon 11:05] \\
+       A total ordering of time (lexicographic) has been established, and comparison of
+       times is based on that (after converting two digit years to four digit years,
+       according to the specification)
 *** DONE Change Int specification                                     :@code:
     :PROPERTIES:
     :ASSIGNEE: Christa
@@ -57,9 +63,58 @@
     fields. The previous specification for IntegerValue made serialization
     difficult. For now, the representation of integer values is the literal byte
     string (this can and probably should change in the future)
-*** TODO Accept and parse root store, check membership                :@code:
+*** DONE Accept and parse root store, check membership                :@code:
+    CLOSED: [2023-09-01 Fri 10:34]
+    - State "DONE"       from "TODO"       [2023-09-01 Fri 10:34]
+*** TODO [#C] Bounded look-ahead sum                                  :@code:
+    :LOGBOOK:
+    CLOCK: [2023-09-11 Mon 15:15]--[2023-09-11 Mon 16:15] =>  1:00
+    :END:
+*** DONE [#A] Fix RDN specification                                   :@code:
+    CLOSED: [2023-09-18 Mon 11:59]
+    - State "DONE"       from "TODO"       [2023-09-18 Mon 11:59]
+    :LOGBOOK:
+    CLOCK: [2023-09-13 Wed 09:35]--[2023-09-13 Wed 10:35] =>  1:00
+    CLOCK: [2023-09-12 Tue 13:05]--[2023-09-12 Tue 16:05] =>  3:00
+    CLOCK: [2023-09-12 Tue 10:00]--[2023-09-12 Tue 12:00] =>  2:00
+    :END:
+*** DONE [#A] Time and validity correctness                           :@code:
+    CLOSED: [2023-10-23 Mon 11:08]
+    - State "DONE"       from "TODO"       [2023-10-23 Mon 11:08]
+    :LOGBOOK:
+    CLOCK: [2023-10-06 Fri 09:50]--[2023-10-06 Fri 18:00] =>  8:10
+    CLOCK: [2023-10-06 Fri 09:05]--[2023-10-06 Fri 10:05] =>  1:00
+    :END:
+*** DONE Add SetOf specification                                      :@code:
+    CLOSED: [2023-10-23 Mon 11:07]
+    - State "DONE"       from "TODO"       [2023-10-23 Mon 11:07] \\
+      Added, and RDN has been converted to use SetOf
+    :LOGBOOK:
+    CLOCK: [2023-10-20 Fri 11:05]--[2023-10-20 Fri 15:00] =>  3:55
+    :END:
 ** Non-malleability
-*** TODO Define injective spec -> data maps
+*** DONE Define injective spec -> data maps                           :@code:
+    CLOSED: [2023-10-23 Mon 11:07]
+    - State "DONE"       from "TODO"       [2023-10-23 Mon 11:07] \\
+      Nonmalleability proven for everything up to certificate chains!
+    :LOGBOOK:
+    CLOCK: [2023-10-15 Sun 08:00]--[2023-10-15 Sun 14:30] =>  6:30
+    CLOCK: [2023-10-05 Thu 08:50]--[2023-10-05 Thu 17:00] =>  8:10
+    CLOCK: [2023-10-03 Tue 09:00]--[2023-10-03 Tue 16:40] =>  7:40
+    CLOCK: [2023-09-27 Wed 11:45]--[2023-09-27 Wed 17:00] =>  5:15
+    CLOCK: [2023-09-26 Tue 15:25]--[2023-09-26 Tue 18:25] =>  3:00
+    CLOCK: [2023-09-21 Thu 08:30]--[2023-09-21 Thu 09:30] =>  1:00
+    CLOCK: [2023-09-19 Tue 15:20]--[2023-09-19 Tue 18:00] =>  2:40
+    CLOCK: [2023-09-18 Mon 13:50]--[2023-09-18 Mon 17:00] =>  3:10
+    :END:
+    - Note taken on [2023-09-16 Sat 09:51] \\
+      It is important to note that the meaningfulness of the injectiveness part of
+      nonmalleability property rests on the choice of the "raw" representation. We
+      are defining injectivity here wrt a nonindexed datatype we map into, where that
+      datatypes is meant to represent the purely computational component of the
+      structure. But, it is easy to "cheat" at this, by an identity map into Exists---
+      (List UInt8) A, which keeps all the specificational components. Thus, one
+      potential weakeness (but also "challenge") is capturing the *two* specifications correctly.
     - Note taken on [2023-08-15 Tue 13:22] \\
       Non-malleable means:
       - /unique:/ there is only one value /v/ to be read from a bytestring /bs/
@@ -71,14 +126,38 @@
       Currently, we can't state injectiveness because the specification includes the
       bytestring as part of the type. So, we need a non-indexed version of "value" so
       we can state this second part of /malleable/.
+*** TODO Sharpen raw representation of OID                            :@code:
+
+    - Note taken on [2023-09-18 Mon 15:18] \\
+      We are going to go forward with a raw representation of OIDs as List (List
+      UInt8) since we only ever compare encodings to encodings. This is pretty cheap,
+      as what one might really care about is the *decoded* values read. But that
+      involves a lot of work!
+      
+      - ensuring that there are only 3 arcs from the root
+      - generalizing unsigned to work with arbitrary powers of 2 (because the OIDSub
+        values are really packed into base 128, with the leading bit just telling you
+        whether this is the end of encoding the present value)
+      - proving this generalization is injective!
 ** Total Correctness
 
    Ideally, all {-# TERMINATING #-} pragmas should be removed. I (Christa)
    believe the ones that call into question whether the /parser itself/ (rather
    than the runtime-irrelevant proofs) should be prioritized.
-*** TODO Remove termination pragmas in the executable code
-*** TODO Remove all remaining termination pragmas
+*** DONE Remove termination pragmas in the executable code            :@code:
+    CLOSED: [2023-09-18 Mon 11:59]
+    - State "DONE"       from "TODO"       [2023-09-18 Mon 11:59]
+    :LOGBOOK:
+    CLOCK: [2023-09-07 Thu 10:10]--[2023-09-07 Thu 13:15] =>  1:50
+    CLOCK: [2023-09-05 Tue 09:55]--[2023-09-05 Tue 11:15] =>  1:20
+    CLOCK: [2023-09-03 Sun 15:30]--[2023-09-03 Sun 17:00] =>  0:45
+    CLOCK: [2023-09-01 Fri 14:10]--[2023-09-01 Fri 14:30] =>  0:20
+    CLOCK: [2023-09-01 Fri 13:30]--[2023-09-01 Fri 14:05] =>  0:35
+    :END:
+*** DONE Remove all remaining termination pragmas                     :@code:
+    CLOSED: [2023-09-18 Mon 11:59]
 
+    - State "DONE"       from "TODO"       [2023-09-18 Mon 11:59]
 ** Chain Building
     - Note taken on [2022-05-03 Tue 16:07] \\
       Was not truly finished --- requires parsing PEM first, then decoding.
@@ -106,10 +185,12 @@
       Had to return to base64 parsing because the spec was not quite right (too lax
       when it comes to input whose bit length is not a multiple of 24)
     - State "DONE"       from "TODO"       [2022-06-02 Thu 17:24]
-*** TODO [#A] Parse PEM                                               :@code:
+*** DONE [#A] Parse PEM                                               :@code:
+    CLOSED: [2023-09-01 Fri 10:33]
     :PROPERTIES:
     :ASSIGNEE: Christa
     :END:
+    - State "DONE"       from "TODO"       [2023-09-01 Fri 10:33]
     - Note taken on [2022-08-28 Sun 19:08] \\
       <2022-08-29 Mon 12:00>
     - Note taken on [2022-08-28 Sun 19:06] \\
@@ -119,6 +200,25 @@
 **** DONE Finish PEM property postulates
      CLOSED: [2022-12-07 Wed 21:07]
      - State "DONE"       from "TODO"       [2022-12-07 Wed 21:07]
+*** DONE [#A] Fix strings specification                               :@code:
+    CLOSED: [2023-09-18 Mon 11:59]
+    - State "DONE"       from "TODO"       [2023-09-18 Mon 11:59]
+    - Note taken on [2023-09-08 Fri 10:15] \\
+      The length bounds for DisplayText don't appear to be correct... at least,
+      we have found a cert that is longer than 200 bytes (because it uses UTF16
+      encoding) 
+    - State "DONE"       from "TODO"       [2023-09-08 Fri 08:55] \\
+      Finished for now, though we don't support full UTF16
+    :LOGBOOK:
+    CLOCK: [2023-09-08 Fri 09:30]--[2023-09-08 Fri 13:30] =>  4:00
+    CLOCK: [2023-09-05 Tue 15:30]--[2023-09-05 Tue 17:15] =>  1:45
+    CLOCK: [2023-09-03 Sun 09:00]--[2023-09-03 Sun 13:25] =>  4:25
+    :END:
+
+    - Note taken on [2023-09-03 Sun 11:25] \\
+      We discovered that BMP, universal, and other string types were not implemented
+      correctly. The assumption was that these were UTF8, but they they were actually
+      UTF16 and UTF32
 ** Cert parsing
 *** DONE Parse public key extensions                                  :@code:
     CLOSED: [2022-07-11 Mon 17:54]
@@ -180,11 +280,20 @@
     :ASSIGNEE: Christa
     :END:
     - State "DONE"       from "TODO"       [2022-03-22 Tue 13:17]
-*** TODO Prove StringPrep algorithm is idempotent                     :@code:
+*** MAYBE Prove StringPrep algorithm is idempotent                    :@code:
+    CLOSED: [2023-09-18 Mon 11:59]
     :PROPERTIES:
     :ASSIGNEE: Christa
     :END:
-
+    - State "MAYBE"      from "TODO"       [2023-09-18 Mon 11:59] \\
+      Not a priority at this time
+*** DONE Decidable equality for =Unicode=                             :@code:
+    CLOSED: [2023-09-08 Fri 08:55]
+    - State "DONE"       from "TODO"       [2023-09-08 Fri 08:55] \\
+      Finished for now, though we don't support full UTF16
+    :LOGBOOK:
+    CLOCK: [2023-09-05 Tue 11:15]--[2023-09-05 Tue 12:00] =>  0:45
+    :END:
 ** Presentation
   
 *** TODO Note =--sized-types= =--guardedness= inconsistency        :@typeset:
@@ -201,11 +310,14 @@
      That said, since sized types are broken on their own, the ideal solution is
      to roll our own trie implementation.
    
-*** TODO Rename grammar properties                                    :@code:
+*** DONE Rename grammar properties                                    :@code:
+    CLOSED: [2023-10-23 Mon 11:08]
     :PROPERTIES:
     :ASSIGNEE: Christa
     :END:
 
+    - State "DONE"       from "TODO"       [2023-10-23 Mon 11:08] \\
+      NonNesting -> NoSubstrings
     The names of properties for the grammar elements should, where possible, be
     named following existing literature on languages.
 
@@ -220,15 +332,32 @@
 
 *** TODO Remove postulates, =--allow-unsolved-metas=                  :@code:
 
-*** TODO [#A] Write-up explanation of Aeres architecture              :@code:
+*** WONT Implement Set uniqueness constraints, or note                :@code:
+    CLOSED: [2023-10-23 Mon 11:09]
+
+    - State "WONT"       from "TODO"       [2023-10-23 Mon 11:09] \\
+      SetOf and Set have no uniqueness constraints!
+    - Note taken on [2023-10-06 Fri 15:54] \\
+      We don't implement uniqueness constraints... yet
+*** DONE [#A] Write-up explanation of Aeres architecture              :@code:
+    CLOSED: [2023-09-01 Fri 10:33]
     :PROPERTIES:
     :ASSIGNEE: Christa
     :END:
 
+    - State "DONE"       from "TODO"       [2023-09-01 Fri 10:33]
 ** Building and running
 *** TODO Move tests to their own directory                            :@code:
 
     This will also speed-up typechecking and compilation time during development
+*** TODO [#A] Update main to test all candidate chains                :@code:
+    :PROPERTIES:
+    :ASSIGNEE: Christa
+    :END:
+
+    - Note taken on [2023-09-11 Mon 14:27] \\
+      Joy is doing chain building in Agda, and would like Aeres to run the chain
+      checks on every candidate chain.
 * PROJ AERES Paper
 ** [2/5] Christa
 
@@ -254,6 +383,21 @@
 
 * Misc Notes
 
+*** 2023 Oct 16 Mon 11:38
+
+    Some confusion about the encoding of RSA PSS: what does DEFAULT apply to?
+    #+begin_example
+      id-RSASSA-PSS  OBJECT IDENTIFIER  ::=  { pkcs-1 10 }
+
+      RSASSA-PSS-params  ::=  SEQUENCE  {
+         hashAlgorithm      [0] HashAlgorithm DEFAULT
+                                   sha1Identifier,
+         maskGenAlgorithm   [1] MaskGenAlgorithm DEFAULT
+                                   mgf1SHA1Identifier,
+         saltLength         [2] INTEGER DEFAULT 20,
+         trailerField       [3] INTEGER DEFAULT 1  }
+    #+end_example
+    
 *** 2022 May 31 Tue 20:33
 
     - serializer for OID, for getSignAlgBS
@@ -296,6 +440,14 @@
     - Org
       - Joy: update the TODO items that have been assigned to you with the
         results (e.g., analysis of cert data for unicode coverage)
+
+*** 2023 Sep 11 Mon 13:51
+
+    *Challenges:* RDNs may include email addresses, encoded as IA5 strings, but
+    the specification for string prep (comparing issuer and subject names) is
+    not clear on how to handle anything that falls outside of the
+    DirectoryString type
+
 * End
 
 #  LocalWords:  AERES
