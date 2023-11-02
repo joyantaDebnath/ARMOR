@@ -11,8 +11,8 @@
 \newcommand{\warnme}[1]{%
 {\color{red} \textbf{$[$} #1 \textbf{$]$}}}
 
-\newcommand{\TODO}[1]{%
-{\color{purple} \textbf{$[$ TODO: } #1 \textbf{$]$}}}
+% \newcommand{\TODO}[1]{%
+% {\color{purple} \textbf{$[$ TODO: } #1 \textbf{$]$}}}
 
 \newcommand{\tmp}[1]{%
 {\color{gray} \textit{#1} }}
@@ -21,8 +21,8 @@
 
 \newcommand{\victor}[2][nolabel]{%
 {\color{C2} \refstepcounter{commentctr}\label{#1} \textbf{$[$ (\thecommentctr) Victor: } #2 \textbf{$]$}}}
-\newcommand{\todo}[2][nolabel]{%
-{\color{C1} \refstepcounter{commentctr}\label{#1} \textbf{$[$ (\thecommentctr) TODO: } #2 \textbf{$]$}}}
+% \newcommand{\todo}[2][nolabel]{%
+% {\color{C1} \refstepcounter{commentctr}\label{#1} \textbf{$[$ (\thecommentctr) TODO: } #2 \textbf{$]$}}}
 
 
 %% LaTeX stuff

@@ -2,20 +2,20 @@
 This section describes the verification goals for our parser and semantic
 checker modules (Figure~\ref{cert_validation}) and how we achieved them.
 For parsing, we give an independent specification of the supported subset of the
-PEM, X.509, and X.690 formats that expresses (independently of the 
-parser) what it means for a bytestring to be in these languages, and our parsers
-are \emph{correct by construction} with respect to the specifications.
+PEM, X.509, and X.690 formats that expresses, \emph{independently of the 
+parser,} what it means for a bytestring to be in these languages, and our parsers
+are \emph{correct by construction} with respect to these specifications.
 All of our parsers are therefore sound by definition.
 Completeness, which we establish for our X.509 certificate parser, is obtained
 using some additional lemmas concerning the specification of certificates.
 
 The specifications we give are defined using datatype families (indexed by
-input strings), and so serve a dual role as internal data representations of the
+input strings), and serve a dual role as internal data representations of the
 formats they describe.
 For semantic validation, the code performing the semantic checks, which is
-invoked on these internal representations, returns not merely a ``yes-no''
-answer, but \emph{proofs} that the property (expressed as an Agda type) does or
-does not hold.
+invoked on these internal representations, returns not merely  ``yes-no''
+answers, but \emph{proofs} that the properties (expressed as Agda types) do or
+do not hold.
 
 \subsubsection*{Input Strings}
 Inputs to our parser have types of the form |List A|, where |A| is the type of

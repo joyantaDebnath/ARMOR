@@ -1,7 +1,8 @@
+% -*- eval: (flyspell-mode); -*-
 \begin{abstract}
 The X.509 Public-Key Infrastructure (PKI) is a ubiquitous authentication mechanism, 
 used as a fundamental building block for achieving the required security guarantees 
-in many security-critical applications. Vulnerabilities or non-compliances with the 
+in many security-critical applications. Vulnerabilities or noncompliances with the 
 X.509 standard (i.e., RFC 5280) in an X.509 certificate chain validation implementation 
 can result in impersonation attacks and/or interoperability issues. In this paper, 
 we focus on developing a modular X.509 certificate chain validation library called 

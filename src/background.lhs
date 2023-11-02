@@ -32,11 +32,21 @@ While the aforementioned checks gives an overview of the certificate chain valid
 
 \subsection{Our Objective}
 \label{sec:our-objective}
-The overarching objective of this work is to develop a \textit{formally-verified reference implementation} for the \xfon CCVL. This goal entails formulating a precise formal specification that aligns with the requirements of RFC-5280, ensuring its logical consistency, developing an implementation capable of enforcing all the requirements, and, lastly, applying some formal verification techniques to confirm the implementation's adherence to the formalized specification. For the verification step, we aim to prove the \soundness and \completeness of our implementation as the top-level properties, which are defined below. \\
+The overarching objective of this work is to develop a \textit{formally-verified
+  reference implementation} for the \xfon CCVL.
+This goal entails formulating a precise formal specification that aligns with
+the requirements of RFC-5280, ensuring its logical consistency, developing an
+implementation capable of enforcing all the requirements, and, lastly, applying
+some formal verification techniques to confirm the implementation's adherence to
+the formalized specification.
+For the verification step, we aim to prove the \soundness and \completeness of
+our implementation as the top-level properties, which are 
+defined below. \todo{\footnotesize CJ: don't we prove sound, complete for parsing only, not
+  all CCVL?} \\ 
 \textbf{Soundness:} If the CCVL implementation ($I$) accepts an input certificate chain ($cc$), then the formal specification ($FS$) also accepts the certificate chain (cc). That means, $\forall cc, I(cc) \implies FS(cc)$. \\
 \textbf{Completeness:} If the formal specification ($FS$) accepts an input certificate chain ($cc$), then the CCVL implementation ($I$) also accepts the certificate chain (cc). That means, $\forall cc, FS(cc) \implies \exists I(cc)$.
 
-\soundness and \completeness together ensure that an implementation behaves exactly as specified. A sound system does not produce false positives (\ie, invalid inputs presented as valid), and a complete system does not produce false negatives (\ie, valid inputs presented as invalid). Thus, these properties guarantee that the implementation will always behave as expected.
+\Soundness and \completeness together ensure that an implementation behaves exactly as specified. A sound system does not produce false positives (\ie, invalid inputs presented as valid), and a complete system does not produce false negatives (\ie, valid inputs presented as invalid). Thus, these properties guarantee that the implementation will always behave as expected.
 
 
 \subsection{Technical Challenges}
@@ -45,7 +55,11 @@ There are several challenges to our work. In general, interpreting the RFC-5280 
 
 \subsubsection{Parsing Challenges} 
 \label{parse}
-The internal data structure of an \xfon certificate, while described in the \textit{Abstract Syntax Notation One} (\asnone), is eventually serialized based on the \xsno Distinguished Encoding Rules (\der)~\cite{rec2002x}. To make this binary data more human-readable and easier to debug, it is then encoded into the Privacy Enhanced Mail (\pem)~\cite{balenson1993privacy} format using \basesf encoding. Upon receiving such a certificate in the \pem format, one must reverse the whole encoding process to extract and interpret the information stored within it. Firstly, the \basesf decoding must be applied to convert the textual \pem certificate back into its original binary format. This \der-encoded binary data then needs to be parsed using a \der certificate parser, which extracts all the information from the certificate and transforms it into an intermediate representation for the subsequent semantic validation phase. This intermediate representation provides detailed information contained within a certificate and has a one-to-one correspondence with its \asnone certificate representation. Figure~\ref{encoding} clearly shows the encoding and decoding steps of an \xfon certificate.
+The internal data structure of an \xfon certificate, while described in the
+\textit{Abstract Syntax Notation One} (\asnone), is eventually serialized based
+on the \xsno Distinguished Encoding Rules (\der)~\cite{rec2002x}. To make this
+binary data more human-readable\todo{CJ: Human readable?! Isn't it to avoid
+  misinterpreting bytes as escape sequences?} and easier to debug, it is then encoded into the Privacy Enhanced Mail (\pem)~\cite{balenson1993privacy} format using \basesf encoding. Upon receiving such a certificate in the \pem format, one must reverse the whole encoding process to extract and interpret the information stored within it. Firstly, the \basesf decoding must be applied to convert the textual \pem certificate back into its original binary format. This \der-encoded binary data then needs to be parsed using a \der certificate parser, which extracts all the information from the certificate and transforms it into an intermediate representation for the subsequent semantic validation phase. This intermediate representation provides detailed information contained within a certificate and has a one-to-one correspondence with its \asnone certificate representation. Figure~\ref{encoding} shows the encoding and decoding steps of an \xfon certificate.
 
 \begin{figure}[h]
     \centering
@@ -55,27 +69,79 @@ The internal data structure of an \xfon certificate, while described in the \tex
     \label{encoding}
     \end{figure}
 
-However, this \der representation of the certificate internally follows a $<T, L, V>$ structure to represent each certificate field, where $T$ denotes the type, $V$ indicates the actual content, and $L$ signifies the length of the $V$ field. Additionally, the $V$ field can include nested $<T, L, V>$ structures, adding additional layers of complexity to the binary data. Parsing such a binary data is challenging since it always requires passing the value of the $L$ field (length) to accurately parse the subsequent $V$ field. Therefore, the internal grammar an of \der-encoded certificate is context-sensitive, and developing a parser for such a \textit{context-sensitive} language is generally a complex task~\cite{kaminsky2010pki, debnath2021re}.
+However, this \der representation of the certificate internally follows a $<T,
+L, V>$ structure to represent each certificate field, where $T$ denotes the
+type, $V$ indicates the actual content, and $L$ signifies the length in bytes of
+the $V$ field.
+Additionally, the $V$ field can include nested $<T, L, V>$ structures,
+adding additional layers of complexity to the binary data. Parsing such a binary
+data is challenging since it always requires passing the value of the $L$ field
+(length) to accurately parse the subsequent $V$ field. Therefore, the internal
+grammar of a \der-encoded certificate is context-sensitive, and developing a
+parser for such a \textit{context-sensitive} language is generally a complex
+task~\cite{kaminsky2010pki, debnath2021re}. 
 
-In some cases, the parsing process also involves correctly interpreting the parsed data. Take the example of the \texttt{UTCTime} format used for certificate validity periods. It uses a two-digit year representation, $YY$, and here lies the potential for misinterpretation. In this format, values from $00$ to $49$ are deemed to belong to the $21st$ century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the $20th$ century and are consequently translated into $19YY$. This peculiarity of the \texttt{UTCTime} format allows the representation of years from $1950$ to $2049$. Therefore, when constructing a valid internal representation of a certificate, the \der parser must correctly interpret this two-digit year to avoid potential validation errors.
+In some cases, the parsing process also involves correctly interpreting the
+parsed data.
+Take the example of the \texttt{UTCTime} format used for certificate validity
+periods.
+It uses a two-digit year representation, $YY$, and here lies the potential for
+misinterpretation.
+In this format, values from $00$ to $49$ are deemed to belong to the $21st$
+century and are thus interpreted as $20YY$.
+In contrast, values from $50$ to $99$ are associated with the $20th$ century and
+are consequently translated into $19YY$.
+This peculiarity of the \texttt{UTCTime} format allows the representation of
+years from $1950$ to $2049$.
+Therefore, when constructing a valid internal representation of a certificate,
+the \der parser must correctly interpret this two-digit year to avoid potential
+validation errors. 
 
 \subsubsection{Semantic Validation Challenges} 
 \label{sem}
 One advantage of using the \pem format is that the server can include its own certificate as well as the associated issuer CA certificates in one single file. Once these certificates are parsed into their corresponding intermediate representations, the client application must undertake a series of semantic checks, as mentioned in Section~\ref{cert_val_proc}. However, the CA certificates can come out-of-order or miss one or more required certificates. This is why prior to enforcing the semantic checks, a valid certificate chain should be constructed from the end-entity certificate to the root CA certificate~\cite{path, cooper2005rfc}. In addition, string transformation needs to be performed for each certificate, which is a type of string conversion to ensure all the strings in a certificate are in \textit{normalized} form~\cite{zeilenga2006lightweight}. We can move to the semantic validation only after such intermediate steps. Figure~\ref{cert_validation} shows the stages for certificate chain validation.
 
 \begin{figure}[h]
-    \centering
-    \scriptsize
-    \includegraphics[scale=0.7]{img/cert_validation.pdf} \\
-    \caption{Sequential stages for certificate chain validation}
-    \label{cert_validation}
-    \end{figure}
+  \centering
+  \scriptsize
+  \includegraphics[scale=0.7]{img/cert_validation.pdf} \\
+  \caption{Sequential stages for certificate chain validation}
+  \label{cert_validation}
+\end{figure}
 
-However, each of these intermediate steps presents challenges. For example, building a valid chain can be difficult due to the lack of specific directions as well as the possibility of having multiple valid certificate chains since a single certificate can be cross-signed by more than one CA. In addition, converting strings to \textit{normalized} form is also a complex process since the number of character sets is humongous considering all the languages worldwide. Finally, before signature verification, the implementation needs to carefully parse the contents of the \texttt{SignatureValue} field to prevent attacks based on the \textit{RSA signature forgery}~\cite{finney2006bleichenbacher, bleichenbacher1998chosen}. While these intermediate steps are conceptually straightforward, implementing them in a robust and secure manner is a significant challenge.
+However, each of these intermediate steps presents challenges.
+For example, building a valid chain can be difficult due to the lack of specific
+directions as well as the possibility of having multiple valid certificate
+chains since a single certificate can be cross-signed by more than one CA.
+In addition, converting strings to \textit{normalized} form is also a complex
+process since the number of character sets is humongous considering all the
+languages worldwide.
+Finally, before signature verification, the implementation needs to carefully
+parse the contents of the \texttt{SignatureValue} field to prevent attacks based
+on the \textit{RSA signature forgery}~\cite{finney2006bleichenbacher,
+  bleichenbacher1998chosen}.
+While these intermediate steps are conceptually straightforward, implementing
+them in a robust and secure manner is a significant challenge.\todo{CJ: We
+  should say at each step the formal guarantees we offer, e.g., no formal
+  guarantees for string prep.}
 
 
 \subsubsection{Formal Verification Challenges} 
-\xfon CCVL involves cryptographic operations, particularly during signature verification. Such cryptographic operations are based on mathematical theories and are computationally complex, making them challenging to formally model and verify. In addition, guaranteeing \soundness and \completeness of the implementation further intensifies the task. \soundness, ensuring that every certificate chain the process marks as valid is indeed valid according to RFC-5280 specifications, demands a comprehensive approach that leaves no corner case or unusual behavior unchecked, a significant challenge given the complexity of the \xfon standard. \completeness, however, requires the system to confirm the validity of all genuinely valid certificate chains per RFC-5280. Achieving \completeness necessitates an exhaustive exploration of all potential valid states and configurations, a daunting endeavor given the broad parameter space and flexibility in the \xfon standard.
+\xfon CCVL involves cryptographic operations, particularly during signature
+verification.
+Such cryptographic operations are based on mathematical theories and are
+computationally complex, making them challenging to formally model and verify.
+In addition, guaranteeing \soundness and \completeness of the implementation
+further intensifies the task.
+\Soundness, ensuring that every certificate chain the process marks as valid is
+indeed valid according to RFC-5280 specifications, demands a comprehensive
+approach that leaves no corner case or unusual behavior unchecked, a significant
+challenge given the complexity of the \xfon standard.
+\Completeness, however, requires the system to confirm the validity of all
+genuinely valid certificate chains per RFC-5280.
+Achieving \completeness necessitates an exhaustive exploration of all potential
+valid states and configurations, a daunting endeavor given the broad parameter
+space and flexibility in the \xfon standard. 
 
 \subsection{Technical Insights} We now present our insights on solving the challenges of developing a formally-verified CCVL implementation.
 

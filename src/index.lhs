@@ -116,6 +116,8 @@
 \usepackage{cleveref}
 \usepackage{tabularx}
 
+\usepackage{todonotes}
+
 \usepackage[normalem]{ulem}
 
 %%%%%%% General stuff
@@ -156,8 +158,10 @@
 \newcommand{\dnssec}{DNSSEC\xspace}
 \newcommand{\tlsa}{TLSA\xspace}
 
-\newcommand{\soundness}{\textit{Soundness}\xspace}
-\newcommand{\completeness}{\textit{Completeness}\xspace}
+\newcommand{\Soundness}{\textit{Soundness}\xspace}
+\newcommand{\soundness}{\textit{soundness}\xspace}
+\newcommand{\Completeness}{\textit{Completeness}\xspace}
+\newcommand{\completeness}{\textit{completeness}\xspace}
 
 \newcommand{\fuzzing}{\textit{Fuzzing}\xspace}
 \newcommand{\symex}{\textit{Symbolic Execution}\xspace}

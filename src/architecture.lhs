@@ -9,12 +9,12 @@ Now, we present a brief overview of these tools.
 
 \subsubsection{Agda Theorem Prover}
 \label{sec:design-agda}
-\agda~\cite{bove2009brief} is a powerful and expressive programming language
+\agda~\cite{bove2009brief, No07_Agda} is a powerful and expressive programming language
 that combines functional programming and formal verification.
 At its core, \agda is a \textit{dependently typed} functional programming
 language, which allows types to refer to terms.
-This capability helps express rich properties in types and ensures that the
-programs conform to these properties.
+This capability helps express rich properties in types, with typechecking
+enforcing that programs satisfy these properties.
 In other words, if a program compiles, it is also proven to meet the
 specifications described by its type.
 Under the \emph{Curry-Howard}
@@ -34,7 +34,7 @@ data Vec (A : Set) : Nat -> Set where
   vnil : Vec A 0
   vcons : forall {n} -> A -> Vec A n -> Vec A (1 + n)
 
-head : forall {A n} -> Vec A (1 + n) -> Vec A n
+head : forall {A n} -> Vec A (1 + n) -> A
 head (vcons hd tl) = hd
   \end{code}
   \caption{Length-indexed lists in Agda}
@@ -62,9 +62,20 @@ We now briefly explain the code listing in the figure.
   explicitly, leaving \agda to infer their values from the types of other
   arguments to the function.
   For example, we can write |vcons 0 vnil|, and \agda will know this has type
-  |Vec Nat 1|, as the only correct instantiation of parameter |n| of |vcons| for
+  |Vec Nat 1|, as the only correct instantiation of parameter |n| of |vcons| 
   is |0|.
 \end{itemize}
+
+Tracking the length of lists statically allows us to express correctness
+properties in the types of functions producing or consuming them.
+As a simple example, the second definition of Figure~\ref{fig:agda-ex}, |head|,
+expresses in its type that the list it consumes must have at least one element
+(|Vec A (1 + n)|).
+Because of this, in the definition of |head| we do not need to consider the case
+that the argument is an empty list: through a process called \emph{dependent
+  pattern matching}~\cite{Co92_Pattern-Dependent-Types}, \agda determines that
+the equation \(0 = 1 + n\) is impossible to solve for the natural numbers, and
+thus the empty list can never be a well-typed argument to |head|.
 
 % Note that we can generate an executable binary of the implementation by first compiling the \agda source code into \haskell and then using a \haskell compiler to compile the generated \haskell code into a binary. 
 
@@ -140,7 +151,18 @@ We now briefly explain the code listing in the figure.
   \label{armor}
   \end{figure}
 
-Figure~\ref{armor} shows the high-level architecture of \armor, which consists of four core modules: \driver, \parser, \stringtransformer, and \semantic. As discussed in Section~\ref{sem}, the \driver module, written in \python, takes the input certificates in a single \pem file. We assume the input \pem file contains all the certificates in order. That means we rely on the sender to provide the end-entity and CA certificates with a valid certification path. Therefore, we do not include the \chain module in our implementation to ease our verification steps. However, we formally verified the most challenging steps, such as parsing, string transformation, and semantic validation using the \agda theorem prover. Note that we execute signature verification and trust anchor check outside our verified \semantic module. Finally, our \driver module manages the I/O operations and directs the external calls needed to execute signature verification (based on the oracle of \morpheus) and trust anchor check. As mentioned in Section~\ref{mor}, some inputs to the \morpheus's oracle require pre-processing with cryptographic operations, such as \textit{modular exponentiation} and \textit{hashing}, for which we leverage \python's \cryptography library~\cite{crypto}. 
+Figure~\ref{armor} shows the high-level architecture of \armor, which consists
+of four core modules: \driver, \parser, \stringtransformer, and \semantic.
+As discussed in Section~\ref{sem}, the \driver module, written in \python, takes
+the input certificates in a single \pem file.
+We assume the input \pem file contains all the certificates in order.
+That means we rely on the sender to provide the end-entity and CA certificates
+with a valid certification path.
+Therefore, we do not include the \chain module in our implementation to ease our
+verification steps.
+However, we formally verified the most challenging steps, such as parsing,
+string transformation\todo{CJ: We have not!}, and semantic validation using the \agda theorem prover.
+Note that we execute signature verification and trust anchor check outside our verified \semantic module. Finally, our \driver module manages the I/O operations and directs the external calls needed to execute signature verification (based on the oracle of \morpheus) and trust anchor check. As mentioned in Section~\ref{mor}, some inputs to the \morpheus's oracle require pre-processing with cryptographic operations, such as \textit{modular exponentiation} and \textit{hashing}, for which we leverage \python's \cryptography library~\cite{crypto}. 
 
 
 

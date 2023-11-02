@@ -1,3 +1,4 @@
+% -*- eval: (flyspell-mode); -*-
 \section{Introduction}
 
 The \xfon PKI standard \cite{RFC5280} provides a scalable way to verify the binding of an entity's identity with its public key. 
@@ -30,7 +31,7 @@ have been beneficial in identifying numerous vulnerabilities, they often fall sh
 In contrast, a formally verified \xfon certificate chain validation implementation can provide mathematical assurances that the implementation 
 behaves correctly, setting a benchmark for developing other such implementations. Such a formally verified implementation, however, is currently 
 missing from the literature. \emph{The current paper addresses this research gap by designing and developing a library for \xfon certificate chain validation, 
-named \armor, whose compliance with the standard is mathematically proven correct}.  
+named \armor, whose compliance with the standard is established by a formal, machine-checked proof.}  
 
 Although the current paper, to the best of our knowledge, presents the first implementation of \xfon certificate 
 chain validation with a machine-checked proof of correctness, it draws inspirations from a number of prior work in the area 
@@ -49,8 +50,17 @@ parsing; (4) Focuses only on verifiable encoding of certificates, not parsing; (
 % \textbf{Technical Challenges:} 
 Developing \armor required addressing the following technical challenges. 
 \emph{Firstly}, the specifications we need to follow are written in natural language (\eg, English) and often unclear and under-specified~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}, making them tricky to interpret correctly. 
-\emph{Secondly}, formalizing the specification accurately requires a lot of manual efforts. 
- \emph{Thirdly}, building a provably correct parser to decode the structure of a \der (Distinguished Encoding Rule)~\cite{rec2002x} encoded binary certificate is quite complex due to the \emph{context-sensitive} nature of the certificate's  grammar~\cite{kaminsky2010pki, debnath2021re}. \emph{Fourthly}, before we can check an already parsed certificate for semantic errors, we need to correctly perform some intermediate transformations like  string transformation~\cite{zeilenga2006lightweight}. \emph{Finally}, proving the partial correctness guarantees, especially completeness, is technically very demanding and requires handling different case splits and discharging their proofs manually. 
+\emph{Secondly}, formalizing the specification accurately requires significant manual effort. 
+ \emph{Thirdly}, building a provably correct parser to decode the structure of a
+ \der (Distinguished Encoding Rule)~\cite{rec2002x} encoded binary certificate
+ is quite complex due to the \emph{context-sensitive} nature of the
+ certificate's  grammar~\cite{kaminsky2010pki, debnath2021re}. \emph{Fourthly},
+ before we can check an already parsed certificate for semantic errors, we need
+ to correctly perform some intermediate transformations like  string
+ transformation~\cite{zeilenga2006lightweight}. \emph{Finally}, proving the
+ correctness guarantees, especially completeness, is technically very demanding:
+ it requires considering \emph{all} possible parses of a byte string, which can
+ lead to multiple case splits requiring manual proof.
 
 % daunting task of modeling and demonstrating the correctness of the cryptographic operations can pose a significant challenge, demanding sophisticated mathematical techniques and a deep understanding of the underlying cryptographic principles while ensuring the focus remains on the core certificate validation process.
 
@@ -86,12 +96,12 @@ modules, namely \parser, \stringtransformer, and \semantic, are written in \agda
 a dependently typed functional programming language. \agda not only allows one to write programs 
 but also allows one to prove properties about these programs through interactive theorem proving. 
 We prove the different guarantees of the different modules. Notable among these verification efforts, 
-is the first machine-checked proof of partial correctness (i.e., \soundness and \completeness) of the \parser module. 
+is the first machine-checked proof of correctness (i.e., \soundness and \completeness) of the \parser module. 
 For proving the completeness of the parser, we also prove two necessary properties of our formalization of the 
-grammar of an \xfon certificate, namely, \emph{unambiguity} (i.e., the parser has no degree of freedom over which prefix of the 
-input it consumes) and \emph{uniqueness} (i.e., the parser has no degree of freedom once it chooses a particular prefix), 
-which our parser also enjoys. These formal guarantees signifies that it is possible to develop efficient parsers for \xfon, although 
-the grammar itself is context-sensitive. 
+grammar of an \xfon certificate: \emph{no substrings} (i.e., parsers have no degrees of freedom over which prefix of the 
+input it consumes) and \emph{unambiguity} (i.e., parsers have no degrees of freedom in decoding a particular input).
+These formal guarantees signify that it is possible to develop efficient parsers
+for \xfon, although the grammar itself is context-sensitive. 
 
 As \armor is as good as its specification, it is crucial to ensure that our interpretation of the specification is consistent 
 with other implementations. To check the correctness of the specification, we differentially test \armor against $11$ open-source 
@@ -116,7 +126,8 @@ is more important than runtime overhead.
 % \textbf{Evaluation and Notable Findings:} We aim to evaluate \armor's correctness in interpreting the specification, its performance as a benchmark, and its runtime and memory overhead. Therefore, we conduct differential testing against $11$ open-source \xfon implementations. Our evaluation uses a dataset of $2$ million certificates randomly selected from a snapshot of $1.5$ billion real certificates gathered from the \censys~\cite{censys} certificate repository. Our analysis shows that \armor enforces stricter validation rules compared to most libraries, rejecting $10,222$ certificate chains accepted by other libraries due to their violations of RFC-5280 requirements. \armor also showed no discrepancies compared to high-assurance implementation like \ceres~\cite{debnath2021re}. In terms of runtime and memory overhead, \armor consumes a considerable amount of memory compared to other libraries, yet its execution time is competitive, especially when compared to \ceres. These results suggest that despite not outperforming the \cpp libraries (\eg, \openssl~\cite{openssl}, \gnutls~\cite{gnutls}, \boringssl~\cite{boringssl}, \mbedtls~\cite{mbedtls}, \wolfssl~\cite{wolfssl}, \matrixssl~\cite{matrixssl}) regarding memory and runtime, \armor's correctness guarantees and reasonable runtime make it a viable choice for real-world scenarios.
 
 % \textbf{Our Contributions:} 
-This paper makes the following technical contributions. 
+This paper makes the following technical contributions.\todo{CJ: Add parser-independent
+spec of grammar.}
 \begin{enumerate}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them enabling development of other such formally-verified implementations in the future. 
 \item We present the design and implementation of \armor, which enjoys the soundness and completeness guarantees with respect to our specification.  
