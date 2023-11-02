@@ -68,6 +68,7 @@
     - State "DONE"       from "TODO"       [2023-09-01 Fri 10:34]
 *** TODO [#C] Bounded look-ahead sum                                  :@code:
     :LOGBOOK:
+    CLOCK: [2023-10-31 Tue 11:10]--[2023-10-31 Tue 11:15] =>  0:05
     CLOCK: [2023-09-11 Mon 15:15]--[2023-09-11 Mon 16:15] =>  1:00
     :END:
 *** DONE [#A] Fix RDN specification                                   :@code:
@@ -363,7 +364,16 @@
       Joy is doing chain building in Agda, and would like Aeres to run the chain
       checks on every candidate chain.
 * PROJ AERES Paper
-** [2/5] Christa
+  :PROPERTIES:
+  :CATEGORY: Aeres
+  :toggl-project: Aeres
+  :END:
+  :LOGBOOK:
+  CLOCK: [2023-10-31 Tue 11:15]--[2023-10-31 Tue 17:05] =>  5:50
+  CLOCK: [2023-10-31 Tue 11:15]--[2023-10-31 Tue 11:15] =>  0:00
+  CLOCK: [2023-10-31 Tue 11:10]--[2023-10-31 Tue 11:15] =>  0:05
+  :END:
+** [2/5] Christa                                                    :ARCHIVE:
 
    - [ ] Double-check S3.1.1
    - [ ] Double-check S3.3.6
