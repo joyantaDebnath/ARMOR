@@ -1,21 +1,20 @@
 \section{Verification and Correctness Proofs}
-This section describes the verification goals for our parser and semantic
-checker modules (Figure~\ref{cert_validation}) and how we achieved them.
-For parsing, we give an independent specification of the supported subset of the
-PEM, X.509, and X.690 formats that expresses, \emph{independently of the 
-parser,} what it means for a bytestring to be in these languages, and our parsers
-are \emph{correct by construction} with respect to these specifications.
-All of our parsers are therefore sound by definition.
-Completeness, which we establish for our X.509 certificate parser, is obtained
-using some additional lemmas concerning the specification of certificates.
-
-The specifications we give are defined using datatype families (indexed by
-input strings), and serve a dual role as internal data representations of the
+This section details the design and verified guarantees of our parser and
+semantic checker modules (Figure~\ref{cert_validation}).
+We begin by overviewing our approach to specifying the supported subsets of the
+PEM, X.509, and X.690 formats.
+These specifications are given \emph{independently of the parser,} facilitating
+verification of the properties of language itself (such as
+\emph{unambiguousness} and \emph{nonmalleability}), 
+and they are defined using datatype families (indexed by
+input strings), and so serve a dual role as internal data representations of the
 formats they describe.
-For semantic validation, the code performing the semantic checks, which is
-invoked on these internal representations, returns not merely  ``yes-no''
-answers, but \emph{proofs} that the properties (expressed as Agda types) do or
-do not hold.
+Next, we describe the design of our parsers, which are \emph{correct by
+  construction} with respect to these specifications.
+Finally, we show our approach to semantic validation, which expresses the
+desired properties as predicates over the internal data representations; the
+code performing the semantic checks returns not merely ``yes-no'' answers, but
+\emph{proofs} that the properties do or do not hold.
 
 \subsubsection*{Input Strings}
 Inputs to our parser have types of the form |List A|, where |A| is the type of
@@ -25,7 +24,9 @@ literals.
 For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
 the Agda standard library type |Fin 256| (the type for nonnegative integers
 strictly less than 256).
-The decoding of the base 64 data contained within the PEM certificates 
+The result of the PEM parser is fed to the X.509 parser using a decoder that is
+verified with respect to an encoder (base 64 encoding and decoding form an
+isomorphism).
 
 \subsection{Independent Specification}
 Our first challenge concerns how the specification is represented, that is,
@@ -35,57 +36,148 @@ Our answer is that for each production rule |G| of the supported subset of the
 PEM, X.690, and X.509 grammars, we define a predicate |G : List A -> Set| over
 the input strings.
 Membership of an input string |xs| in the language denoted by |G| corresponds to
-the truth of the proposition |G xs|.
+the inhabitation of the type |G xs|.
 
-For each defined |G| we are careful to document which components are ``data''
-and which are ``specification.''
-For example, field |v| of |BoolValue| is data and the remaining fields are
-specification.
-One of the primary advantages of Agda is that there is one language for both
-programs and proofs, but this strength becomes a challenge when trying to
-enforce this distinction.
-Our approach is to use erasure annotations (|@0|) on components serving
-specificational purposes only.
-This not only improves the performance of ARMOR, as these components are removed
-by the Agda's GHC backend, but it also gives programmers using ARMOR as a reference
-assurance that that those components need not be present in implementations
-designed to run in resource-constrained environments.
-
-\subsubsection{Properties}
-A major advantage of our approach to specifying X.509 is that we can prove
-properties \emph{about} these specifications, increasing trust that we have
-accurately captured the meaning of the natural language descriptions.
-In addition, two properties in particular are essential to our proof of parser
-completeness.
-\begin{itemize}
-\item \textbf{Unambiguous:} at most one prefix of a bytestring can belong to
-  |G|.
-  That means, \(\forall \mathit{ws}\, \mathit{xs}\, \mathit{ys}\, \mathit{zs},
-  \mathit{ws} +\!\!\!+ \mathit{xs} = \mathit{ys} +\!\!\!+ \mathit{zs} \land
-  |G ws| \land |G ys| \implies \mathit{ws} = \mathit{ys}\).
-  
-\item \textbf{Uniqueness:} the internal representation of |G xs| is uniquely
-  determined by |xs|.
-  That means (using \(\mathit{Rep}_{|G|}(x,\mathit{xs})\) to express ``\(x\) is the
-  internal representation of |G xs|''),
-  \(\forall x\, y\, \mathit{xs}, \mathit{Rep}_{|G|}(x,\mathit{xs}) \land
-  \mathit{Rep}_{|G|}(y,\mathit{xs}) \implies x = y\).
-\end{itemize}
-\noindent Both of these properties have been proven for our specification of
-X.509 certificates.
-In Agda, predicates |Unambiguous| and |Unique| are defined as follow.
 \begin{figure}[h]
-  \centering
   \begin{code}
-    Unambiguous : (List UInt8 -> Set) -> Set
-    Unambiguous G =  forall {ws xs ys zs} -> ws ++ xs == ys ++ zs
-                     -> G ws -> G ys -> ws == ys
-    Unique : (List UInt8 -> Set) -> Set
-    Unique G = forall {xs} -> (g h : G xs) -> g == h
+record IntegerValue (@0 bs : List UInt8) : Set where
+  constructor mkIntVal
+  field
+    @0 hd : UInt8
+    @0 tl : List UInt8
+    @0 minRep : MinRep hd tl
+    val : IntZ
+    @0 valeq : val == Base256.twosComp bs
+    @0 bseq : bs == hd :: tl
   \end{code}
-  \caption{Definition of unambiguousness and uniqueness}
-  \label{fig:unambig-uniq}
+  \caption{Specification of integer values}
+  \label{fig:s4-integervalue}
 \end{figure}
+
+We illustrate our approach with a concrete example: our specification of X.690
+DER integer values, shown in Figure~\ref{fig:s4-integervalue}.
+This specification takes the form of an Agda record (roughly analogous to a
+C-style \texttt{struct}) that is parameterized by a bytestring |bs|.
+The types of the fields of this record specify \emph{what it means} for |bs| to
+be a valid encoding of an integer value, \emph{and} give integer value |bs| encodes.
+\begin{itemize}
+\item \textbf{Erasure annotations.} The string |@0| marks the
+  accompanying identifier as \emph{erased at runtime}.
+  In the figure, only the field |val| (the integer encoded by |bs|) is present
+  at runtime, with the remaining fields erase by Agda's GHC backend.
+  The annotations for runtime erasure not only improve the performance of ARMOR,
+  but also serve to document, for programmers using ARMOR as a reference
+  implementation, which components of the internal representation serve only
+  specificational purposes.
+
+\item \textbf{Nonempty encoding.} Fields |hd|, |tl|, and |bseq| together ensure
+  that the encoding of an integer value ``consists of one or more
+  octets.\todo{cite}''
+  Specifically, |bseq| ensures that |bs| is of the form |hd :: tl|, where |hd|
+  is the first content octet and |tl| contains the remaining bytes (if any).
+  
+\item \textbf{Minimum representation.} X.690 BER requires that the two's
+  complement encoding of an integer value consists of the minimum number of
+  octets needed for this purpose.
+  This is enforced by the field |minRep| (we shall see the definition of the
+  relation |MinRep| shortly).
+
+\item \textbf{Linking the value and its encoding.}
+  Field |valeq| forecloses any possibility that an inhabitant of |IntegerValue
+  bs| populates field |val| with an arbitrary integer by requiring that it
+  \emph{must} be equal to the result of decoding |bs| as a two's complement
+  binary value, where |Base256.twosComp| is the decoding operation.
+\end{itemize}
+
+A major advantage of our approach to specifying X.509 is that it facilitates
+proving properties \emph{about the grammar} without having to reason about
+parser implementation details.
+By verifying properties of grammar itself, we can be more confident that we have
+accurately captured the meaning of the natural language descriptions. 
+Two properties in particular that we have proven hold of our specification
+capture the major design goal of X.690 DER formats: they are \emph{unambiguous},
+meaning that a given bytestring can encode \emph{at most one value} of a
+particular type; and they are \emph{non-malleable}, meaning that distinct
+bytestrings cannot encode identical values.
+
+\subsubsection{Unambiguous}
+We formally define unambiguousness of a language |G| in Agda as follows.
+\begin{code}
+Unambiguous G = forall {xs} -> (a1 a2 : G xs) -> a1 == a2
+\end{code}
+Read this definition as saying that for every string |xs|, any two inhabitants
+of the internal representation of the value encoded by |xs| in |G| are equal.
+
+\textbf{Challenges.} |Unambiguous| expresses a property much stronger
+than might be first apparent.
+To illustrate, showing |Unambiguous IntegerValue| requires showing that the
+corresponding fields are equal --- \emph{even the purely specificaional fields.}
+Once established, the additional strength that |Unambiguous| significantly aids
+development of the verified parser; however, this means that specifications must
+be carefuly crafted so as to admit unique proof terms.
+
+\subsubsection{Non-malleable}
+Compared to unambiguousness, non-malleability requires more machinery to
+express, so we begin by discussing the challenges that motivate this machinery.
+Since bytestring encodings are part of the very types of internal
+representations (and because Agda's notion of equality is fundamentally
+\emph{homogeneous}), it is impossible to express equality between internal
+representations |a1 : G xs1| and |a2 : G xs2| without \emph{already assuming
+  |xs1| is equal to |xs2|}.
+
+To make non-malleability non-trivial, we must therefore express what is the
+``raw'' internal datatype corresponding to |G|, discarding the specificational
+components.
+We express this in Agda by |Raw|, given below.
+\begin{code}
+record Raw (G : List A -> Set) : Set where
+  field
+    D : Set
+    to : {@0 xs : List A} -> G xs -> D
+\end{code}
+
+\begin{code}
+RawIntegerValue : Raw IntegerValue
+Raw.D RawIntegerValue = IntZ
+Raw.to RawIntegerValue = IntegerValue.val
+\end{code}
+
+\noindent An inhabitant of |Raw G| consists of a type |D|, intended to be the
+``raw data'' of |G|, together with a function |to| that should extract this data
+from any inhabitant |G xs|.
+
+
+% In addition, two properties in particular are essential to our proof of parser
+% completeness.
+% \begin{itemize}
+% \item \textbf{Unambiguous:} at most one prefix of a bytestring can belong to
+%   |G|.
+%   That means, \(\forall \mathit{ws}\, \mathit{xs}\, \mathit{ys}\, \mathit{zs},
+%   \mathit{ws} +\!\!\!+ \mathit{xs} = \mathit{ys} +\!\!\!+ \mathit{zs} \land
+%   |G ws| \land |G ys| \implies \mathit{ws} = \mathit{ys}\).
+  
+% \item \textbf{Uniqueness:} the internal representation of |G xs| is uniquely
+%   determined by |xs|.
+%   That means (using \(\mathit{Rep}_{|G|}(x,\mathit{xs})\) to express ``\(x\) is the
+%   internal representation of |G xs|''),
+%   \(\forall x\, y\, \mathit{xs}, \mathit{Rep}_{|G|}(x,\mathit{xs}) \land
+%   \mathit{Rep}_{|G|}(y,\mathit{xs}) \implies x = y\).
+% \end{itemize}
+% \noindent Both of these properties have been proven for our specification of
+% X.509 certificates.
+% In Agda, predicates |Unambiguous| and |Unique| are defined as follow.
+% \begin{figure}[h]
+%   \centering
+%   \begin{code}
+%     Unambiguous : (List UInt8 -> Set) -> Set
+%     Unambiguous G =  forall {ws xs ys zs} -> ws ++ xs == ys ++ zs
+%                      -> G ws -> G ys -> ws == ys
+%     Unique : (List UInt8 -> Set) -> Set
+%     Unique G = forall {xs} -> (g h : G xs) -> g == h
+%   \end{code}
+%   \caption{Definition of unambiguousness and uniqueness}
+%   \label{fig:unambig-uniq}
+% \end{figure}
 
 \subsection{Sound and Complete Parsing}
 Recall that, for a language \(G\), \emph{soundness} of a parser means that every

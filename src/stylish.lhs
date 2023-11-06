@@ -169,6 +169,7 @@
 %format <*>        = "\mathbin{\HSSym{<\!\!*\!\!>}}"
 %format  *>        = "\mathbin{\HSSym{*\!\!>}}"
 %format <*         = "\mathbin{\HSSym{<\!\!*}}"
+%format ?          = "\HSVar{?}\,"
 
 %% Formatting single letters and subscripts by
 %% default.
@@ -282,6 +283,7 @@
 %format truer         = "\HSVar{\mathit{true}_{r}}"
 %format vr         = "\HSVar{\mathit{v}_{r}}"
 %format fromN         = "\HSVar{\mathit{from}\mathbb{N}}"
+%format IntZ       = "\HSSym{\mathbb{Z}}"
 
 %format injectivel         = "\HSVar{\mathit{injective}^{l}}"
 %format conicall         = "\HSVar{\mathit{conical}^{l}}"
@@ -297,6 +299,7 @@
 %format a2         = "\HSVar{\mathit{a}_{2}}"
 %format proj2         = "\HSVar{\mathit{proj}_{2}}"
 %format bseq         = "\HSVar{\mathit{bs}_{eq}}"
+%format valeq         = "\HSVar{\mathit{val}_{eq}}"
 %format readeq         = "\HSVar{\mathit{read}_{eq}}"
 %format pseq         = "\HSVar{\mathit{ps}_{eq}}"
 %format eqrefl         = "\HSVar{\mathit{eq}_{refl}}"
