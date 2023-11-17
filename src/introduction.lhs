@@ -132,7 +132,7 @@ spec of grammar.}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them enabling development of other such formally-verified implementations in the future. 
 \item We present the design and implementation of \armor, which enjoys the soundness and completeness guarantees with respect to our specification.  
 \item We prove that our interpretation of the syntactic requirements of \xfon enjoys some specific properties that indicate that it is possible to develop efficient parsers for it. 
-\item We evaluate \armor with respect to its specificational accuracy and runtime overhead against $11$ widely used libraries, and demonstrate its reasonable performance and effectiveness in practice.
+\item We evaluate \armor with respect to its specificational accuracy and overhead against $11$ open-source libraries, and demonstrate its reasonable performance and effectiveness in practice.
 \end{enumerate}
 
 % Our work presents significant contributions to the field of \xfon PKI, as stated below.
