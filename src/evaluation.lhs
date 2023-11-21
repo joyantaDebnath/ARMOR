@@ -203,3 +203,72 @@ In the case of \armor, it strikes a reasonable balance between execution time an
     \textbf{Total}                        & \textbf{191}                     & \textbf{139}                    & \textbf{83}                        & \textbf{111}                     & \textbf{118}                       & \textbf{1}                   & \textbf{1}                            & \textbf{6204}                         & \textbf{875}                    \\ \hline
     \end{tabular}
     \end{table*}
+
+
+
+
+ \begin{table*}[h]
+    \captionsetup{font=footnotesize}
+    \centering
+         \setlength\extrarowheight{1.5pt}
+         \setlength{\tabcolsep}{1.5pt}
+         \sffamily\scriptsize
+         \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
+         \sffamily\scriptsize
+         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+         \vspace{0.5em}
+         \label{t0}
+         \sffamily\scriptsize
+     \centering
+\begin{tabular}{cc||ccccc||ccccc||}
+\cline{3-12}
+\textit{}                                    &                   & \multicolumn{5}{c||}{\textbf{Success (Megabytes)}}                                                                                                                 & \multicolumn{5}{c||}{\textbf{Failure (Megabytes)}}                                                                                                                 \\ \hline
+\multicolumn{1}{||c||}{\textbf{Library}}       & \textbf{Language} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} \\ \hline
+\multicolumn{1}{||c||}{\textit{Mbed TLS}}      & C/C++             & \multicolumn{1}{c||}{4.039}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{4.125}           & 0.149         & \multicolumn{1}{c||}{4.052}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{4.125}           & 0.157         \\ \hline
+\multicolumn{1}{||c||}{\textit{BoringSSL}}     & C/C++             & \multicolumn{1}{c||}{4.011}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.938}           & 0.126         & \multicolumn{1}{c||}{3.922}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.938}           & 0.159         \\ \hline
+\multicolumn{1}{||c||}{\textit{MatrixSSL}}     & C/C++             & \multicolumn{1}{c||}{3.260}         & \multicolumn{1}{c||}{3.375}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.375}           & 0.131         & \multicolumn{1}{c||}{3.127}         & \multicolumn{1}{c||}{3.375}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.188}           & 0.342         \\ \hline
+\multicolumn{1}{||c||}{\textit{WolfSSL}}       & C/C++             & \multicolumn{1}{c||}{8.393}         & \multicolumn{1}{c||}{8.625}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{8.438}           & 0.137         & \multicolumn{1}{c||}{8.165}         & \multicolumn{1}{c||}{8.625}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{8.063}           & 0.274         \\ \hline
+\multicolumn{1}{||c||}{\textit{OpenSSL}}       & C/C++             & \multicolumn{1}{c||}{5.795}         & \multicolumn{1}{c||}{6.188}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{5.813}           & 0.150         & \multicolumn{1}{c||}{5.798}         & \multicolumn{1}{c||}{6.188}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{5.813}           & 0.166         \\ \hline
+\multicolumn{1}{||c||}{\textit{GnuTLS}}        & C/C++             & \multicolumn{1}{c||}{7.787}         & \multicolumn{1}{c||}{8.063}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{7.875}           & 0.164         & \multicolumn{1}{c||}{7.165}         & \multicolumn{1}{c||}{8.063}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{7.313}           & 0.818         \\ \hline
+\multicolumn{1}{||c||}{\textit{Crypto}}        & Go                & \multicolumn{1}{c||}{62.707}        & \multicolumn{1}{c||}{67.688}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{61.500}          & 2.670         & \multicolumn{1}{c||}{62.741}        & \multicolumn{1}{c||}{67.500}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{61.500}          & 2.706         \\ \hline
+\multicolumn{1}{||c||}{\textit{Bouncy Castle}} & Java              & \multicolumn{1}{c||}{125.203}       & \multicolumn{1}{c||}{137.105}      & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{125.531}         & 3.375         & \multicolumn{1}{c||}{99.565}        & \multicolumn{1}{c||}{134.621}      & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{96.277}          & 9.000         \\ \hline
+\multicolumn{1}{||c||}{\textit{Sun}}           & Java              & \multicolumn{1}{c||}{56.040}        & \multicolumn{1}{c||}{65.781}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{55.441}          & 2.169         & \multicolumn{1}{c||}{51.705}        & \multicolumn{1}{c||}{63.742}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{51.098}          & 2.576         \\ \hline
+\multicolumn{1}{||c||}{\textit{Certvalidator}} & Python            & \multicolumn{1}{c||}{27.391}        & \multicolumn{1}{c||}{28.313}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{27.375}          & 0.471         & \multicolumn{1}{c||}{26.646}        & \multicolumn{1}{c||}{28.313}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{26.813}          & 0.866         \\ \hline
+\multicolumn{1}{||c||}{\textit{CERES}}         & Python            & \multicolumn{1}{c||}{39.983}        & \multicolumn{1}{c||}{40.852}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{40.043}          & 0.644         & \multicolumn{1}{c||}{27.344}        & \multicolumn{1}{c||}{35.852}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{27.867}          & 3.500         \\ \hline
+\multicolumn{1}{||c||}{\textit{ARMOR}}         & Agda              & \multicolumn{1}{c||}{1049.710}      & \multicolumn{1}{c||}{1187.270}     & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{1032.795}        & 60.699        & \multicolumn{1}{c||}{1069.531}      & \multicolumn{1}{c||}{1185.940}     & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{1075.090}        & 135.514       \\ \hline
+\end{tabular}
+\end{table*}
+
+
+
+\begin{table*}[h]
+    \captionsetup{font=footnotesize}
+    \centering
+         \setlength\extrarowheight{1.5pt}
+         \setlength{\tabcolsep}{1.5pt}
+         \sffamily\scriptsize
+         \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
+         \sffamily\scriptsize
+         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+         \vspace{0.5em}
+         \label{t0}
+         \sffamily\scriptsize
+     \centering
+\begin{tabular}{cc||ccccc||ccccc||}
+\cline{3-12}
+                                             &                   & \multicolumn{5}{c||}{\textbf{Success (Seconds)}}                                                                                                                   & \multicolumn{5}{c||}{\textbf{Failure (Seconds)}}                                                                                                                   \\ \hline
+\multicolumn{1}{||c||}{\textbf{Library}}       & \textbf{Language} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} \\ \hline
+\multicolumn{1}{||c||}{\textit{Mbed TLS}}      & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.021}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.000         & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.014}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{BoringSSL}}     & C/C++             & \multicolumn{1}{c||}{0.017}         & \multicolumn{1}{c||}{0.031}        & \multicolumn{1}{c||}{0.014}        & \multicolumn{1}{c||}{0.016}           & 0.001         & \multicolumn{1}{c||}{0.016}         & \multicolumn{1}{c||}{0.040}        & \multicolumn{1}{c||}{0.015}        & \multicolumn{1}{c||}{0.016}           & 0.002         \\ \hline
+\multicolumn{1}{||c||}{\textit{OpenSSL}}       & C/C++             & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.019}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.007}           & 0.001         & \multicolumn{1}{c||}{0.006}         & \multicolumn{1}{c||}{0.017}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.006}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{MatrixSSL}}     & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.018}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.001         & \multicolumn{1}{c||}{0.004}         & \multicolumn{1}{c||}{0.018}        & \multicolumn{1}{c||}{0.001}        & \multicolumn{1}{c||}{0.004}           & 0.002         \\ \hline
+\multicolumn{1}{||c||}{\textit{WolfSSL}}       & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.013}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.000         & \multicolumn{1}{c||}{0.004}         & \multicolumn{1}{c||}{0.010}        & \multicolumn{1}{c||}{0.003}        & \multicolumn{1}{c||}{0.004}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{GnuTLS}}        & C/C++             & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.016}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.007}           & 0.001         & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.013}        & \multicolumn{1}{c||}{0.002}        & \multicolumn{1}{c||}{0.007}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{Crypto}}        & Go                & \multicolumn{1}{c||}{0.150}         & \multicolumn{1}{c||}{0.322}        & \multicolumn{1}{c||}{0.126}        & \multicolumn{1}{c||}{0.147}           & 0.011         & \multicolumn{1}{c||}{0.150}         & \multicolumn{1}{c||}{0.289}        & \multicolumn{1}{c||}{0.134}        & \multicolumn{1}{c||}{0.147}           & 0.011         \\ \hline
+\multicolumn{1}{||c||}{\textit{Bouncy Castle}} & Java              & \multicolumn{1}{c||}{0.540}         & \multicolumn{1}{c||}{1.878}        & \multicolumn{1}{c||}{0.408}        & \multicolumn{1}{c||}{0.532}           & 0.058         & \multicolumn{1}{c||}{0.383}         & \multicolumn{1}{c||}{1.324}        & \multicolumn{1}{c||}{0.304}        & \multicolumn{1}{c||}{0.365}           & 0.063         \\ \hline
+\multicolumn{1}{||c||}{\textit{Sun}}           & Java              & \multicolumn{1}{c||}{0.144}         & \multicolumn{1}{c||}{0.616}        & \multicolumn{1}{c||}{0.118}        & \multicolumn{1}{c||}{0.136}           & 0.019         & \multicolumn{1}{c||}{0.126}         & \multicolumn{1}{c||}{0.879}        & \multicolumn{1}{c||}{0.093}        & \multicolumn{1}{c||}{0.121}           & 0.017         \\ \hline
+\multicolumn{1}{||c||}{\textit{Certvalidator}} & Python            & \multicolumn{1}{c||}{0.162}         & \multicolumn{1}{c||}{0.340}        & \multicolumn{1}{c||}{0.147}        & \multicolumn{1}{c||}{0.159}           & 0.010         & \multicolumn{1}{c||}{0.154}         & \multicolumn{1}{c||}{0.288}        & \multicolumn{1}{c||}{0.096}        & \multicolumn{1}{c||}{0.154}           & 0.017         \\ \hline
+\multicolumn{1}{||c||}{\textit{CERES}}         & Python            & \multicolumn{1}{c||}{0.534}         & \multicolumn{1}{c||}{0.980}        & \multicolumn{1}{c||}{0.220}        & \multicolumn{1}{c||}{0.524}           & 0.035         & \multicolumn{1}{c||}{0.363}         & \multicolumn{1}{c||}{0.784}        & \multicolumn{1}{c||}{0.140}        & \multicolumn{1}{c||}{0.396}           & 0.130         \\ \hline
+\multicolumn{1}{||c||}{\textit{ARMOR}}         & Agda              & \multicolumn{1}{c||}{2.641}         & \multicolumn{1}{c||}{4.553}        & \multicolumn{1}{c||}{2.207}        & \multicolumn{1}{c||}{2.618}           & 0.118         & \multicolumn{1}{c||}{2.518}         & \multicolumn{1}{c||}{4.665}        & \multicolumn{1}{c||}{0.053}        & \multicolumn{1}{c||}{2.544}           & 0.300         \\ \hline
+\end{tabular}
+\end{table*}

@@ -52,7 +52,6 @@
 
 \documentclass[conference,compsoc]{IEEEtran}
 %include polycode.fmt
-
 \usepackage{multirow}
 \usepackage[T1]{fontenc} 
 \usepackage{graphicx}
