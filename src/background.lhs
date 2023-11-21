@@ -1,41 +1,70 @@
 \section{Background and Problem Definition}
-In this section, we first present a brief introduction to \xfon certificates and their validation logic. We then present our objective of this paper and the related technical challenges, with our insights to address them.
+This section briefly introduces \xfon certificate chain and its validation logic, and then presents our objective, related technical challenges, and insights to address them.
 
 \subsection{Preliminaries on \xfon Certificate}
-\xfon certificate is a digitally signed document that binds a public key to a specific identity to assure that the certificate holder is indeed the entity it claims to be. Though the \xfon standard is primarily defined in the \xfon ITU-T Recommendation~\cite{rec2005x}, RFC-5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC-5280 concentrates on version 3 of the certificate standard and the usage of Certificate Revocation List (CRL) and extensions.
+Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions.
 
-\subsubsection{Structure of a Certificate} An \xfon certificate comprises three top-level fields: \texttt{TbsCertificate}, \texttt{SignatureAlgorithm}, and  \texttt{SignatureValue}, as shown in Figure~\ref{cert_chain}. The \texttt{TbsCertificate} field contains various information, such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public key, the algorithm employed by the issuer for signing the certificate, and a few \textit{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer signs the entire \texttt{TbsCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the certificate issuer or signer for generating the signature.
+\textbf{Structure of a Certificate.} A version 3 certificate comprises three top-level fields: \texttt{TbsCertificate}, \texttt{SignatureAlgorithm}, and  \texttt{SignatureValue}. The \texttt{TbsCertificate} field contains various information, such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \texttt{TbsCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
 
-\subsubsection{Certificate Chain} A certificate chain, also known as a certification path, is a sequence of \xfon certificates originating from an end-entity certificate (the one being authenticated) and ending with a root CA certificate. This chain is based on the concept of trust transitivity that means if Certificate $A$ is trusted by Certificate $B$ and Certificate $B$ is trusted by Certificate $C$, then Certificate $A$ is inherently trusted by Certificate $C$. Each certificate in the chain is signed by the owner of the subsequent certificate, and the process continues until reaching the root certificate. These root certificates are \textit{self-signed} certificates issued by trusted CAs, which form the root of trust in the \xfon ecosystem.
+\textbf{Certificate Chain Validation.} A certificate chain is represented as a sequence of certificates, $C_1 \rightarrow C_2 \rightarrow \ldots \rightarrow C_{n-1} \rightarrow C_n$, where $C_1$ is the root CA certificate and is inherently trusted by the validator (denoted by $T(C_1) = \text{true}$), $C_2$ to $C_{n-1}$ are intermediate CA certificates, and $C_n$ is the end-user certificate. The chain's hierarchy is depicted as each certificate $C_i$ 
+is issued by its predecessor $C_{i-1}$. During certificate chain validation, each certificate $C_i$ undergoes parsing (denoted by $P(C_i)$) and semantic-check process (denoted by $SCP(C_i)$). While parsing enforces syntactic restrictions on certificate fields, semantic-checks involve decoding and checking the values in a certificate (\eg, checking certificate validity period and critical bits of certain extensions). In addition, semantic-checks on subsequent certificates (\eg, name chaining, signature validation) in a chain is represented by a function $CCP(C_i, C_{i-1})$, which must return \emph{true} for all $i \ge 2$. Hence, the overall validity of the chain is given by the following expression.
+\[
+\bigwedge_{i=1}^{n} P(C_i) \land \bigwedge_{i=1}^{n} SCP(C_i) \land \bigwedge_{i=2}^{n} CCP(C_i, C_{i-1}) \land T(C_1)
+\]
 
-\begin{figure}[h]
-\centering
-\scriptsize
-\includegraphics[scale=0.5]{img/cert_chain.pdf} \\
-Fields marked with * are optional \\
-\vspace{0.2cm}
-\caption{Graphical representation of \xfon certificate chain}
-\label{cert_chain}
-\end{figure}
 
-\subsubsection{Certificate Chain Validation Process} 
-\label{cert_val_proc}
-Certificate chain validation logic (\ie, CCVL) defines the process to verify the authenticity of a certificate chain. This CCVL involves parsing and validating each certificate in the chain, based on the restrictions primarily described in RFC-5280~\cite{cooper2008internet}. Below we briefly present some notable checks performed in the context of a client validating a server's certificate chain. \\
-    \textbf{Name Chaining Check:} The client needs to verify whether the issuer of a certificate is the same as the subject of the subsequent certificate in the chain, except the root CA certificate has the same issuer and subject name. \\
-    \textbf{Validity Period Check:} The client must verify that the current time falls inside the certificate validity period. \\
-    \textbf{Signature Verification:} Public key of the issuer certificate must be used to verify signature on the current certificate. \\
-    \textbf{Trust Anchor Check:} The client must check whether the root CA is trusted according to its pre-defined trust anchors (\ie, set of trusted CAs). \\
-    \textbf{Hostname Verification:} The client needs to compare the hostname used to initiate the connection with the name bound in the server's certificate. \\
-    \textbf{Revocation Check:} Due to some unexpected events such as private key compromise, the issuer may revoke a certificate before its scheduled expiration date. The client should check the CRL~\cite{cooper2008internet} or use the OCSP~\cite{ocsp} protocol to verify that the certificate has not been revoked.
 
-While the aforementioned checks gives an overview of the certificate chain validation, the actual implementation encompasses more restrictions and steps, which we discuss in detail in the subsequent sections.
+\subsection{Noncompliance Issues and Testing Efforts}
+While the aforementioned steps gives an overview of the certificate chain validation algorithm, the actual X.509 implementation encompasses more restrictions and steps, which we discuss in detail in the later sections.
+
+
+% \begin{figure}[h]
+% \centering
+% \scriptsize
+% \includegraphics[scale=0.5]{img/cert_chain.pdf} \\
+% Fields marked with * are optional \\
+% \vspace{0.2cm}
+% \caption{Graphical representation of \xfon certificate chain}
+% \label{cert_chain}
+% \end{figure}
+
+% \subsubsection{Certificate Chain Validation Algorithm} 
+% \label{cert_val_proc}
+% Certificate chain validation logic (\ie, CCVL) defines the process to verify the authenticity of a certificate chain. This CCVL involves parsing and validating each certificate in the chain, based on the restrictions primarily described in RFC 5280~\cite{cooper2008internet}. Below we briefly present some notable checks performed in the context of a client validating a server's certificate chain. \\
+%     \textbf{Name Chaining Check:} The client needs to verify whether the issuer of a certificate is the same as the subject of the subsequent certificate in the chain, except the root CA certificate has the same issuer and subject name. \\
+%     \textbf{Validity Period Check:} The client must verify that the current time falls inside the certificate validity period. \\
+%     \textbf{Signature Verification:} Public-key of the issuer certificate must be used to verify signature on the current certificate. \\
+%     \textbf{Trust Anchor Check:} The client must check whether the root CA is trusted according to its pre-defined trust anchors (\ie, set of trusted CAs). \\
+%     \textbf{Hostname Verification:} The client needs to compare the hostname used to initiate the connection with the name bound in the server's certificate. \\
+%     \textbf{Revocation Check:} Due to some unexpected events such as private key compromise, the issuer may revoke a certificate before its scheduled expiration date. The client should check the CRL~\cite{cooper2008internet} or use the OCSP~\cite{ocsp} protocol to verify that the certificate has not been revoked.
+
+% While the aforementioned checks gives an overview of the certificate chain validation, the actual implementation encompasses more restrictions and steps, which we discuss in detail in the subsequent sections.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \subsection{Our Objective}
 \label{sec:our-objective}
-The overarching objective of this work is to develop a \textit{formally-verified
+The overarching objective of this work is to develop a \emph{formally-verified
   reference implementation} for the \xfon CCVL.
 This goal entails formulating a precise formal specification that aligns with
-the requirements of RFC-5280, ensuring its logical consistency, developing an
+the requirements of RFC 5280, ensuring its logical consistency, developing an
 implementation capable of enforcing all the requirements, and, lastly, applying
 some formal verification techniques to confirm the implementation's adherence to
 the formalized specification.
@@ -50,13 +79,13 @@ defined below. \todo{\footnotesize CJ: don't we prove sound, complete for parsin
 
 
 \subsection{Technical Challenges}
-There are several challenges to our work. In general, interpreting the RFC-5280 specification, which is written in natural language (\eg, English), presents a significant challenge due to its inherent inconsistencies, ambiguities, and potential for misinterpretation. Prior studies have also identified these issues~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}, pointing out several problematic clauses in RFC-5280. Moreover, RFC-5280 does not only encompass rules for certificate issuers but also for the applications that validate certificates. This intertwined set of rules further complicates the specification, making it challenging to determine how the CCVL implementations should respond in certain cases (\ie, whether to accept or reject an input). We now describe additional challenges specific to parsing, semantic checks, and formal verification.
+There are several challenges to our work. In general, interpreting the RFC 5280 specification, which is written in natural language (\eg, English), presents a significant challenge due to its inherent inconsistencies, ambiguities, and potential for misinterpretation. Prior studies have also identified these issues~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}, pointing out several problematic clauses in RFC 5280. Moreover, RFC 5280 does not only encompass rules for certificate issuers but also for the applications that validate certificates. This intertwined set of rules further complicates the specification, making it challenging to determine how the CCVL implementations should respond in certain cases (\ie, whether to accept or reject an input). We now describe additional challenges specific to parsing, semantic checks, and formal verification.
 
 
 \subsubsection{Parsing Challenges} 
 \label{parse}
 The internal data structure of an \xfon certificate, while described in the
-\textit{Abstract Syntax Notation One} (\asnone), is eventually serialized based
+\emph{Abstract Syntax Notation One} (\asnone), is eventually serialized based
 on the \xsno Distinguished Encoding Rules (\der)~\cite{rec2002x}. To make this
 binary data more human-readable\todo{CJ: Human readable?! Isn't it to avoid
   misinterpreting bytes as escape sequences?} and easier to debug, it is then encoded into the Privacy Enhanced Mail (\pem)~\cite{balenson1993privacy} format using \basesf encoding. Upon receiving such a certificate in the \pem format, one must reverse the whole encoding process to extract and interpret the information stored within it. Firstly, the \basesf decoding must be applied to convert the textual \pem certificate back into its original binary format. This \der-encoded binary data then needs to be parsed using a \der certificate parser, which extracts all the information from the certificate and transforms it into an intermediate representation for the subsequent semantic validation phase. This intermediate representation provides detailed information contained within a certificate and has a one-to-one correspondence with its \asnone certificate representation. Figure~\ref{encoding} shows the encoding and decoding steps of an \xfon certificate.
@@ -78,7 +107,7 @@ adding additional layers of complexity to the binary data. Parsing such a binary
 data is challenging since it always requires passing the value of the $L$ field
 (length) to accurately parse the subsequent $V$ field. Therefore, the internal
 grammar of a \der-encoded certificate is context-sensitive, and developing a
-parser for such a \textit{context-sensitive} language is generally a complex
+parser for such a \emph{context-sensitive} language is generally a complex
 task~\cite{kaminsky2010pki, debnath2021re}. 
 
 In some cases, the parsing process also involves correctly interpreting the
@@ -99,7 +128,7 @@ validation errors.
 
 \subsubsection{Semantic Validation Challenges} 
 \label{sem}
-One advantage of using the \pem format is that the server can include its own certificate as well as the associated issuer CA certificates in one single file. Once these certificates are parsed into their corresponding intermediate representations, the client application must undertake a series of semantic checks, as mentioned in Section~\ref{cert_val_proc}. However, the CA certificates can come out-of-order or miss one or more required certificates. This is why prior to enforcing the semantic checks, a valid certificate chain should be constructed from the end-entity certificate to the root CA certificate~\cite{path, cooper2005rfc}. In addition, string transformation needs to be performed for each certificate, which is a type of string conversion to ensure all the strings in a certificate are in \textit{normalized} form~\cite{zeilenga2006lightweight}. We can move to the semantic validation only after such intermediate steps. Figure~\ref{cert_validation} shows the stages for certificate chain validation.
+One advantage of using the \pem format is that the server can include its own certificate as well as the associated issuer CA certificates in one single file. Once these certificates are parsed into their corresponding intermediate representations, the client application must undertake a series of semantic checks, as mentioned in Section~\ref{cert_val_proc}. However, the CA certificates can come out-of-order or miss one or more required certificates. This is why prior to enforcing the semantic checks, a valid certificate chain should be constructed from the end-entity certificate to the root CA certificate~\cite{path, cooper2005rfc}. In addition, string transformation needs to be performed for each certificate, which is a type of string conversion to ensure all the strings in a certificate are in \emph{normalized} form~\cite{zeilenga2006lightweight}. We can move to the semantic validation only after such intermediate steps. Figure~\ref{cert_validation} shows the stages for certificate chain validation.
 
 \begin{figure}[h]
   \centering
@@ -113,12 +142,12 @@ However, each of these intermediate steps presents challenges.
 For example, building a valid chain can be difficult due to the lack of specific
 directions as well as the possibility of having multiple valid certificate
 chains since a single certificate can be cross-signed by more than one CA.
-In addition, converting strings to \textit{normalized} form is also a complex
+In addition, converting strings to \emph{normalized} form is also a complex
 process since the number of character sets is humongous considering all the
 languages worldwide.
 Finally, before signature verification, the implementation needs to carefully
 parse the contents of the \texttt{SignatureValue} field to prevent attacks based
-on the \textit{RSA signature forgery}~\cite{finney2006bleichenbacher,
+on the \emph{RSA signature forgery}~\cite{finney2006bleichenbacher,
   bleichenbacher1998chosen}.
 While these intermediate steps are conceptually straightforward, implementing
 them in a robust and secure manner is a significant challenge.\todo{CJ: We
@@ -134,11 +163,11 @@ computationally complex, making them challenging to formally model and verify.
 In addition, guaranteeing \soundness and \completeness of the implementation
 further intensifies the task.
 \Soundness, ensuring that every certificate chain the process marks as valid is
-indeed valid according to RFC-5280 specifications, demands a comprehensive
+indeed valid according to RFC 5280 specifications, demands a comprehensive
 approach that leaves no corner case or unusual behavior unchecked, a significant
 challenge given the complexity of the \xfon standard.
 \Completeness, however, requires the system to confirm the validity of all
-genuinely valid certificate chains per RFC-5280.
+genuinely valid certificate chains per RFC 5280.
 Achieving \completeness necessitates an exhaustive exploration of all potential
 valid states and configurations, a daunting endeavor given the broad parameter
 space and flexibility in the \xfon standard. 
@@ -149,4 +178,4 @@ space and flexibility in the \xfon standard.
 
 \subsubsection{Modularity} Adopting a modular approach to implementing the \xfon CCVL can significantly mitigate some challenges. The entire process can be broken down into smaller, manageable components or modules. Each module is designed to perform a specific function, such as \der parsing, certificate chain building, string transformation, and semantic checks. Such modularization allows us to precisely specify the requirements for each module and independently establish their correctness. In addition, instead of trying to accomplish everything in a single step, this modularization allows us to undertake the validation task in multiple passes, increasing the simplicity and manageability of the overall process.
 
-\subsubsection{Specificity} While the \xsno \der and RFC-5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. In addition, RFC-5280 puts additional restrictions on certain \der rules to be used for the Internet. Therefore, we aim to create a formally-verified reference implementation that focuses primarily on the most commonly used fragments of the standard specifications.
+\subsubsection{Specificity} While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. In addition, RFC 5280 puts additional restrictions on certain \der rules to be used for the Internet. Therefore, we aim to create a formally-verified reference implementation that focuses primarily on the most commonly used fragments of the standard specifications.

@@ -1,19 +1,19 @@
 % -*- eval: (flyspell-mode); -*-
 \section{Introduction}
 
-The \xfon PKI standard \cite{cooper2008internet} provides a scalable way to verify the binding of an entity's identity with its public-key. 
+The \xfon PKI standard~\cite{cooper2008internet} provides a scalable way to verify the binding of an entity's identity with its public-key. 
 The identity-public-key binding of an entity is represented as an \xfon certificate, which is digitally signed by an issuer\footnote{The issuer of an \xfon certificate can also be the entity itself, 
 whose identity and public-key binding is vouched for in the certificate. Such certificates are commonly known as self-signed certificates.} 
 (\eg, certificate authority or CA), 
 signifying the issuer's trust in the authenticity and integrity of this binding. For scalably establishing the authenticity and integrity 
 of a certificate, the \xfon standard takes advantage of the \emph{transitivity} of this ``\emph{trust}'' relationship. 
-This intuition is realized in the \xfon standard \cite{cooper2008internet} through a \emph{certificate chain validation} algorithm. Concretely, when an 
+This intuition is realized in the \xfon standard~\cite{cooper2008internet} through a \emph{certificate chain validation} algorithm. Concretely, when an 
 entity $e_1$ wants to check whether the certificate of another entity $e_2$ is authentic, this algorithm starts with the certificate of a  
 trust anchor (\ie, an issuer who is unconditionally trusted by $e_1$) and then attempts to extend this trust through a chain of input certificates, 
 all the way down to $e_2$.
 
-Implementations of \xfon certificate chain validation, hailed as the ``\emph{most dangerous code in the world}'' \cite{mdcode}, are thus critical 
-to ensuring the authentication guarantees promised by the \xfon PKI~\cite{rec2005x}. Along with its authentication guarantees, 
+Implementations of \xfon certificate chain validation, hailed as the ``\emph{most dangerous code in the world}''~\cite{mdcode}, are thus critical 
+to ensuring the authentication guarantees promised by the \xfon PKI~\cite{cooper2008internet}. Along with its authentication guarantees, 
 \xfon also provides a scalable and flexible mechanism for public-key distribution. These desirable guarantees of \xfon PKI 
 are often used as fundamental building blocks for achieving other security assurances such as \emph{confidentiality}, \emph{integrity}, and 
 \emph{non-repudiation} in many applications, including but not limited to SSL/TLS, IPSec, HTTPS, Email, DNS over HTTPS/TLS, WiFi, code signing, 
@@ -26,7 +26,7 @@ potentially exposing the system to man-in-the-middle (MITM) and impersonation at
 give rise to interoperability issues. 
 
 A majority of the prior work focuses on developing software testing mechanisms specialized for checking the correctness of 
-different libraries \cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt, rfcguided, symcert}. While these methods 
+different libraries~\cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt, rfcguided, symcert}. While these methods 
 have been beneficial in identifying numerous vulnerabilities, they often fall short of providing any formal guarantees regarding correctness. 
 This is corroborated through many high impact bugs and vulnerabilities in some widely used applications and open-source libraries 
 \cite{CVE-2019-5275, CVE-2014-0161, CVE-2020-5523, CVE-2019-15604, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527, CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}.   
@@ -40,7 +40,7 @@ Although the current paper, to the best of our knowledge, presents the first imp
 chain validation with a machine-checked proof of correctness, it draws inspirations from a number of prior work in the area 
 \cite{debnath2021re, ramananandro2019everparse, ni2023asn1, tao2021dice, barenghi2018systematic, nqsb-tls}. 
 % As an example, we rely on the 
-% prior re-engineering effort of the \xfon specification and implementation \cite{debnath2021re, nqsb-tls} to distinguish between the syntactic 
+% prior re-engineering effort of the \xfon specification and implementation~\cite{debnath2021re, nqsb-tls} to distinguish between the syntactic 
 % and semantic requirements to design \armor in a modular way. 
 In comparison to \armor, prior work, however, suffers from at least one of the following 
 limitations: (1) Lacks any formal guarantees; (2) Focuses only on parsing; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
@@ -65,19 +65,19 @@ parsing; (4) Focuses only on verifiable encoding of certificates, not parsing; (
 %  it requires considering \emph{all} possible parses of a byte string, which can
 %  lead to multiple case splits requiring manual proof.
 
-Developing \armor required addressing the following technical challenges. 
+\textbf{Challenges}. Developing \armor required addressing the following technical challenges. 
  \emph{First}, the \xfon specification is distributed 
-across many different RFC documents (\eg, RFC 5280 \cite{cooper2008internet}, RFC 6125 \cite{saint2011rfc}, RFC 4158 \cite{cooper2005rfc}, RFC 2527 \cite{rfc2527}, RFC 4518 \cite{zeilenga2006lightweight}) and specified in natural language, which have 
-been shown to suffer from inconsistencies, ambiguities, and under-specification \cite{debnath2021re, larisch2022hammurabi, yen2021tools}. \emph{Second}, the format 
+across many different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC 4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC 4518~\cite{zeilenga2006lightweight}) and specified in natural language, which have 
+been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}. \emph{Second}, the format 
 of an \xfon certificate is complex and nested, represented in ASN.1 DER
 \cite{rec2002x}, and one requires a context-sensitive grammar to capture the
-syntactic restrictions of an  \xfon certificate \cite{kaminsky2010pki}.
+syntactic restrictions of an  \xfon certificate~\cite{kaminsky2010pki}.
 Thus, proving total correctness of the parser is quite complicated.
 To make matters worse, parsing just the ASN.1 structure from the certificate bytestream 
 is insufficient because the relevant certificate field value may need to be further 
 decoded from the parsed ASN.1 value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, 
 PEM parsing, Base64 decoding, ASN.1 DER parsing, parsing ASN.1 values, string canonicalization, (host) name matching, chain building, 
-semantic rule checking, cryptographic signature verification), each of which can be complex by itself (see \cite{path, yahyazadeh2021morpheus, pkcsndss}).
+semantic rule checking, cryptographic signature verification), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
 
 % daunting task of modeling and demonstrating the correctness of the cryptographic operations can pose a significant challenge, demanding sophisticated mathematical techniques and a deep understanding of the underlying cryptographic principles while ensuring the focus remains on the core certificate validation process.
 
@@ -88,17 +88,17 @@ semantic rule checking, cryptographic signature verification), each of which can
 % manageability of the implementation, and also formal verification. Particularly, one can 
 % decompose the overall guarantees that need to be proven into guarantees for each modules, 
 % which can then be discharged independently. We want to emphasize that such modularity has 
-% been promoted and demonstrated in essence by prior work \cite{debnath2021re, nqsb-tls}, 
+% been promoted and demonstrated in essence by prior work~\cite{debnath2021re, nqsb-tls}, 
 % which conjectured that it can simplify the formal verification. We show it is indeed the case 
 % that it substantially simplifies the proof of correctness. Second,   
 
 % inspired by prior re-engineering effort of the \xfon specification 
-% and implementation \cite{debnath2021re, nqsb-tls}, it is possible to decompose 
+% and implementation~\cite{debnath2021re, nqsb-tls}, it is possible to decompose 
 % the requirements of \xfon into syntactic and semantic requirements to ensure a 
 % simpler parser. As we will show, such a methodology facilitates the development of a manageable parser that does not compromise on the necessary rigor. \textit{Furthermore}, we leverage a modular implementation, breaking the process into distinct modules. Such an approach aids in simplifying the overall certificate validation process, as it allows for the detailed specification of the requirements and establishes the correctness of each module independently. \textit{Finally}, backed by measurements, we recognize that not all aspects of the \xsno \der~\cite{rec2002x} and RFC-5280~\cite{cooper2008internet} specifications are used in practice, we primarily focus on the most commonly employed fragments of these standards, thereby ensuring the relevance and usability of our formally-verified implementation.
 
 % \textbf{ARMOR's Approach:} 
-Thus, \armor is designed and developed with modularity in mind. Inspired by prior work \cite{debnath2021re, nqsb-tls}, 
+\textbf{Approach}. \armor is designed and developed with modularity in mind. Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
 we modularly decompose the whole \xfon certificate chain validation 
 process into several stages. Such modularity facilitates both ease of implementation, 
 manageability of the implementation, and also formal verification efforts. Particularly, we 
@@ -134,11 +134,11 @@ as the tool of choice for formally verification is motivated primarily by its sm
 % These formal guarantees signify that it is possible to develop efficient parsers
 % for \xfon, although the grammar itself is context-sensitive. 
 
-As \armor is as good as its specification, it is crucial to ensure that our interpretation of the specification is consistent 
+\textbf{Evaluation}. As \armor is as good as its specification, it is crucial to ensure that our interpretation of the specification is consistent 
 with other implementations. To check the correctness of the specification, we differentially test \armor against $11$ open-source 
 \xfon libraries. To carry out this differential analysis, we use the following two datasets of input certificate chains: 
 (1) a dataset of $2$ million certificates randomly selected from a snapshot of $1.5$ billion real certificates gathered from the \censys~\cite{censys} certificate repository; 
-(2) a dataset of $1$ million certificates generated by the \frankencert tool \cite{frank} to mimic bad inputs. 
+(2) a dataset of $1$ million certificates generated by the \frankencert tool~\cite{frank} to mimic bad inputs. 
 We observe that \armor agrees with most libraries 
 at least $X\%$ of the time. For the remaining $Y\%$, we notice 
 that \armor strictly follows the requirements in RFC 5280~\cite{cooper2008internet}, whereas the other libraries 
@@ -160,7 +160,7 @@ is more important than runtime overhead.
 \says{JD}{need to be more specific on which modules are formally proved. soundess and completeness are part of parser, not semantic validation. also, the properties are defined in terms of chain. are we sure?}
 
 % \textbf{Our Contributions:} 
-This paper makes the following technical contributions.\says{CJ}{Add parser-independent spec of grammar.}
+\textbf{Contributions.} This paper makes the following technical contributions.\says{CJ}{Add parser-independent spec of grammar.}
 \begin{enumerate}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them enabling development of other such formally-verified implementations in the future. 
 \item We present the design and implementation of \armor, which enjoys the \emph{soundness} and \emph{completeness} guarantees with respect to our specification.  
