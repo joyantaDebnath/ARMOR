@@ -1,20 +1,23 @@
 \section{Verification and Correctness Proofs}
 This section details the design and verified guarantees of our parser and
 semantic checker modules (Figure~\ref{cert_validation}).
-We begin by overviewing our approach to specifying the supported subsets of the
-PEM, X.509, and X.690 formats.
-These specifications are given \emph{independently of the parser,} facilitating
-verification of the properties of language itself (such as
-\emph{unambiguousness} and \emph{nonmalleability}), 
-and they are defined using datatype families (indexed by
-input strings), and so serve a dual role as internal data representations of the
-formats they describe.
-Next, we describe the design of our parsers, which are \emph{correct by
-  construction} with respect to these specifications.
-Finally, we show our approach to semantic validation, which expresses the
-desired properties as predicates over the internal data representations; the
-code performing the semantic checks returns not merely ``yes-no'' answers, but
-\emph{proofs} that the properties do or do not hold.
+\begin{itemize}
+\item We start with an overview of our specifications of the supported subsets
+  of the PEM, X.690 DER, and X.509 formats, emphasizing how their being
+  \emph{parser independent} facilitates verifying language properties without
+  mentioning implementation details.
+  
+\item Next, we describe our parsers, which are designed to be \emph{correct by
+    construction} with respect to the language specifications.
+  We achieve this by having parsers return \emph{proofs} either affirming or
+  refuting language membership.
+  
+\item Finally, we describe approach to \emph{correct by construction} semantic
+  validation.
+  We express the desired properties of semantic checking as predicates over the
+  internal data representations, with the code executing these checks
+  implemented as proofs that these properties are decidable.
+\end{itemize}
 
 \subsubsection*{Input Strings}
 Inputs to our parser have types of the form |List A|, where |A| is the type of
@@ -25,12 +28,12 @@ For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
 the Agda standard library type |Fin 256| (the type for nonnegative integers
 strictly less than 256).
 The result of the PEM parser is fed to the X.509 parser using a decoder that is
-verified with respect to an encoder (base 64 encoding and decoding form an
-isomorphism).
+verified with respect to an encoder (that is, we prove base 64 encoding and
+decoding form an isomorphism).
 
 \subsection{Independent Specification}
 Our first challenge concerns how the specification is represented, that is,
-answering the question ``soundness and completeness \emph{with respect to
+answering the question ``parser soundness and completeness \emph{with respect to
   what?}''
 Our answer is that for each production rule |G| of the supported subset of the
 PEM, X.690, and X.509 grammars, we define a predicate |G : List A -> Set| over
