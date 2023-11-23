@@ -27,9 +27,15 @@ literals.
 For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
 the Agda standard library type |Fin 256| (the type for nonnegative integers
 strictly less than 256).
-The result of the PEM parser is fed to the X.509 parser using a decoder that is
-verified with respect to an encoder (that is, we prove base 64 encoding and
-decoding form an isomorphism).
+\subsubsection*{Base64 Decoding}
+We hand-off the result of the PEM parser, which extracts the Base64 encoding of the
+certificates, to the X.509 parser, which expects an octet string, through a
+Base64 decoder that is verified with respect to an encoder.
+Specifically, we prove: 1) that the encoder always produces a valid sextet
+string (Base64 binary string); and 2) the encoder and decoder pair forms an
+isomorphism between octet strings and valid sextet strings.\todo{\tiny Would
+be nice to show the type signatures here, but they need cleaning up!}
+
 
 \subsection{Independent Specification}
 Our first challenge concerns how the specification is represented, that is,
@@ -83,7 +89,7 @@ be a valid encoding of an integer value, \emph{and} give integer value |bs| enco
   complement encoding of an integer value consists of the minimum number of
   octets needed for this purpose.
   This is enforced by the field |minRep| (we shall see the definition of the
-  relation |MinRep| shortly).
+  relation |MinRep| shortly).\todo{\tiny Show it or drop this.}
 
 \item \textbf{Linking the value and its encoding.}
   Field |valeq| forecloses any possibility that an inhabitant of |IntegerValue
@@ -121,17 +127,15 @@ be carefuly crafted so as to admit unique proof terms.
 
 \subsubsection{Non-malleable}
 Compared to unambiguousness, non-malleability requires more machinery to
-express, so we begin by discussing the challenges that motivate this machinery.
-Since bytestring encodings are part of the very types of internal
-representations (and because Agda's notion of equality is fundamentally
-\emph{homogeneous}), it is impossible to express equality between internal
-representations |a1 : G xs1| and |a2 : G xs2| without \emph{already assuming
-  |xs1| is equal to |xs2|}.
-
-To make non-malleability non-trivial, we must therefore express what is the
+express, so we begin by discussing the challenges motivating this machinery.
+Since the bytestring encodings are part of \emph{the very types of internal
+representations}, e.g., |IntegerValue xs|, it is impossible to express equality
+between internal representations |a1 : G xs1| and |a2 : G xs2| without
+\emph{already assuming |xs1| is equal to |xs2|}.
+Thus, to make non-malleability non-trivial, we must express what is the
 ``raw'' internal datatype corresponding to |G|, discarding the specificational
 components.
-We express this in Agda by |Raw|, given below.
+We express this general notion in Agda by |Raw|, given below.
 \begin{code}
 record Raw (G : List A -> Set) : Set where
   field
@@ -139,17 +143,33 @@ record Raw (G : List A -> Set) : Set where
     to : {@0 xs : List A} -> G xs -> D
 \end{code}
 
-\begin{code}
-RawIntegerValue : Raw IntegerValue
-Raw.D RawIntegerValue = IntZ
-Raw.to RawIntegerValue = IntegerValue.val
-\end{code}
-
-\noindent An inhabitant of |Raw G| consists of a type |D|, intended to be the
+An inhabitant of |Raw G| consists of a type |D|, intended to be the
 ``raw data'' of |G|, together with a function |to| that should extract this data
 from any inhabitant |G xs|.
+To illustrate, consider the case for |IntegerValue| below.
+\begin{code}
+  RawIntegerValue : Raw IntegerValue
+  Raw.D RawIntegerValue = IntZ
+  Raw.to RawIntegerValue = IntegerValue.val
+\end{code}
+\noindent This says that the raw representation for integer values is |IntZ| (a
+type for integers defined in Agda's standard library), and the extraction
+function is just the field accessor |IntegerValue.val|.
 
-
+Once we have defined an instance of |Raw G| for a language specification |G|,
+we express non-malleability of |G| with respect to that raw representation
+becomes with the following property: give two input strings |xs1| and |xs2|, with witnesses
+|g1 : G xs1| and |g2 : G xs2|, if the raw representations of |g1| and |g2| are
+equal, then not only are |xs1| and |xs2| equal strings, but also |g1| and |g2|.
+In Agda, this is written as:
+\begin{code}
+NonMalleable : {G : @0 List A -> Set} -> Raw G -> Set
+NonMalleable{G} R =
+  forall {@0 xs1 xs2} -> (g1 : G xs1) (g2 : G xs2)
+  -> Raw.to R g1 == Raw.to R g2 -> (xs1 , g1) ==  (xs2 , g2)  
+\end{code}
+For |IntegerValue| in particular, proving |NonMalleable RawIntegerValue|
+requires showing |Base256.twosComp| is itself injective.
 % In addition, two properties in particular are essential to our proof of parser
 % completeness.
 % \begin{itemize}
