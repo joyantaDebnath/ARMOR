@@ -1,31 +1,26 @@
 \section{Design and Implementation of ARMOR} 
-In this section, we present the required toolchain for our formally verified CCVL implementation, its high-level architecture, and finally discuss the implementation details.
+In this section, we introduce the \agda theorem prover~\cite{bove2009brief, No07_Agda}, central to our formal verification efforts, and then discuss the architecture of ARMOR, along with its implementation challenges and details.
 
-\subsection{Preliminaries on Toolchain}
-We use the \agda theorem prover~\cite{bove2009brief} for formally verifying the
-CCVL implementation and the formally verified oracle of
-\morpheus~\cite{yahyazadeh2021morpheus} for signature verification.
-Now, we present a brief overview of these tools.
 
-\subsubsection{Agda Theorem Prover}
-\label{sec:design-agda}
+
+\subsection{Preliminaries on \agda Theorem Prover}
 \agda~\cite{bove2009brief, No07_Agda} is a powerful and expressive programming language
 that combines functional programming and formal verification.
-At its core, \agda is a \textit{dependently typed} functional programming
+At its core, \agda is a \textit{dependently-typed} functional programming
 language, which allows types to refer to terms.
 This capability helps express rich properties in types, with typechecking
-enforcing that programs satisfy these properties.
+enforcing that programs satisfy those properties.
 In other words, if a program compiles, it is also proven to meet the
 specifications described by its type.
 Under the \emph{Curry-Howard}
 correspondence~\cite{SU06_Lectures-on-the-Curry-Howard-Isomorphism}, we can view
-Agda's types as \emph{propositions} and its terms as \emph{proofs} of the
+\agda's types as \emph{propositions} and its terms as \emph{proofs} of the
 propositions expressed by their types.
 This makes \agda a powerful tool for both expressing programs and their
 correctness, as the language of programs and proofs is unified.
 
-As an example of \agda's syntax, consider the example shown in
-Figure~\ref{fig:agda-ex} of length-indexed lists, provided as part of the Agda
+\textbf{An Example of \agda's Syntax.} Consider the example shown in
+Figure~\ref{fig:agda-ex} of length-indexed lists, provided as part of the \agda
 standard library as |Vec|. 
 \begin{figure}
   \centering
@@ -44,13 +39,13 @@ By length-indexed, we mean that the length of the list is itself part of the
 type.
 We now briefly explain the code listing in the figure.
 \begin{itemize}
-\item |Set| is the type of (small) types (the details of Agda's
-  universe hierarchy are unimportant for understanding this paper).
+\item |Set| is the type of (small) types. Note that, we skip the details of \agda's
+  universe hierarchy since it is beyond the scope of this paper.
   
 \item The |data| keyword indicates that we are declaring |Vec| as an \emph{inductive
     family} indexed by a type |A| and a natural number. By \emph{inductive
     family}, we mean that for each type |A| and natural number |n|, |Vec A n| is
-  an unique type --- the type for lists with exactly |n| elements of type |A|.
+  a unique type -- the type for lists with exactly |n| elements of type |A|).
   
 \item |Vec| has two \emph{constructors}, |vnil| for the empty list and |vcons|
   for a list with at least one element.
@@ -70,9 +65,9 @@ Tracking the length of lists statically allows us to express correctness
 properties in the types of functions producing or consuming them.
 As a simple example, the second definition of Figure~\ref{fig:agda-ex}, |head|,
 expresses in its type that the list it consumes must have at least one element
-(|Vec A (1 + n)|).
+(denoted by |Vec A (1 + n)|).
 Because of this, in the definition of |head| we do not need to consider the case
-that the argument is an empty list: through a process called \emph{dependent
+that the argument is an empty list. Through a process called \emph{dependent
   pattern matching}~\cite{Co92_Pattern-Dependent-Types}, \agda determines that
 the equation \(0 = 1 + n\) is impossible to solve for the natural numbers, and
 thus the empty list can never be a well-typed argument to |head|.
@@ -135,19 +130,19 @@ thus the empty list can never be a well-typed argument to |head|.
 % boolean value, its numerical representation, and the proof of the correctness
 % of this representation, returned by the |BoolRep|.
 
-\subsubsection{The Oracle of Morpheus}
-\label{mor}
-\morpheus~\cite{yahyazadeh2021morpheus} provides a rigorously validated oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. The system accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not.
+% \subsubsection{The Oracle of Morpheus}
+% \label{mor}
+% \morpheus~\cite{yahyazadeh2021morpheus} provides a rigorously validated oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. The system accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not.
 
 
 
-\subsection{Design of ARMOR}
+\subsection{Architecture of ARMOR}
 
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.67]{img/arch.pdf} \\
-  \caption{Overview of \armor}
+  \includegraphics[scale=0.7]{img/armor.drawio.pdf} \\
+  \caption{Architecture of \armor}
   \label{armor}
   \end{figure}
 

@@ -4,7 +4,7 @@ This section provides a brief discussion on \xfon certificate chain validation, 
 \subsection{Preliminaries on \xfon Certificate Chain}
 Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions.
 
-\textbf{Internal Structure of a Certificate.} A version 3 certificate comprises three top-level fields: \texttt{TbsCertificate}, \texttt{SignatureAlgorithm}, and  \texttt{SignatureValue}. The \texttt{TbsCertificate} field contains various information, such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \texttt{TbsCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
+\textbf{Internal Structure of a Certificate.} A version 3 certificate comprises three top-level fields: \texttt{TBSCertificate}, \texttt{SignatureAlgorithm}, and  \texttt{SignatureValue}. The \texttt{TBSCertificate} field contains various information, such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \texttt{TBSCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
 
 \textbf{Overview on Certificate Chain Validation.} A certificate chain is represented as a sequence of certificates, $C_1 \rightarrow C_2 \rightarrow \ldots \rightarrow C_{n-1} \rightarrow C_n$, where $C_1$ is the root CA certificate and is inherently trusted by the validator (denoted by $T(C_1) = \text{true}$), $C_2$ to $C_{n-1}$ are intermediate CA certificates, and $C_n$ is the end-user certificate. The chain's hierarchy is depicted as each certificate $C_i$ is issued by its predecessor $C_{i-1}$ (see Figure~\ref{cert_chain}). For validating such a chain, each certificate $C_i$ undergoes parsing (denoted by $P(C_i)$) and semantic-checking (denoted by $SCP(C_i)$). While parsing enforces syntactic restrictions on different certificate fields, semantic-checking involves decoding and checking the values in a single certificate (\eg, the certificate is not expired with respect to current system time). In addition, semantic-checking on subsequent certificates in a chain (\eg, matching subject and issuer names, signature verification) is represented by a function $CCP(C_i, C_{i-1})$, which must return \emph{true} for all $i \ge 2$. Hence, the overall legitimacy of a certificate chain is denoted by the following expression.
 \[
@@ -14,10 +14,10 @@ Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x
 \begin{figure}[]
   \centering
   \scriptsize
-  \includegraphics[scale=0.5]{img/cert_chain.pdf} \\
+  \includegraphics[scale=0.58]{img/cert_chain.drawio.pdf} \\
   Fields marked with * are optional \\
   \vspace{0.2cm}
-  \caption{\says{joy}{redraw picture}Representation of an \xfon certificate chain}
+  \caption{Representation of an \xfon certificate chain}
   \label{cert_chain}
   \end{figure}
 
@@ -116,18 +116,18 @@ a mistake previously made by MatrixSSL, axTLS, and tropicSSL~\cite{symcert}.
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.7]{img/cert_validation.pdf} \\
-  \caption{\says{joy}{redraw picture}Sequential stages for certificate chain validation}
+  \includegraphics[scale=0.73]{img/stages.drawio.pdf} \\
+  \caption{Sequential stages for certificate chain validation}
   \label{cert_validation}
 \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \scriptsize
-    \includegraphics[scale=0.68]{img/encoding.pdf}
-    \caption{\says{joy}{redraw picture}Steps for encoding and decoding a certificate}
-    \label{encoding}
-    \end{figure}
+% \begin{figure}[h]
+%     \centering
+%     \scriptsize
+%     \includegraphics[scale=0.68]{img/encoding.pdf}
+%     \caption{\says{joy}{redraw picture}Steps for encoding and decoding a certificate}
+%     \label{encoding}
+%     \end{figure}
 
 
     
