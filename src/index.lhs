@@ -80,6 +80,10 @@
 \usepackage{caption}
 \captionsetup[figure]{skip=0pt} % Adjust for your preferred distance
 
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(C.base)]\node[draw,circle,inner sep=1.2pt,line width=0.2mm,](C) {\footnotesize #1};\!}
+
+
 \usepackage{tabularx}
 
 \usepackage[threshold=0]{csquotes}

@@ -1,10 +1,10 @@
-\section{Design and Implementation of ARMOR} 
-In this section, we introduce the \agda theorem prover~\cite{bove2009brief, No07_Agda}, central to our formal verification efforts, and then discuss the architecture of ARMOR, along with its implementation challenges and details.
+\section{Design and Implementation of \armor} 
+In this section, we introduce the \agda theorem prover~\cite{bove2009brief, No07_agda}, central to our formal verification efforts, and then discuss the architecture of \armor, along with its implementation challenges and details.
 
+\subsection{Preliminaries on Toolchain}
 
-
-\subsection{Preliminaries on \agda Theorem Prover}
-\agda~\cite{bove2009brief, No07_Agda} is a powerful and expressive programming language
+\subsubsection{Agda Theorem Prover}
+\agda~\cite{bove2009brief, No07_agda} is a powerful and expressive programming language
 that combines functional programming and formal verification.
 At its core, \agda is a \textit{dependently-typed} functional programming
 language, which allows types to refer to terms.
@@ -32,7 +32,7 @@ data Vec (A : Set) : Nat -> Set where
 head : forall {A n} -> Vec A (1 + n) -> A
 head (vcons hd tl) = hd
   \end{code}
-  \caption{Length-indexed lists in Agda}
+  \caption{Length-indexed lists in \agda}
   \label{fig:agda-ex}
 \end{figure}
 By length-indexed, we mean that the length of the list is itself part of the
@@ -72,96 +72,126 @@ that the argument is an empty list. Through a process called \emph{dependent
 the equation \(0 = 1 + n\) is impossible to solve for the natural numbers, and
 thus the empty list can never be a well-typed argument to |head|.
 
-% Note that we can generate an executable binary of the implementation by first compiling the \agda source code into \haskell and then using a \haskell compiler to compile the generated \haskell code into a binary. 
+% % Note that we can generate an executable binary of the implementation by first compiling the \agda source code into \haskell and then using a \haskell compiler to compile the generated \haskell code into a binary. 
 
-% As an example of \agda's syntax, consider representing the \agda boolean values
-% in their \xsno \der counterparts.
-% As per the Basic Encoding Rules (\ber)~\cite{rec2002x}, boolean values must
-% comprise a singular octet, with $False$ denoted by setting all bits to $0$ and
-% $True$ denoted by setting at least one bit to $1$.
-% The \der further mandates that the value $True$ is signified by setting all bits
-% to $1$.
-% We capture these requirements of \der boolean in \agda by defining a type that
-% holds not only the boolean value and its $8$-bit numerical representation but
-% also a proof that this representation is correct.
-% To further illustrate, let us look at the \agda code below.  
+% % As an example of \agda's syntax, consider representing the \agda boolean values
+% % in their \xsno \der counterparts.
+% % As per the Basic Encoding Rules (\ber)~\cite{rec2002x}, boolean values must
+% % comprise a singular octet, with $False$ denoted by setting all bits to $0$ and
+% % $True$ denoted by setting at least one bit to $1$.
+% % The \der further mandates that the value $True$ is signified by setting all bits
+% % to $1$.
+% % We capture these requirements of \der boolean in \agda by defining a type that
+% % holds not only the boolean value and its $8$-bit numerical representation but
+% % also a proof that this representation is correct.
+% % To further illustrate, let us look at the \agda code below.  
 
-% \begin{figure}[h]
-%   \centering
-%   \begin{code}
-% data BoolRep : Bool -> UInt8 -> Set where
-%   falser : BoolRep false (UInt8.fromN 0)
-%   truer  : BoolRep true (UInt8.fromN 255)
-
-
-% record BoolValue (@0 bs : List UInt8) : Set where
-%   constructor mkBoolValue
-%   field
-%     v     : Bool
-%     @0 b  : UInt8
-%     @0 vr : BoolRep v b
-%     @0 bseq : bs == [ b ]
-%   \end{code}
-%   \caption{\agda example for representing \der boolean type}
-%   \label{fig:code1}
-% \end{figure}
-
-% Here, |BoolRep| is a dependent type representing a binary relationship between
-% \agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned
-% integers or octet values stipulated by the \xsno \der), where the |falser|
-% constructor associates the false boolean value with $0$, and the |truer|
-% constructor associates true with $255$. The function |UInt8.fromN| transforms
-% a non-negative unbounded integer into its equivalent |UInt8| representation.
-% It is important to note that this transformation is contingent upon \agda's
-% ability to automatically verify that the provided number is less than $256$.
-% Also, the keyword |Set| (referred to as the type of types) defines the type of
-% |BoolRep|, indicating that |BoolRep| maps specific pairs of |Bool| and |UInt8|
-% values to unique types. Subsequently, we can construct a dependent and
-% parameterized record type, |BoolValue|, to represent the boolean value defined
-% by \xsno. This record type, essentially a predicate over byte-strings,
-% includes the boolean value |v|, its byte-string representation |b|, a proof
-% |vr| that |b| is the correct representation of |v|, and a proof |bseq| that
-% the byte-string representation |bs| of this grammatical terminal is a
-% singleton list containing |b|. The |@0| annotations applied to types and
-% fields specify that these values are erased at runtime to minimize execution
-% overhead and to mark parts of the formalization used solely for verification
-% purposes. In short, |BoolRep| verifies the correct mapping between boolean
-% values and their numerical representations, while |BoolValue| holds the
-% boolean value, its numerical representation, and the proof of the correctness
-% of this representation, returned by the |BoolRep|.
-
-% \subsubsection{The Oracle of Morpheus}
-% \label{mor}
-% \morpheus~\cite{yahyazadeh2021morpheus} provides a rigorously validated oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. The system accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not.
+% % \begin{figure}[h]
+% %   \centering
+% %   \begin{code}
+% % data BoolRep : Bool -> UInt8 -> Set where
+% %   falser : BoolRep false (UInt8.fromN 0)
+% %   truer  : BoolRep true (UInt8.fromN 255)
 
 
+% % record BoolValue (@0 bs : List UInt8) : Set where
+% %   constructor mkBoolValue
+% %   field
+% %     v     : Bool
+% %     @0 b  : UInt8
+% %     @0 vr : BoolRep v b
+% %     @0 bseq : bs == [ b ]
+% %   \end{code}
+% %   \caption{\agda example for representing \der boolean type}
+% %   \label{fig:code1}
+% % \end{figure}
 
-\subsection{Architecture of ARMOR}
+% % Here, |BoolRep| is a dependent type representing a binary relationship between
+% % \agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned
+% % integers or octet values stipulated by the \xsno \der), where the |falser|
+% % constructor associates the false boolean value with $0$, and the |truer|
+% % constructor associates true with $255$. The function |UInt8.fromN| transforms
+% % a non-negative unbounded integer into its equivalent |UInt8| representation.
+% % It is important to note that this transformation is contingent upon \agda's
+% % ability to automatically verify that the provided number is less than $256$.
+% % Also, the keyword |Set| (referred to as the type of types) defines the type of
+% % |BoolRep|, indicating that |BoolRep| maps specific pairs of |Bool| and |UInt8|
+% % values to unique types. Subsequently, we can construct a dependent and
+% % parameterized record type, |BoolValue|, to represent the boolean value defined
+% % by \xsno. This record type, essentially a predicate over byte-strings,
+% % includes the boolean value |v|, its byte-string representation |b|, a proof
+% % |vr| that |b| is the correct representation of |v|, and a proof |bseq| that
+% % the byte-string representation |bs| of this grammatical terminal is a
+% % singleton list containing |b|. The |@0| annotations applied to types and
+% % fields specify that these values are erased at runtime to minimize execution
+% % overhead and to mark parts of the formalization used solely for verification
+% % purposes. In short, |BoolRep| verifies the correct mapping between boolean
+% % values and their numerical representations, while |BoolValue| holds the
+% % boolean value, its numerical representation, and the proof of the correctness
+% % of this representation, returned by the |BoolRep|.
+
+\subsubsection{The Oracle of Morpheus}
+\morpheus~\cite{yahyazadeh2021morpheus} provides a rigorously validated oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. The system accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not.
+
+\subsubsection{HACL*}
+HACL* (High Assurance Cryptographic Library) is a notable cryptographic library developed in the F* programming language, which combines functional programming with formal verification. It's distinguished by its high-assurance implementations of cryptographic algorithms, ensuring safety (like memory and type safety) and correctness (adherence to specifications). HACL* is used in industry, notably in Mozilla's Network Security Services (NSS), and offers a range of cryptographic algorithms, including symmetric encryption, hash functions, and public-key cryptography. 
+
+\subsection{Architecture of \armor}
 
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.7]{img/armor.drawio.pdf} \\
+  \includegraphics[scale=0.65]{img/armor.drawio.pdf} \\
   \caption{Architecture of \armor}
   \label{armor}
   \end{figure}
 
-Figure~\ref{armor} shows the high-level architecture of \armor, which consists
-of four core modules: \driver, \parser, \stringtransformer, and \semantic.
-As discussed in Section~\ref{sem}, the \driver module, written in \python, takes
-the input certificates in a single \pem file.
-We assume the input \pem file contains all the certificates in order.
-That means we rely on the sender to provide the end-entity and CA certificates
-with a valid certification path.
-Therefore, we do not include the \chain module in our implementation to ease our
-verification steps.
-However, we formally verified the most challenging steps, such as parsing,
-string transformation\todo{CJ: We have not!}, and semantic validation using the \agda theorem prover.
-Note that we execute signature verification and trust anchor check outside our verified \semantic module. Finally, our \driver module manages the I/O operations and directs the external calls needed to execute signature verification (based on the oracle of \morpheus) and trust anchor check. As mentioned in Section~\ref{mor}, some inputs to the \morpheus's oracle require pre-processing with cryptographic operations, such as \textit{modular exponentiation} and \textit{hashing}, for which we leverage \python's \cryptography library~\cite{crypto}. 
+  Figure~\ref{armor} depicts the detailed architecture and workflow of \armor. The architecture is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{Agda} module (implemented in the \agda theorem prover). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives two \pem certificate files and the current system-time as inputs and \circled{B} forwards these inputs to the \emph{Main} sub-module of the \emph{Agda} module. One \pem file contains the end-user certificate and associated CA certificates, while the other one contains the trust anchors' certificates. The \emph{Main} sub-module in the \emph{Agda} module uses the \pem parser (\circled{C} -- \circled{D}), \basesf decoder (\circled{E} -- \circled{F}), and \der parser (\circled{G} -- \circled{H}) sequentially to parse the two \pem files, converting all certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into internal data structures. Then, (\circled{I} -- \circled{L})it invokes the \emph{Chain-builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trust anchor. The chain-building process depends on matching \texttt{Subject} and \texttt{Issuer} names in subsequent certificates in a chain. Thus, during chain-building, (\circled{G} -- \circled{H}) the \emph{String Canonicalizer} is also used to normalize \texttt{Subject} and \texttt{Issuer} names. Following this, (\circled{M} -- \circled{N}) the \emph{Main} sub-module tests each candidate chain for semantic validation. If a candidate chain passes the semantic checks, \circled{O} the \emph{Main} sub-module informs the \emph{Driver} in the \emph{Python} module. Notably, the \emph{Semantic Validator} in the \emph{Agda} module does not perform signature verification on the candidate chains. Hence, (\circled{P} -- \circled{U}) the \emph{Driver} in the \emph{Python} module calls upon the \emph{Signature Verifier} for this task. The \emph{Signature Verifier}, in turn, employs (\circled{Q} -- \circled{R}) HACL* and (\circled{S} -- \circled{T}) Morpheous for cryptographic operations. Once the signature verification is successful, \circled{U} the \emph{Driver} is notified, and \circled{V} it then outputs the final chain validation result and the public-key of the end-user certificate.
+
+
+
+
+
+
+
+
+
+
+
+
+
+% % which consists
+% % of four core modules: \driver, \parser, \stringtransformer, and \semantic.
+% % As discussed in Section~\ref{sem}, the \driver module, written in \python, takes
+% % the input certificates in a single \pem file.
+% % We assume the input \pem file contains all the certificates in order.
+% % That means we rely on the sender to provide the end-entity and CA certificates
+% % with a valid certification path.
+% % Therefore, we do not include the \chain module in our implementation to ease our
+% % verification steps.
+% % However, we formally verified the most challenging steps, such as parsing,
+% % string transformation\todo{CJ: We have not!}, and semantic validation using the \agda theorem prover.
+% % Note that we execute signature verification and trust anchor check outside our verified \semantic module. Finally, our \driver module manages the I/O operations and directs the external calls needed to execute signature verification (based on the oracle of \morpheus) and trust anchor check. As mentioned in Section~\ref{mor}, some inputs to the \morpheus's oracle require pre-processing with cryptographic operations, such as \textit{modular exponentiation} and \textit{hashing}, for which we leverage \python's \cryptography library~\cite{crypto}. 
 
 
 
 \subsection{Implementation Details}
+
+\textbf{Challenge 1: Choosing the boundary for modularization}
+
+
+
+
+
+\textbf{Challenge 2: Choosing the level of specificity}
+
+\textbf{Challenge 3: Speeding up the string canonicalization}
+
+\textbf{Challenge 4: Designing the chain building algorithm}
+
+\textbf{Challenge 5: Tacking the formal verification of cryptographic operations}
+
+
 \label{imp}
 Now we provide details on our implementation, including the reasons behind specific design choices.
 
@@ -207,7 +237,7 @@ We currently support $23$ semantic properties; see Table~\ref{rules} in Appendix
 \textbf{Trust Anchor Check:} The trust anchor check generally involves verifying if the root CA certificate is present in the trusted CA store of the verifier's system. However, in practice, this root store can also include intermediate CA certificates or even the end-entity certificate itself. This allows the validation process to proceed in reverse order, starting from the end-entity certificate and moving toward the root CA certificate until a match is found in the trusted CA store. Given that this process can be accomplished by directly mapping the \der bytestring of the input certificates to those in the trusted store, we delegate this task to our driver module as the final step in the validation process. This division of labor allows us to leave the straightforward task of bytestring comparison to the \driver module.
 
 
-\subsubsection{Verified Agda Code to Executable Binary} \agda is primarily a proof assistant, not commonly used to produce executable binaries directly. However, we can indirectly produce executable binaries by compiling \agda code to \haskell and then using \ghc~\cite{ghc} to generate an executable. This process begins with creating an \agda program, enabling IO operations through \agda's builtin features. Then, \agda's \textsf{compile} command transforms the \agda code to \haskell. The generated \haskell code is then compiled into an executable binary using the \ghc \haskell compiler. However, the generated executable may not be as efficient as code written directly in \haskell.
+\subsubsection{Verified \agda Code to Executable Binary} \agda is primarily a proof assistant, not commonly used to produce executable binaries directly. However, we can indirectly produce executable binaries by compiling \agda code to \haskell and then using \ghc~\cite{ghc} to generate an executable. This process begins with creating an \agda program, enabling IO operations through \agda's builtin features. Then, \agda's \textsf{compile} command transforms the \agda code to \haskell. The generated \haskell code is then compiled into an executable binary using the \ghc \haskell compiler. However, the generated executable may not be as efficient as code written directly in \haskell.
 
 
 
