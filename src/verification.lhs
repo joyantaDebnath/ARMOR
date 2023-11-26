@@ -244,23 +244,26 @@ TLV-encoded values.
 % \end{figure}
 
 \subsection{Sound and Complete Parsing}
+We now describe our approach to verified parsing.
 Recall that, for a language \(G\), \emph{soundness} of a parser means that every
 bytestring it accepts is in the language, and \emph{completeness} means that it
 accepts every bytestring in the language.
-Our approach to verifying these properties for our X.509 CCVL parser is to make
-it \emph{correct by construction}, meaning that the parser does not merely
-indicate success or failure as a Boolean or integer code, but returns a proof.
+Our approach to verifying these properties for all our parsers is to make them
+\emph{correct by construction}, meaning that parsers do not merely indicate
+success or failure with e.g.\ an integer code, but return \emph{proofs}. 
 If the parser is successful, this is a proof that some prefix of its input is in
 the language, and if the parser fails, it returns a proof that \emph{no} prefix
 of its input is.
 
-\subsubsection{Parser Success and Soundness}
-Our first step is to formally define what it means for the parser to be
-successful.
+\subsubsection{The Type of Correct-by-Construction Parsers}
+Our first step is to formally define what success in means.
 In FOL, we would express the condition for the parser's success on a prefix of
 |xs| as \(\exists \mathit{ys}\, \mathit{zs}, \mathit{xs} = \mathit{ys} +\!\!\!+
 \mathit{zs} \land |G ys|\).
-In Agda, we express this as the parameterized record |Success|, shown below.
+That is to say, on success the parser consumes some prefix of the input string
+that is in the language |G|.
+In Agda, we express the result of successful parsing as the parameterized record
+|Success|, shown below.
 \begin{figure}[h]
   \centering
   \begin{code}
@@ -276,21 +279,23 @@ In Agda, we express this as the parameterized record |Success|, shown below.
   \caption{Success conditions for parsing}
   \label{fig:parser-success}
 \end{figure}
+In the definition, understand parameters |G| and |xs| as the language denoted by
+a production rule and an input string, respectively.
+The fields of the record are: |prefix|, the consumed prefix of the input (erased
+at runtime); |suffix|, the remaining suffix of the input from which we parse
+subsequent productions; |pseq|, which relates |prefix| and |suffix| to the input
+string |xs| (also runtime erased); and |value|, which serves dual roles as both
+the internal data representation of the value encoded by |prefix| \textbf{and}
+a proof that |prefix| is in the language |G|.  
+As a consequence, \emph{soundness will be immediate}.
 
-Note that fields |prefix| (the consumed prefix) and |pseq| (relating the prefix
-and suffix to the original bytestring) are erased from runtime; the data carried
-at runtime is the remaining bytestring to parse, |suffix|, and the parsed value,
-|value|, a proof that |prefix| is in the language denoted by |G|.
-As a consequence, \textbf{soundness is immediate}.
-
-\subsubsection{Parser Failure and Completeness}
 Our next step is to define what parser failure means.
 We define this to be the condition that \emph{no} prefix of the input |xs| is in
 the language of |G|, which is to say the failure condition is the
 \emph{negation} of the success condition: |not Success G xs|.
 
 To have the parser return |Success G xs| on success and |not Success G xs| on
-failure, we turn datatype |Dec| in the Agda standard library, shown below.
+failure, we use datatype |Dec| in the Agda standard library, shown below.
 \begin{code}
 data Dec (A : Set) : Set where
   yes : A -> Dec A
@@ -309,18 +314,35 @@ We are now able to complete the definition of the type of parsers, shown below.
   \centering
   \begin{code}
 Parser : (List UInt8 -> Set) -> Set
-Parser G = (xs : List UInt8) -> Dec (Success G xs)    
+Parser G = forall xs -> Dec (Success G xs)    
   \end{code}
   \caption{Definition of |Parser|}
   \label{fig:parser-def}
 \end{figure}%
-|Parser| is a family of types, where for each language |G| family member
+|Parser| is a family of types, where for each language |G|, the type
 |Parser G| is the proposition that, for all bytestrings |xs|, it is decidable
 whether some prefix of |xs| is in |G|; alternatively, we can (as programmers)
-read it as the type of functions with take a bytestring and possibly return a
+read it as the type of functions which take a bytestring and possibly return a
 parsed data structure and remaining bytestring to continue parsing.
 
-\textbf{Completeness:} To finish, we now explain how our setup guarantees
+\textbf{Challenges.}
+The guarantee that, on failure, the parser returns |not Success G xs| is very
+strong, as it asserts a property concerning \emph{all possible prefixes} of the
+input.
+This strength is double-edged: while having this guarantee makes proving
+completeness straightforward, \emph{proving} it means ruling out all possible
+ways in which the input could be parsed.
+In some cases, we have made choices about parser implementations to facilitate
+the proofs concerning the failure case, at a cost to performance.
+The clearest example of such a trade-off is in our parsers for X.690
+\texttt{Choice} values, which are implemented using back-tracking.
+
+
+\subsubsection{Parser Success and Soundness}
+
+\subsubsection{Parser Failure and Completeness}
+
+\textbf{Completeness.} To finish, we now explain how our setup guarantees
 completeness.
 Assuming |G| is a language that satisfies |Unambiguous| and |Unique|
 (Figure~\ref{fig:unambig-uniq}) (in particular, our specification
