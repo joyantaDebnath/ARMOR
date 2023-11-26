@@ -1,9 +1,5 @@
 \section{Related Work}
 
-
-
-
-
 % % Due to the wide adoption of \xfon PKI, the research community has critically analyzed the implementation and deployment of \xfon PKI in recent years. In the following, we provide a brief overview of previous research efforts and explain how our work diverges from them.
 
 % The widespread adoption of X.509 PKI has led to significant scrutiny by the research community regarding its implementation and deployment in recent years. In this section, we provide a concise overview of prior research efforts in this field and clarify how our work diverges from these existing studies.

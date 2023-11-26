@@ -28,7 +28,7 @@ A majority of the prior work focuses on developing software testing mechanisms s
 different \xfon libraries~\cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt, rfcguided, symcert}. While these methods 
 have been beneficial in identifying numerous vulnerabilities, they often fall short of providing any formal guarantees regarding correctness. 
 This is corroborated through many high impact bugs and vulnerabilities in some widely used applications and open-source libraries 
-\cite{CVE-2019-5275, CVE-2014-0161, CVE-2020-5523, CVE-2019-15604, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527, CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}.   
+\cite{CVE-2020-5523, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527, CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}.   
 In contrast, a formally-verified implementation of \xfon certificate chain
 validation can provide mathematical assurances that the implementation behaves
 correctly, setting a benchmark for developing other such implementations.
@@ -69,12 +69,12 @@ parsing; (4) Focuses only on verifiable encoding of certificates, not parsing; (
 across many different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC 4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC 4518~\cite{zeilenga2006lightweight}) and specified in natural language, which have 
 been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}. \emph{Second}, the format 
 of an \xfon certificate is complex and nested, represented in \asnone \der
-\cite{rec2002x}, and one requires a context-sensitive grammar to capture the
-syntactic restrictions of an \xfon certificate~\cite{kaminsky2010pki, debnath2021re}.
+\cite{rec2002x}, and one requires a context-sensitive grammar to enforce the
+syntactic requirements of an \xfon certificate~\cite{kaminsky2010pki, debnath2021re}.
 Thus, proving total correctness of the parser is quite complicated.
 To make matters worse, parsing just the \asnone structure from the certificate bytestream 
 is insufficient because the relevant certificate field value may need to be further 
-decoded from the parsed \asnone value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone \der parsing, decoding \asnone values, string canonicalization, chain building, semantic rule checking, cryptographic signature verification, hostname verification, revocation checking), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
+decoded from the parsed \asnone value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone \der parsing, decoding \asnone values, string canonicalization, chain building, semantic checking, cryptographic signature verification, hostname verification, revocation checking), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
 
 % daunting task of modeling and demonstrating the correctness of the cryptographic operations can pose a significant challenge, demanding sophisticated mathematical techniques and a deep understanding of the underlying cryptographic principles while ensuring the focus remains on the core certificate validation process.
 
@@ -105,7 +105,7 @@ takes as input a certificate chain to be validated as well as some other
 necessary inputs (\eg, current system time, trust anchors), and returns a pair $\langle r, k\rangle$ 
 in which the result of the validation process $r\in \{\mathsf{Invalid}, \mathsf{Valid}\}$ 
 and $k$ is the public-key of the entity whose certificate is being validated. The  
-\emph{Agda} module, written in a dependently typed functional programming language called \agda~\cite{bove2009brief, No07_agda}, implements all the intermediate stages (\eg, parsing, semantic validation, chain-building, string canonicalization) of certificate chain validation. Notably \agda not only allows one to write programs 
+\emph{Agda} module, written in a dependently typed functional programming language called \agda~\cite{bove2009brief, No07_agda}, implements all the intermediate stages (\eg, parsing, semantic checking, chain building, string canonicalization) of certificate chain validation. Notably \agda not only allows one to write programs 
 but also allows one to prove correctness properties about those programs through \emph{interactive theorem proving}. 
 
 We proved the following correctness properties for our high-assurance implementation ARMOR : \emph{soundness} (any certificate chain deemed valid by our implementation is indeed 
@@ -139,7 +139,7 @@ at least $X\%$ of the time. For the remaining $Y\%$, we notice
 that \armor strictly follows the requirements in RFC 5280~\cite{cooper2008internet}, whereas the other libraries 
 have a more relaxed enforcement of these requirements. 
 Finally, to evaluate the practical usability of \armor, we measure its runtime overhead in terms of computational time and memory consumption. 
-We notice that \armor has a much higher overhead compared to the X.509 libraries that are written in \cpp, \python, \java, and \go.
+We notice that \armor has a much higher overhead compared to the \xfon libraries that are written in \cpp, \python, \java, and \go.
 % (\eg, \openssl~\cite{openssl}, \gnutls~\cite{gnutls}, \boringssl~\cite{boringssl}, \mbedtls~\cite{mbedtls}, \wolfssl~\cite{wolfssl}, \matrixssl~\cite{matrixssl}). 
 % Compared to libraries in our evaluation written in Python, Java, and Go, we observe that  \armor either outperforms them or has similar performance. 
 Our empirical evaluation signifies that \emph{\armor may be a reasonable choice of \xfon certificate validation library in some application domains where formal correctness 
