@@ -38,6 +38,7 @@ be nice to show the type signatures here, but they need cleaning up!}
 
 
 \subsection{Independent Specification}
+\label{sec:s4-lang-spec}
 Our first challenge concerns how the specification is represented, that is,
 answering the question ``parser soundness and completeness \emph{with respect to
   what?}''
@@ -198,7 +199,7 @@ NoSubstrings G =
   forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
   -> G xs1 -> G xs2 -> xs1 == xs2
 \end{code}
-Given that \xfon uses a form of \emph{type-length-value} encoding, it is
+Given that \xfon uses \(<T,L,V>\) encoding, it is
 unsurprising that that we are able to prove |NoSubstrings| holds for our
 specification.
 However, this property is essential to understanding our \emph{strong
@@ -207,8 +208,8 @@ However, this property is essential to understanding our \emph{strong
 \subsubsection{Summary of Language Guarantees}
 We have proven \emph{unambiguousness} for the supported subsets of formats
 PEM,\todo{\tiny Remove if we haven't}
-X.690 DER, and X.509; we have proven \emph{non-malleability} for the supported
-subsets of formats X.690 DER and X.509, and proven \emph{no-substrings} for all
+\xsno \der, and \xfon; we have proven \emph{non-malleability} for the supported
+subsets of formats \xsno \der and \xfon, and proven \emph{no substrings} for all
 TLV-encoded values.
 
 % In addition, two properties in particular are essential to our proof of parser
@@ -337,8 +338,106 @@ the proofs concerning the failure case, at a cost to performance.
 The clearest example of such a trade-off is in our parsers for X.690
 \texttt{Choice} values, which are implemented using back-tracking.
 
+\subsubsection{Parser Soundness, Completeness, and Strong Completeness}
+We now show our formal definitions and proofs of soundness and completeness for
+parsing, beginning with soundness.
+\begin{figure}[h]
+  \begin{code}
+Sound : (G : @0 List A -> Set) -> Parser G -> Set
+Sound G p =
+  forall xs -> (w : IsYes (p xs)) -> G (Success.prefix (toWitness w))    
 
-\subsubsection{Parser Success and Soundness}
+@0 soundness : forall {G} -> (p : Parser G) -> Sound G p
+soundness p xs w = Success.value (toWitness w)
+  \end{code}
+  \caption{Parser soundness (definition and proof)}
+  \label{fig:s4-parser-soundness}
+\end{figure}%
+
+\textbf{Soundness.}
+Recall that parser soundness means that, if a parser for \(G\) accepts a prefix of the
+input string, then that prefix is in \(G\).
+The Agda definition and proof of soundness for all of our parsers is
+shown in Figure~\ref{fig:s4-parser-soundness}, which we now detail.
+Beginning with |Sound|, the predicate expressing that parser |p| is sound with
+respect to language |G|, the predicate |IsYes| (definition omitted) expresses
+the property that a given decision (in this case, one of type |Dec (Success G
+xs)|) is affirmative (i.e., constructed using |yes|).
+The function |toWitness : forall {Q} {d : Dec Q} -> IsYes d -> Q| takes a
+decision |d| for proposition |Q| and proof that it is affirmative, and produces
+the underlying proof of |Q|.
+Thus, we read the definition of |Sound G p| as: ``for all input strings |xs|, if
+parser |p| accepts |xs|, the the prefix it consumes is in |G|.''
+
+The proof |soundness| states that \emph{all parsers are sound}.
+As our parsers are correct by construction, the definition is straightforward:
+we use |toWitness| to extract the proof of parser success, i.e., a term of type
+|Success G xs|, then use the field accessor |Success.value| to obtain the
+desired proof that the consumed prefix is in |G|.
+
+\textbf{Completeness.}
+Recall that the definition of parser completeness with respect to a language |G|
+means that if an input string |xs| is in |G|, the parser accepts \emph{some
+  prefix of |xs|}.
+Of course, this property in isolation does not rule out certain bad behavior
+that threatness security; specifically, it does not contrain the parser's
+freedom over (1) which prefix of the input is consumed, and (2) how the internal
+datastructure is constructed.
+However, and as we have discussed in Section~\ref{sec:s4-lang-spec}, these are
+properties of the \emph{language}, and not its parsers.
+To emphasize this, after discussing the completeness proof we will show how,
+using language properties, it can be strengthed to address the aforementioned
+security concerns.
+
+\begin{figure}[h]
+\begin{code}
+Complete : (G : @0 List A -> Set) -> Parser G -> Set
+Complete G p = forall xs -> G xs -> IsYes (p xs)
+
+trivSuccess : forall {G} {xs} -> G xs -> Success G xs
+
+completeness : forall {G} -> (p : Parser G) -> Complete G p
+completeness p xs inG = fromWitness (p xs) (trivSuccess inG)
+\end{code}
+  \caption{Parser weak completeness (definition and proof)}
+  \label{fig:s4-parser-wkcompleteness}
+\end{figure}
+
+Figure~\ref{fig:s4-parser-wkcompleteness} shows our definition and proof of
+\emph{completeness} in \agda, which we now detail.
+The definition of |Complete| directly translates our notion of completeness: for
+every input string |xs|, if |xs| is in |G|, then parser |p| accepts some prefix
+of |xs|.
+For the proof, we first prove a straightforward lemma |trivSuccess| (definition
+omitted) that states any proof that |xs| is in |G| can be turned into a proof
+that some prefix of |xs| (namely, |xs| itself) is in |G|.
+With this, the proof of |completeness| uses the function |fromWitness : {Q :
+  Set} -> (d : Dec Q) -> Q -> IsYes d|, which intuitively states that if a
+proposition |Q| is true, then any decision for |Q| must be in the affirmative.
+
+\textbf{Strong completeness.}
+\begin{figure}[h]
+  \begin{code}
+StronglyComplete : (G : @0 List A -> Set) -> Parser G -> Set
+StronglyComplete G p = forall xs -> (inG : G xs)
+  -> exists  (w : IsYes (p xs))
+             ((_ , inG) == (_ , Success.value (toWitness w)))
+
+strongCompleteness
+  : forall {G} -> Unambiguous G -> NoSubstrings G
+    -> (p : Parser G) -> StronglyComplete G p
+strongCompleteness ua nn p xs inG = (w , secure xs inG s)
+  where
+  w = completeness p inG
+  s = toWitness w
+  secure : forall xs inG s -> (_ , inG) == (_ , Success.value s)
+  secure xs inG s with nn _ inG (Success.prefix s)
+  ... | refl with ua inG (Success.value s)
+  ... | refl = refl
+  \end{code}
+  \caption{Strong completeness (definition and proof)}
+  \label{fig:s4-parser-stcompleteness}
+\end{figure}
 
 \subsubsection{Parser Failure and Completeness}
 

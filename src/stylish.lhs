@@ -83,6 +83,7 @@
 %format pattern    = "\HSKeyword{pattern}"
 %format with       = "\HSKeyword{with}"
 %format forall     = "\HSSym{\forall}"
+%format exists     = "\HSSym{\exists}"
 
 %%% A Handy placeholder symbol to have
 %format SQ         = "\HSVar{\square}"
@@ -303,3 +304,4 @@
 %format readeq         = "\HSVar{\mathit{read}_{eq}}"
 %format pseq         = "\HSVar{\mathit{ps}_{eq}}"
 %format eqrefl         = "\HSVar{\mathit{eq}_{refl}}"
+%format refl       = "\HSCon{refl}"
