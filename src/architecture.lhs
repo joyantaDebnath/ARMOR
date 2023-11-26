@@ -1,11 +1,21 @@
 \section{Design and Implementation of \armor} 
-The development of \armor entails four critical steps: (1) Consulting the X.509 specifications to extract the requirements for certificate chain validation and then formally represent them; (2) Developing the actual implementation for X.509 certificate chain validation; (3) Employing an interactive theorem prover to prove that the implementation meets the specified criteria; and (4) Extracting an executable binary from the validated implementation, serving as a reference for future non-compliance checking and validation purposes. As the interactive theorem prover, we choose \agda~\cite{bove2009brief, No07_agda} for \armor. In this section, we first present a brief introduction to \agda, and then present the architecture and the implementation details of \armor.
+The development of \armor entails four critical steps: (1) Consulting the X.509
+specifications to extract the requirements for certificate chain validation and
+then formally represent them; (2) Developing the actual implementation for X.509
+certificate chain validation; (3) Employing an interactive theorem prover to
+prove that the implementation meets the specified criteria;\todo{\tiny The
+  separation between (2) and (3) is misleading, impls are correct by construction} and (4) Extracting
+an executable binary from the validated implementation, serving as a reference
+for future non-compliance checking and validation purposes. As the interactive
+theorem prover, we choose \agda~\cite{bove2009brief, No07_agda} for \armor. In
+this section, we first present a brief introduction to \agda, and then present
+the architecture and the implementation details of \armor. 
 
 \subsection{Background on \agda}
-\agda, at its core, is a \textit{dependently-typed} functional programming
-language, which allows types to refer to terms.
-This capability helps express rich properties in types, with typechecking
-enforcing that programs satisfy those properties.
+\agda is a \textit{dependently-typed} functional programming
+language, meaning that types may involve term expressions.
+This capability helps express rich properties in types, and enforcing that
+programs satisfy those properties is reduced to typechecking.
 In other words, if a program compiles, it is also proven to meet the
 specifications described by its type.
 Under the \emph{Curry-Howard}
@@ -13,7 +23,7 @@ correspondence~\cite{SU06_Lectures-on-the-Curry-Howard-Isomorphism}, we can view
 \agda's types as \emph{propositions} and its terms as \emph{proofs} of the
 propositions expressed by their types.
 This makes \agda a powerful tool for both expressing programs and their
-correctness, as the language of programs and proofs is unified.
+correctness, as it unifies the language of programs and proofs.
 
 \textbf{Example.} Consider the example shown in
 Figure~\ref{fig:agda-ex} of length-indexed lists, provided as part of the \agda
@@ -41,7 +51,7 @@ We now briefly explain the code listing in the figure.
 \item The |data| keyword indicates that we are declaring |Vec| as an \emph{inductive
     family} indexed by a type |A| and a natural number. By \emph{inductive
     family}, we mean that for each type |A| and natural number |n|, |Vec A n| is
-  a unique type -- the type for lists with exactly |n| elements of type |A|).
+  a unique type --- the type for lists with exactly |n| elements of type |A|).
   
 \item |Vec| has two \emph{constructors}, |vnil| for the empty list and |vcons|
   for a list with at least one element.
@@ -52,7 +62,7 @@ We now briefly explain the code listing in the figure.
 \item Curly braces indicate function arguments that need not be passed
   explicitly, leaving \agda to infer their values from the types of other
   arguments to the function.
-  For example, we can write |vcons 0 vnil|, and \agda will know this has type
+  For example, we can write |vcons 5 vnil|, and \agda will know this has type
   |Vec Nat 1|, as the only correct instantiation of parameter |n| of |vcons| 
   is |0|.
 \end{itemize}
@@ -145,23 +155,34 @@ thus the empty list can never be a well-typed argument to |head|.
   \vspace{0.2cm}
   \caption{Architecture of \armor}
   \label{armor}
-  \end{figure}
+\end{figure}
 
 
-  \armor is designed and developed with modularity in mind. Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
-  we modularly decompose the whole \xfon certificate chain validation 
-  process into several stages. Such modularity facilitates both ease of implementation, 
-  manageability of the implementation, and also formal verification efforts. Figure~\ref{armor} depicts the architecture of \armor, which is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{Agda} module (implemented in the \agda). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives the inputs and \circled{B} forwards those inputs to the \emph{Main} sub-module of the \emph{Agda} module. The \emph{Main} sub-module then sequentially utilizes the \emph{PEM parser} (\circled{C} -- \circled{D}), \emph{Base64 decoder} (\circled{E} -- \circled{F}), and \emph{DER parser} (\circled{G} -- \circled{H}) to parse the input certificate files and represent all input certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into their internal data structures. Then, (\circled{I} -- \circled{L}) it invokes the \emph{Chain builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trusted CA certificate. Note that, our chain building process depends on matching the \texttt{Subject} and \texttt{Issuer} names of subsequent certificates in a chain. This matching algorithm is defined in Section 7.1 of RFC 5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. Thus, during chain building, (\circled{G} -- \circled{H}) the \emph{String canonicalizer} is called to normalize the \texttt{Subject} and \texttt{Issuer} names.
+\armor is designed and developed with modularity in mind. Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
+we modularly decompose the whole \xfon certificate chain validation 
+process into several stages. Such modularity facilitates both ease of implementation, 
+manageability of the implementation, and also formal verification
+efforts.\todo{\tiny Need map key, also explain in prose.}\todo{\tiny Table
+  summary of formal guarantees?}
+Figure~\ref{armor} depicts the architecture of \armor, which is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{Agda} module (implemented in the \agda). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives the inputs and \circled{B} forwards those inputs to the \emph{Main} sub-module of the \emph{Agda} module. The \emph{Main} sub-module then sequentially utilizes the \emph{PEM parser} (\circled{C} -- \circled{D}), \emph{Base64 decoder} (\circled{E} -- \circled{F}), and \emph{DER parser} (\circled{G} -- \circled{H}) to parse the input certificate files and represent all input certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into their internal data structures. Then, (\circled{I} -- \circled{L}) it invokes the \emph{Chain builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trusted CA certificate. Note that, our chain building process depends on matching the \texttt{Subject} and \texttt{Issuer} names of subsequent certificates in a chain. This matching algorithm is defined in Section 7.1 of RFC 5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. Thus, during chain building, (\circled{G} -- \circled{H}) the \emph{String canonicalizer} is called to normalize the \texttt{Subject} and \texttt{Issuer} names.
   
   Next, (\circled{M} -- \circled{N}) the \emph{Main} sub-module tests each candidate chain for semantic validation. If any of the candidate chains passes the semantic validation, \circled{O} the \emph{Main} sub-module informs the \emph{Driver} in the \emph{Python} module. Notably, the \emph{Semantic validator} in the \emph{Agda} module does not perform any signature verification on the candidate chains since we do not implement and formally verify cryptographic operations in \armor. Hence, (\circled{P} -- \circled{U}) the \emph{Driver} in the \emph{Python} module calls upon the external \emph{Signature Verifier} for this task. The \emph{Signature verifier}, in turn, employs two formally-verified libraries -- (\circled{Q} -- \circled{R}) \haclstar~\cite{zinzindohoue2017hacl} and (\circled{S} -- \circled{T}) \morpheus~\cite{yahyazadeh2021morpheus} for the required cryptographic operations (details on \armor's signature verification is discussed later). Once the signature verification is successful, \circled{U} the \emph{Driver} is notified, and \circled{V} it then outputs the final chain validation result and the public-key of the end-user certificate.
 
 \subsubsection{Our Insights on Technical Challenges} We now discuss our design choices to tackle the challenges discussed on Section 2. 
 
 \textit{a. Choosing the boundary for parsing.}
-In Section 2, we discussed the RFC 5280 specification, which comprises two main rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization specifically concentrates on the \emph{consumer rules}, which are intended for certificate chain validation implementations. Additionally, RFC 5280 is categorized into \emph{syntactic} and \emph{semantic} rules. A clear separation between these syntactic and semantic rules is pivotal in formally specifying requirements. However, having a balance is also essential-- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the re-engineering effort by Debnath \etal~\cite{debnath2021re}. Similar to that prior work, we categorize \der restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on \der's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. 
+In Section 2, we discussed the RFC 5280 specification, which comprises two main
+rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization
+specifically concentrates on the \emph{consumer rules}, which are intended for
+certificate chain validation implementations.
+Additionally, RFC 5280 is categorized into \emph{syntactic} and \emph{semantic}
+rules.\todo{\tiny \emph{We} did this, not the RFC}
+A clear separation between these syntactic and semantic rules is pivotal in
+formally specifying requirements.
+However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the re-engineering effort by Debnath \etal~\cite{debnath2021re}. Similar to that prior work, we categorize \der restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on \der's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. 
 
 \textit{b. Choosing the level of specificity.}
-While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. In addition, RFC 5280 puts additional restrictions on certain \der rules to be used for the Internet. Therefore, we aim to create a formally-verified implementation that focuses primarily on the most commonly used fragments of the standard specifications. For example, in our current configuration of \armor, we support $10$ certificate extensions. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. When any other extension is present, we only consume the corresponding bytes of the extension to continue parsing rest of the certificate fields. Table~\ref{extfreq} shows our analysis on the frequency of different extensions based on $1.5$ billion real certificates collected from the \censys~\cite{censys} certificate repository in January $2022$. Based on this measurement study, we support the following extensions-- Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
+While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. In addition, RFC 5280 puts additional restrictions on certain \der rules to be used for the Internet. Therefore, we aim to create a formally verified implementation that focuses primarily on the most commonly used subset of the standard specifications. For example, in our current configuration of \armor, we support $10$ certificate extensions. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. When any other extension is present, we only consume the corresponding bytes of the extension to continue parsing rest of the certificate fields. Table~\ref{extfreq} shows our analysis on the frequency of different extensions based on $1.5$ billion real certificates collected from the \censys~\cite{censys} certificate repository in January $2022$. Based on this measurement study, we support the following extensions: Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
 
 \begin{table}[h]
   \captionsetup{font=footnotesize}
@@ -196,13 +217,20 @@ While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrict
 
 
 
-\textit{c. Tackling cryptographic operations.} Verification of cryptographic operations are out-of-scope for this work. Therefore, we rely on formally-verified external libraries for the task of Signature verification. 
-We currently support only RSA signature verification, primarily because over $96\%$ of certificates employ RSA public keys, corroborated by our measurement studies on the $1.5$ billion \censys~\cite{censys} certificates. However, the RSA Signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the \agda code, we utilize \haclstar~\cite{zinzindohoue2017hacl} and \morpheus~\cite{yahyazadeh2021morpheus}. \haclstar is a formally-verified cryptographic library developed in $F^*$ and can be compiled into $C$ programs while retaining all its verified properties (\eg, memory safety, resistance to timing side-channel attacks, and functional correctness). In \armor, we specifically utilize \haclstar's \emph{hash function} implementations. In contrast, \morpheus is an oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. This oracle accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not. This design choice allows us to focus on leveraging \agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in \python and \morpheus.
+\textit{c. Tackling cryptographic operations.} Verification of cryptographic
+operations is out of scope for this work.
+Therefore, we rely on formally-verified external libraries for the task of signature verification. 
+We currently support only RSA signature verification, primarily because over
+$96\%$ of certificates employ RSA public keys, corroborated by our measurement
+studies on the $1.5$ billion \censys~\cite{censys} certificates.
+However, the RSA signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the \agda code, we utilize \haclstar~\cite{zinzindohoue2017hacl} and \morpheus~\cite{yahyazadeh2021morpheus}. \haclstar is a formally-verified cryptographic library developed in $F^*$ and can be compiled into $C$ programs while retaining all its verified properties (\eg, memory safety, resistance to timing side-channel attacks, and functional correctness). In \armor, we specifically utilize \haclstar's \emph{hash function} implementations. In contrast, \morpheus is an oracle of the RSA $\mathit{PKCS\#1-v1.5}$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. This oracle accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TBSCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not. This design choice allows us to focus on leveraging \agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in \python and \morpheus.
 
 
 \subsubsection{Verification Overview} 
 Our verification effort on the \emph{Agda} module can be decomposed to the
-verification of \emph{Parsers (\ie, PEM parser, Base64 decoder, X.690 DER and X.509 parser)} and the verification of \emph{Semantic validator}. In this work, we only formally specify and implement the \emph{String canonicalizer} and \emph{Chain builder}, however, we do not provide any formal correctness guarantees for them. We now present a high-level overview on our verification efforts, while details on the verification and correctness proofs with their specific-challenges are discussed in Section 4. 
+verification of \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
+  X.509 parser)} and the verification of \emph{semantic validation}.
+In this work, we only formally specify\todo{\tiny No formal spec} and implement the \emph{String canonicalizer} and \emph{Chain builder}, however, we do not provide any formal correctness guarantees for them. We now present a high-level overview on our verification efforts, while details on the verification and correctness proofs with their specific-challenges are discussed in Section 4. 
 
 \noindent\textbf{Verification of Parsers:}  
 We conceptually separate each parser verification task into \emph{language
@@ -271,14 +299,15 @@ understand the relevant specifications X.509 and X.690 DER.
 % components are purely for specificational purposes.
 
 \textit{b. Language security verification.} We verify properties of the language specifications that give
-  confidence they meet their desired design goals.
+  confidence they meet their desired design goals.\todo{\tiny Should this be
+    included in intro contributions?}
 X.509 certificates are required to use the X.690 DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
 \emph{unambiguousness} (a bytestring cannot be a valid encoding of two distinct values)
 and (2) \emph{non-malleability} (two distinct bytestrings cannot be valid encodings of
-the same value). \emph{unambiguousness} and \emph{non-malleability} are properties of a
+the same value). \emph{Unambiguousness} and \emph{non-malleability} are properties of a
 given language, and proofs of these properties for \xfon and X.690 DER 
-provide high-assurance ont these formats, rather than their parser
-implementations.
+provide high-assurance for these formats \emph{themselves}, rather than for
+parser and serializer implementations.
 Our approach of giving parser-independent, relational specifications of
 languages enables us to prove \emph{directly} that they hold for the supported
 languages, without reference to implementation details of parsing or
@@ -306,24 +335,26 @@ parser correctness.
 % resorting to back-tracking.
 
 \textit{c. Parser correctness verification.}
-We write parsers that are \emph{sound} and \emph{complete} by construction. With a parser-independent characterization of a language established, \emph{soundness} (any certificate deemed valid by our implementation is indeed 
-a valid certificate)
-and \emph{completeness} (any certificate deemed valid by the specification is indeed valid according to our implementation) of parsing can be expressed directly in terms of that
-characterization. Note that parser acceptance means that some
-prefix of the input was successfully processed, with the parser returning not
-only the internal representation of the parsed value but the remaining suffix of
-the input to be processed by parsers for the languages denoted by the subsequent
-production rules.
+We write parsers that are \emph{sound} and \emph{complete} by construction.
+With a parser-independent characterization of a language established, these
+properties of parsing can be expressed directly in terms of that
+characterization.
+Note that parser acceptance means that some prefix of the input was successfully
+processed, with the parser returning not only the internal representation of the
+parsed value but the remaining suffix of the input to be processed by parsers
+for the languages denoted by the subsequent production rules.
 With this in mind, \emph{soundness} of parsing with respect to language \(G\) means that,
 if the parser accepts some prefix of an input string \(\mathit{xs}\), then that
 prefix is in the language \(G\), and \emph{completeness} means that if \(\mathit{xs}\)
 is \(G\), then the parser will accept some prefix of \(\mathit{xs}\) (possibly
-all of \(\mathit{xs}\) itself). In our approach, this is guaranteed by the types of the parsers themselves:
-if the parser accepts a prefix of \(\mathit{xs}\), it returns a proof that
+all of \(\mathit{xs}\) itself).
+In our approach, this is guaranteed by the types of the parsers themselves: if
+the parser accepts a prefix of \(\mathit{xs}\), it returns a proof that
 prefix is in \(G\), and if it rejects \(\mathit{xs}\), it returns a proof that
 \emph{no prefix} of \(\mathit{xs}\) is in \(G\). 
 That is to say, parsers are really proofs that membership (in \(G\)) of an
 input’s prefix is decidable.
+
 
 % Of course, this formulation of parser soundness and completeness is insufficient
 % to address all concerns of security, even with proofs that the language being
@@ -366,8 +397,8 @@ input’s prefix is decidable.
 % that chain.
 
 \noindent\textbf{Verification of semantic validator:} 
-We provide formal, relational specifications of semantic validation, and give a correct-by-construction implementation of the \emph{Semantic validator}.
-The X.509 standard requires enforcement of certain properties (over both single
+We provide formal specifications of semantic validation, and give a correct-by-construction implementation of the \emph{Semantic validator}.
+The \xfon standard requires enforcement of certain properties (over both single
 certificates and certificate chains) that fall outside the scope of parsing.
 For example, within a single certificate certain fields (\eg, unique
 identifiers, extensions) cannot appear unless permitted by the version of the
