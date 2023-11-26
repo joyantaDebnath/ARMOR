@@ -1,20 +1,23 @@
 \section{Verification and Correctness Proofs}
 This section details the design and verified guarantees of our parser and
 semantic checker modules (Figure~\ref{cert_validation}).
-We begin by overviewing our approach to specifying the supported subsets of the
-PEM, X.509, and X.690 formats.
-These specifications are given \emph{independently of the parser,} facilitating
-verification of the properties of language itself (such as
-\emph{unambiguousness} and \emph{nonmalleability}), 
-and they are defined using datatype families (indexed by
-input strings), and so serve a dual role as internal data representations of the
-formats they describe.
-Next, we describe the design of our parsers, which are \emph{correct by
-  construction} with respect to these specifications.
-Finally, we show our approach to semantic validation, which expresses the
-desired properties as predicates over the internal data representations; the
-code performing the semantic checks returns not merely ``yes-no'' answers, but
-\emph{proofs} that the properties do or do not hold.
+\begin{itemize}
+\item We start with an overview of our specifications of the supported subsets
+  of the PEM, X.690 DER, and X.509 formats, emphasizing how their being
+  \emph{parser independent} facilitates verifying language properties without
+  mentioning implementation details.
+  
+\item Next, we describe our parsers, which are designed to be \emph{correct by
+    construction} with respect to the language specifications.
+  We achieve this by having parsers return \emph{proofs} either affirming or
+  refuting language membership.
+  
+\item Finally, we describe approach to \emph{correct by construction} semantic
+  validation.
+  We express the desired properties of semantic checking as predicates over the
+  internal data representations, with the code executing these checks
+  implemented as proofs that these properties are decidable.
+\end{itemize}
 
 \subsubsection*{Input Strings}
 Inputs to our parser have types of the form |List A|, where |A| is the type of
@@ -24,13 +27,19 @@ literals.
 For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
 the Agda standard library type |Fin 256| (the type for nonnegative integers
 strictly less than 256).
-The result of the PEM parser is fed to the X.509 parser using a decoder that is
-verified with respect to an encoder (base 64 encoding and decoding form an
-isomorphism).
+\subsubsection*{Base64 Decoding}
+We hand-off the result of the PEM parser, which extracts the Base64 encoding of the
+certificates, to the X.509 parser, which expects an octet string, through a
+Base64 decoder that is verified with respect to an encoder.
+Specifically, we prove: 1) that the encoder always produces a valid sextet
+string (Base64 binary string); and 2) the encoder and decoder pair forms an
+isomorphism between octet strings and valid sextet strings.\todo{\tiny Would
+be nice to show the type signatures here, but they need cleaning up!}
+
 
 \subsection{Independent Specification}
 Our first challenge concerns how the specification is represented, that is,
-answering the question ``soundness and completeness \emph{with respect to
+answering the question ``parser soundness and completeness \emph{with respect to
   what?}''
 Our answer is that for each production rule |G| of the supported subset of the
 PEM, X.690, and X.509 grammars, we define a predicate |G : List A -> Set| over
@@ -80,7 +89,7 @@ be a valid encoding of an integer value, \emph{and} give integer value |bs| enco
   complement encoding of an integer value consists of the minimum number of
   octets needed for this purpose.
   This is enforced by the field |minRep| (we shall see the definition of the
-  relation |MinRep| shortly).
+  relation |MinRep| shortly).\todo{\tiny Show it or drop this.}
 
 \item \textbf{Linking the value and its encoding.}
   Field |valeq| forecloses any possibility that an inhabitant of |IntegerValue
@@ -116,19 +125,29 @@ Once established, the additional strength that |Unambiguous| significantly aids
 development of the verified parser; however, this means that specifications must
 be carefuly crafted so as to admit unique proof terms.
 
+Another challenging aspect in proving unambiguousness for X.690 DER in
+particular is the format's support for sequences that have \emph{optional} and
+\emph{default} fields, that is, fields that might not be present in the
+sequence.
+We are threatened with ambiguity if it is possible to mistake an optional field
+whose encoding is present for another optional field that is absent.
+To avoid this scenario, the X.690 format stipulates that every field of any
+``block'' of optional or default fields must be given a tag distinct from every
+other such field.
+Our proof of unambiguousness for \xfon relies heavily on lemmas proving the
+\xfon format obeys this stipulation.
+
 \subsubsection{Non-malleable}
 Compared to unambiguousness, non-malleability requires more machinery to
-express, so we begin by discussing the challenges that motivate this machinery.
-Since bytestring encodings are part of the very types of internal
-representations (and because Agda's notion of equality is fundamentally
-\emph{homogeneous}), it is impossible to express equality between internal
-representations |a1 : G xs1| and |a2 : G xs2| without \emph{already assuming
-  |xs1| is equal to |xs2|}.
-
-To make non-malleability non-trivial, we must therefore express what is the
+express, so we begin by discussing the challenges motivating this machinery.
+Since the bytestring encodings are part of \emph{the very types of internal
+representations}, e.g., |IntegerValue xs|, it is impossible to express equality
+between internal representations |a1 : G xs1| and |a2 : G xs2| without
+\emph{already assuming |xs1| is equal to |xs2|}.
+Thus, to make non-malleability non-trivial, we must express what is the
 ``raw'' internal datatype corresponding to |G|, discarding the specificational
 components.
-We express this in Agda by |Raw|, given below.
+We express this general notion in Agda by |Raw|, given below.
 \begin{code}
 record Raw (G : List A -> Set) : Set where
   field
@@ -136,16 +155,61 @@ record Raw (G : List A -> Set) : Set where
     to : {@0 xs : List A} -> G xs -> D
 \end{code}
 
-\begin{code}
-RawIntegerValue : Raw IntegerValue
-Raw.D RawIntegerValue = IntZ
-Raw.to RawIntegerValue = IntegerValue.val
-\end{code}
-
-\noindent An inhabitant of |Raw G| consists of a type |D|, intended to be the
+An inhabitant of |Raw G| consists of a type |D|, intended to be the
 ``raw data'' of |G|, together with a function |to| that should extract this data
-from any inhabitant |G xs|.
+from any inhabitant of |G xs|.
+To illustrate, consider the case for |IntegerValue| below.
+\begin{code}
+  RawIntegerValue : Raw IntegerValue
+  Raw.D RawIntegerValue = IntZ
+  Raw.to RawIntegerValue = IntegerValue.val
+\end{code}
+\noindent This says that the raw representation for integer values is |IntZ| (a
+type for integers defined in Agda's standard library), and the extraction
+function is just the field accessor |IntegerValue.val|.
 
+Once we have defined an instance of |Raw G| for a language specification |G|,
+we express non-malleability of |G| with respect to that raw representation
+with the following property: give two input strings |xs1| and |xs2|, with witnesses
+|g1 : G xs1| and |g2 : G xs2|, if the raw representations of |g1| and |g2| are
+equal, then not only are strings |xs1| and |xs2| equal, but also |g1| and |g2|.
+In Agda, this is written as:
+\begin{code}
+NonMalleable : {G : @0 List A -> Set} -> Raw G -> Set
+NonMalleable{G} R =
+  forall {@0 xs1 xs2} -> (g1 : G xs1) (g2 : G xs2)
+  -> Raw.to R g1 == Raw.to R g2 -> (xs1 , g1) ==  (xs2 , g2)  
+\end{code}
+For |IntegerValue| in particular, proving |NonMalleable RawIntegerValue|
+requires showing |Base256.twosComp| is itself injective.
+
+\textbf{Challenges.}\todo{\tiny Sig alg explicit null parameters}
+
+\subsubsection{No Substrings}
+The final language property we discuss, which we dub \emph{``no substrings,''}
+expresses formally the intuitive idea that a language permits parsers no degrees
+of freedom over which prefix of an input string it consumes.
+As we are striving for \emph{parser independence} in our language
+specifications, we formulate this property as follows: for any two prefixes of
+an input string, if both prefixes are in the language |G|, then they are equal.
+In Agda, we express this as |NoSubstrings| below.
+\begin{code}
+NoSubstrings G =
+  forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
+  -> G xs1 -> G xs2 -> xs1 == xs2
+\end{code}
+Given that \xfon uses a form of \emph{type-length-value} encoding, it is
+unsurprising that that we are able to prove |NoSubstrings| holds for our
+specification.
+However, this property is essential to understanding our \emph{strong
+  completeness} result\todo{\tiny Forward ref} for parsing.
+
+\subsubsection{Summary of Language Guarantees}
+We have proven \emph{unambiguousness} for the supported subsets of formats
+PEM,\todo{\tiny Remove if we haven't}
+X.690 DER, and X.509; we have proven \emph{non-malleability} for the supported
+subsets of formats X.690 DER and X.509, and proven \emph{no-substrings} for all
+TLV-encoded values.
 
 % In addition, two properties in particular are essential to our proof of parser
 % completeness.
