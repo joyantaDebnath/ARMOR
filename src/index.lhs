@@ -188,6 +188,7 @@
 \newcommand{\censys}{\ensuremath{\mathsf{Censys}}\xspace}
 \newcommand{\frankencert}{\ensuremath{\mathsf{Frankencert}}\xspace}
 \newcommand{\morpheus}{\ensuremath{\mathsf{Morpheus}}\xspace}
+\newcommand{\haclstar}{\ensuremath{\mathsf{HACL^*}}\xspace}
 \newcommand{\coq}{\ensuremath{\mathsf{Coq}}\xspace}
 \newcommand{\ghc}{\ensuremath{\mathsf{GHC}}\xspace}
 \newcommand{\libfaketime}{\ensuremath{\mathsf{Libfaketime}}\xspace}
@@ -203,6 +204,7 @@
 \newcommand{\ocspstapling}{\ensuremath{\mathsf{OCSP\mhyphen Stapling}}\xspace}
 
 \newcommand{\python}{\texttt{Python}\xspace}
+\newcommand{\fstar}{\texttt{F^*}\xspace}
 \newcommand{\cpp}{\texttt{C/C++}\xspace}
 \newcommand{\haskell}{\texttt{Haskell}\xspace}
 \newcommand{\agda}{\texttt{Agda}\xspace}

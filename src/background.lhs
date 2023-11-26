@@ -27,8 +27,8 @@ correctly, setting a benchmark for developing other such implementations.
 Such a formally-verified implementation, however, is currently missing.
 
 \subsection{Our Objective and High-level Challenges}
-This paper addresses the aforementioned research gap by \emph{designing and developing a formally-verified implementation for \xfon certificate chain validation}.
-Concretely, our primary goal is to \emph{check whether a given X.509 implementation is compliant with the X.509 specification}. In general, to prove the compliance of a given X.509 implementation ($I$), we have to formally specify the requirements ($\phi$) of valid X.509 certificate chains and then prove that the implementation $I$ satisfies the formal specification $\phi$ (\ie, $I \models \phi$), writing machine-checked proofs using any theorem prover.
+This paper addresses the aforementioned research gap by \emph{designing and developing a formally-verified implementation for \xfon certificate chain validation, named \armor}.
+Concretely, our primary goal is to \emph{check whether a given X.509 implementation is compliant with the X.509 specification}. In general, to prove the compliance of a given X.509 implementation ($I$), we have to formally specify the requirements ($\phi$) of valid X.509 certificate chains and then prove that the implementation $I$ satisfies the formal specification $\phi$ (\ie, $I \models \phi$), writing machine-checked proofs using any interactive theorem prover.
 
 \subsubsection*{Challenges} There exists several challenges to develop a formally-verified X.509 implementation.
 

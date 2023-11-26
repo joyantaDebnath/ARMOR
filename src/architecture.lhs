@@ -1,12 +1,8 @@
 \section{Design and Implementation of \armor} 
-In this section, we introduce the \agda theorem prover~\cite{bove2009brief, No07_agda}, central to our formal verification efforts, and then discuss the architecture of \armor, along with its implementation challenges and details.
+The development of \armor entails four critical steps: (1) Consulting the X.509 specifications to extract the requirements for certificate chain validation and then formally represent them; (2) Developing the actual implementation for X.509 certificate chain validation; (3) Employing an interactive theorem prover to prove that the implementation meets the specified criteria; and (4) Extracting an executable binary from the validated implementation, serving as a reference for future non-compliance checking and validation purposes. As the interactive theorem prover, we choose \agda~\cite{bove2009brief, No07_agda} for \armor. In this section, we first present a brief introduction to \agda, and then present the architecture and the implementation details of \armor.
 
-\subsection{Preliminaries on Toolchain}
-
-\subsubsection{Agda Theorem Prover}
-\agda~\cite{bove2009brief, No07_agda} is a powerful and expressive programming language
-that combines functional programming and formal verification.
-At its core, \agda is a \textit{dependently-typed} functional programming
+\subsection{Background on \agda}
+\agda, at its core, is a \textit{dependently-typed} functional programming
 language, which allows types to refer to terms.
 This capability helps express rich properties in types, with typechecking
 enforcing that programs satisfy those properties.
@@ -19,7 +15,7 @@ propositions expressed by their types.
 This makes \agda a powerful tool for both expressing programs and their
 correctness, as the language of programs and proofs is unified.
 
-\textbf{An Example of \agda's Syntax.} Consider the example shown in
+\textbf{Example.} Consider the example shown in
 Figure~\ref{fig:agda-ex} of length-indexed lists, provided as part of the \agda
 standard library as |Vec|. 
 \begin{figure}
@@ -130,14 +126,17 @@ thus the empty list can never be a well-typed argument to |head|.
 % % boolean value, its numerical representation, and the proof of the correctness
 % % of this representation, returned by the |BoolRep|.
 
-\subsubsection{The Oracle of Morpheus}
-\morpheus~\cite{yahyazadeh2021morpheus} provides a rigorously validated oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. The system accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not.
 
-\subsubsection{HACL*}
-HACL* (High Assurance Cryptographic Library) is a notable cryptographic library developed in the F* programming language, which combines functional programming with formal verification. It's distinguished by its high-assurance implementations of cryptographic algorithms, ensuring safety (like memory and type safety) and correctness (adherence to specifications). HACL* is used in industry, notably in Mozilla's Network Security Services (NSS), and offers a range of cryptographic algorithms, including symmetric encryption, hash functions, and public-key cryptography. 
 
-\subsection{Architecture of \armor}
+% \subsubsection{HACL*} \haclstar~\cite{zinzindohoue2017hacl} is a formally-verified cryptographic library developed in $F^*$ and can be compiled into $C$ programs while retaining all its verified properties (\eg, memory safety, resistance to timing side-channel attacks, and functional correctness). In \armor, we specifically utilize \haclstar's \emph{hash function} implementations during RSA signature $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} verification.
 
+
+% \subsubsection{Morpheus}
+% \morpheus~\cite{yahyazadeh2021morpheus} is an oracle of the RSA $PKCS\#1-v1.5$~\cite{moriarty2016pkcs} signature verification, the formal correctness of which has been established using the \coq proof assistant~\cite{huet1997coq}. This oracle accepts several parameters as input, such as a hexadecimal list of bytes representing the structure obtained after performing the modular exponentiation of the \texttt{SignatureValue} using the public exponent of the certificate issuer's RSA public key, the length of the public modulus of the RSA public key, the hash value of \texttt{TbsCertificate} in bytes, and the name of the signature hash algorithm. Upon execution, the oracle provides a boolean outcome, returning true if the signature verification passes and false if it does not.
+
+\subsection{Overview of \armor}
+
+\subsubsection{Detailed Architecture}
 \begin{figure}[h]
   \centering
   \scriptsize
@@ -146,13 +145,21 @@ HACL* (High Assurance Cryptographic Library) is a notable cryptographic library 
   \label{armor}
   \end{figure}
 
-  Figure~\ref{armor} depicts the detailed architecture and workflow of \armor. The architecture is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{Agda} module (implemented in the \agda theorem prover). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives two \pem certificate files and the current system-time as inputs and \circled{B} forwards these inputs to the \emph{Main} sub-module of the \emph{Agda} module. One \pem file contains the end-user certificate and associated CA certificates, while the other one contains the trust anchors' certificates. The \emph{Main} sub-module in the \emph{Agda} module uses the \pem parser (\circled{C} -- \circled{D}), \basesf decoder (\circled{E} -- \circled{F}), and \der parser (\circled{G} -- \circled{H}) sequentially to parse the two \pem files, converting all certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into internal data structures. Then, (\circled{I} -- \circled{L})it invokes the \emph{Chain-builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trust anchor. The chain-building process depends on matching \texttt{Subject} and \texttt{Issuer} names in subsequent certificates in a chain. Thus, during chain-building, (\circled{G} -- \circled{H}) the \emph{String Canonicalizer} is also used to normalize \texttt{Subject} and \texttt{Issuer} names. Following this, (\circled{M} -- \circled{N}) the \emph{Main} sub-module tests each candidate chain for semantic validation. If a candidate chain passes the semantic checks, \circled{O} the \emph{Main} sub-module informs the \emph{Driver} in the \emph{Python} module. Notably, the \emph{Semantic Validator} in the \emph{Agda} module does not perform signature verification on the candidate chains. Hence, (\circled{P} -- \circled{U}) the \emph{Driver} in the \emph{Python} module calls upon the \emph{Signature Verifier} for this task. The \emph{Signature Verifier}, in turn, employs (\circled{Q} -- \circled{R}) HACL* and (\circled{S} -- \circled{T}) Morpheous for cryptographic operations. Once the signature verification is successful, \circled{U} the \emph{Driver} is notified, and \circled{V} it then outputs the final chain validation result and the public-key of the end-user certificate.
+  Figure~\ref{armor} depicts the architecture of \armor, which is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{Agda} module (implemented in the \agda). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives the inputs and \circled{B} forwards those inputs to the \emph{Main} sub-module of the \emph{Agda} module. The \emph{Main} sub-module then sequentially utilizes the \emph{PEM parser} (\circled{C} -- \circled{D}), \emph{Base64 decoder} (\circled{E} -- \circled{F}), and \emph{DER parser} (\circled{G} -- \circled{H}) to parse the input certificate files and represent all input certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into their internal data structures. Then, (\circled{I} -- \circled{L}) it invokes the \emph{Chain builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trusted CA certificate. Note that, our chain building process depends on matching the \texttt{Subject} and \texttt{Issuer} names of subsequent certificates in a chain. Thus, during chain building, (\circled{G} -- \circled{H}) the \emph{String canonicalizer} is called to normalize the \texttt{Subject} and \texttt{Issuer} names before comparison. 
+  
+  Next, (\circled{M} -- \circled{N}) the \emph{Main} sub-module tests each candidate chain for semantic validation. If any of the candidate chains passes the semantic validation, \circled{O} the \emph{Main} sub-module informs the \emph{Driver} in the \emph{Python} module. Notably, the \emph{Semantic Validator} in the \emph{Agda} module does not perform any signature verification on the candidate chains since we do not implement and formally verify cryptographic operations in \armor. Hence, (\circled{P} -- \circled{U}) the \emph{Driver} in the \emph{Python} module calls upon the external \emph{Signature Verifier} for this task. The \emph{Signature Verifier}, in turn, employs two formally-verified libraries -- (\circled{Q} -- \circled{R}) \haclstar~\cite{zinzindohoue2017hacl} and (\circled{S} -- \circled{T}) \morpheus~\cite{yahyazadeh2021morpheus} for the required cryptographic operations (details on \armor's signature verification is discussed later). Once the signature verification is successful, \circled{U} the \emph{Driver} is notified, and \circled{V} it then outputs the final chain validation result and the public-key of the end-user certificate.
 
-\subsection{Implementation Details}
+
+\subsubsection{Correctness Properties} introduce and table
+
+\subsubsection{Verified \agda Code to Executable Binary} \agda is primarily a proof assistant, not commonly used to produce executable binaries directly. However, we can indirectly produce executable binaries by compiling the \agda code to \haskell and then using the \haskell compiler \ghc~\cite{ghc} to generate an executable. This process begins with enabling IO operations through \agda's builtin features. Then, \agda's \textsf{compile} command transforms the \agda code to \haskell. The generated \haskell code is then compiled into an executable binary using the \ghc. However, in terms of runtime performance, the generated executable may not be as efficient as the code written directly in \haskell.
+
+\subsubsection{Trusted Computing Base (TCB)} Our TCB comprises the \agda toolchain, which includes its native type-checker, compiler, and standard library. In addition, we trust the correctness of the \ghc \haskell compiler to generate the executable binary. Lastly, we assume that the verifier's trust anchor (\ie, the trusted root CA store) is up-to-date and does not contain any malicious certificates.
+
+\subsection{Technical Challenges and Our Insights}
 
 
 % Adopting a modular approach to implementing the \xfon CCVL can significantly mitigate some challenges. The entire process can be broken down into smaller, manageable components or modules. Each module is designed to perform a specific function, such as \der parsing, certificate chain building, string transformation, and semantic checks. Such modularization allows us to precisely specify the requirements for each module and independently establish their correctness. In addition, instead of trying to accomplish everything in a single step, this modularization allows us to undertake the validation task in multiple passes, increasing the simplicity and manageability of the overall process.
-
 
 \textbf{Challenge 1: Choosing the boundary for parsing and semantic validation}
 In Section X, we discussed the RFC 5280 specification, which comprises two main rule sets: producer rules and consumer rules. Our formalization specifically concentrates on consumer rules, which are crucial for certificate chain validation implementations. Additionally, RFC 5280 is categorized into syntactic and semantic rules. Syntactic rules are concerned with the decoding of an X.509 certificate encoded under DER format as a byte stream, while semantic rules impose constraints on the values of individual fields within a certificate. These semantic rules also dictate the relationships between field values across different certificates in a chain. A clear separation between these syntactic and semantic rules is pivotal in formally specifying requirements. However, having a balance is also essential-- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the re-engineering effort by Debnath \etal~\cite{debnath2021re}. Similar to that prior work, we categorize \der restrictions as part of the parsing rules, and the rest are left for semantic checks. We enforce the semantic check on \der's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. We currently support $23$ semantic properties; see Table~\ref{rules} in Appendix. Of these, $18$ properties (R1-R18) are applicable for verifying compliance within a single certificate, while the remaining $5$ (R19-R23) are related to checking properties across different certificates in a chain.
@@ -165,11 +172,11 @@ While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrict
 
 
 
-\textbf{Challenge 4: Speeding up the string canonicalization} To verify the semantic check related to name chaining, our approach involves matching the issuer name from a certificate with the subject name present in its issuer CA certificate. This matching algorithm is defined in Section 7.1 of RFC-5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. However, the wide variety of languages and character sets present many cases to cover, leading to considerable complexity. Our initial implementation, which encapsulated all the transformations in a single \agda module, overwhelmed the compiler due to the sheer volume of cases. As a solution, we have divided the transformations across $16$ sub-modules, allowing for their sequential compilation, thereby enhancing the system's efficiency and manageability without compromising the comprehensiveness of the transformations.
+\textbf{Challenge 3: Speeding up the string canonicalization} To verify the semantic check related to name chaining, our approach involves matching the issuer name from a certificate with the subject name present in its issuer CA certificate. This matching algorithm is defined in Section 7.1 of RFC-5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. However, the wide variety of languages and character sets present many cases to cover, leading to considerable complexity. Our initial implementation, which encapsulated all the transformations in a single \agda module, overwhelmed the compiler due to the sheer volume of cases. As a solution, we have divided the transformations across $16$ sub-modules, allowing for their sequential compilation, thereby enhancing the system's efficiency and manageability without compromising the comprehensiveness of the transformations.
 
 
 
-\textbf{Challenge 5: Tackling the formal verification of cryptographic operations} We currently support only RSA signature verification, primarily because over $96\%$ of certificates employ RSA public keys, corroborated by our measurement studies on the $1.5$ billion \censys~\cite{censys} certificates. However, the RSA Signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the \agda code, we utilize \python's \cryptography library and \morpheus's formally verified code to perform the signature verification externally. This approach allows us to focus on leveraging \agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in \python and \morpheus.
+\textbf{Challenge 4: Tackling the formal verification of cryptographic operations} We currently support only RSA signature verification, primarily because over $96\%$ of certificates employ RSA public keys, corroborated by our measurement studies on the $1.5$ billion \censys~\cite{censys} certificates. However, the RSA Signature verification process necessitates the application of specific cryptographic operations on the \texttt{SignatureValue} field, parsing the signed data's hash digest, and the execution of the actual verification process. Given that we do not model and verify cryptography in the \agda code, we utilize \python's \cryptography library and \morpheus's formally verified code to perform the signature verification externally. This approach allows us to focus on leveraging \agda's strengths in formal verification of the parsing and validation logic while outsourcing the computationally-intensive cryptographic operations to established, trusted libraries in \python and \morpheus.
 
 
 \begin{table}[h]
@@ -199,12 +206,3 @@ While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrict
   {\color[HTML]{00009B} CRL Distribution Points}      & 1,45,932,655            & 9\%             & \multicolumn{3}{c||}{\textbf{Total Certificates} = 1,500,000,000}     \\ \hline                                                                                                          
   \end{tabular}
   \end{table}
-
-
-\subsubsection{Verified \agda Code to Executable Binary} \agda is primarily a proof assistant, not commonly used to produce executable binaries directly. However, we can indirectly produce executable binaries by compiling \agda code to \haskell and then using \ghc~\cite{ghc} to generate an executable. This process begins with creating an \agda program, enabling IO operations through \agda's builtin features. Then, \agda's \textsf{compile} command transforms the \agda code to \haskell. The generated \haskell code is then compiled into an executable binary using the \ghc \haskell compiler. However, the generated executable may not be as efficient as code written directly in \haskell.
-
-\subsubsection{Trusted Computing Base (TCB)} Our TCB comprises the \agda toolchain, which includes its native type-checker, compiler, and standard library. In addition, we trust the correctness of the \ghc \haskell compiler to generate the executable binary. Furthermore, we assume the cryptographic operations provided by \python's \cryptography library are correct. Lastly, we assume that the verifier's trust anchor (\ie, the trusted root CA store) is up-to-date and does not contain any malicious certificates.
-
-
-
-\subsubsection{Correctness Guarantees}
