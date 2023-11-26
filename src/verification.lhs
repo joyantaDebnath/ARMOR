@@ -125,6 +125,18 @@ Once established, the additional strength that |Unambiguous| significantly aids
 development of the verified parser; however, this means that specifications must
 be carefuly crafted so as to admit unique proof terms.
 
+Another challenging aspect in proving unambiguousness for X.690 DER in
+particular is the format's support for sequences that have \emph{optional} and
+\emph{default} fields, that is, fields that might not be present in the
+sequence.
+We are threatened with ambiguity if it is possible to mistake an optional field
+whose encoding is present for another optional field that is absent.
+To avoid this scenario, the X.690 format stipulates that every field of any
+``block'' of optional or default fields must be given a tag distinct from every
+other such field.
+Our proof of unambiguousness for \xfon relies heavily on lemmas proving the
+\xfon format obeys this stipulation.
+
 \subsubsection{Non-malleable}
 Compared to unambiguousness, non-malleability requires more machinery to
 express, so we begin by discussing the challenges motivating this machinery.
@@ -145,7 +157,7 @@ record Raw (G : List A -> Set) : Set where
 
 An inhabitant of |Raw G| consists of a type |D|, intended to be the
 ``raw data'' of |G|, together with a function |to| that should extract this data
-from any inhabitant |G xs|.
+from any inhabitant of |G xs|.
 To illustrate, consider the case for |IntegerValue| below.
 \begin{code}
   RawIntegerValue : Raw IntegerValue
@@ -158,9 +170,9 @@ function is just the field accessor |IntegerValue.val|.
 
 Once we have defined an instance of |Raw G| for a language specification |G|,
 we express non-malleability of |G| with respect to that raw representation
-becomes with the following property: give two input strings |xs1| and |xs2|, with witnesses
+with the following property: give two input strings |xs1| and |xs2|, with witnesses
 |g1 : G xs1| and |g2 : G xs2|, if the raw representations of |g1| and |g2| are
-equal, then not only are |xs1| and |xs2| equal strings, but also |g1| and |g2|.
+equal, then not only are strings |xs1| and |xs2| equal, but also |g1| and |g2|.
 In Agda, this is written as:
 \begin{code}
 NonMalleable : {G : @0 List A -> Set} -> Raw G -> Set
@@ -170,6 +182,35 @@ NonMalleable{G} R =
 \end{code}
 For |IntegerValue| in particular, proving |NonMalleable RawIntegerValue|
 requires showing |Base256.twosComp| is itself injective.
+
+\textbf{Challenges.}\todo{\tiny Sig alg explicit null parameters}
+
+\subsubsection{No Substrings}
+The final language property we discuss, which we dub \emph{``no substrings,''}
+expresses formally the intuitive idea that a language permits parsers no degrees
+of freedom over which prefix of an input string it consumes.
+As we are striving for \emph{parser independence} in our language
+specifications, we formulate this property as follows: for any two prefixes of
+an input string, if both prefixes are in the language |G|, then they are equal.
+In Agda, we express this as |NoSubstrings| below.
+\begin{code}
+NoSubstrings G =
+  forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
+  -> G xs1 -> G xs2 -> xs1 == xs2
+\end{code}
+Given that \xfon uses a form of \emph{type-length-value} encoding, it is
+unsurprising that that we are able to prove |NoSubstrings| holds for our
+specification.
+However, this property is essential to understanding our \emph{strong
+  completeness} result\todo{\tiny Forward ref} for parsing.
+
+\subsubsection{Summary of Language Guarantees}
+We have proven \emph{unambiguousness} for the supported subsets of formats
+PEM,\todo{\tiny Remove if we haven't}
+X.690 DER, and X.509; we have proven \emph{non-malleability} for the supported
+subsets of formats X.690 DER and X.509, and proven \emph{no-substrings} for all
+TLV-encoded values.
+
 % In addition, two properties in particular are essential to our proof of parser
 % completeness.
 % \begin{itemize}
