@@ -44,10 +44,9 @@ chain validation with a machine-checked proof of correctness, it draws inspirati
 % prior re-engineering effort of the \xfon specification and implementation~\cite{debnath2021re, nqsb-tls} to distinguish between the syntactic 
 % and semantic requirements to design \armor in a modular way. 
 In comparison to \armor, however, prior work has at least one of the following 
-limitations: (1) Lacks any formal guarantees; (2) Focuses only on parsing; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
-parsing; (4) Focuses only on verifiable\todo{\tiny Verifiable, or verified?}
-encoding of certificates, not parsing; (5) Lacks formal correctness guarantees
-of semantic aspects.\todo{\tiny (2) is a subset of (5)}
+limitations: (1) Lacks any formal guarantees; (2) Focuses only on parsing and lacks formal correctness guarantees
+of semantic aspects; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
+parsing; (4) Focuses only on verified encoding of certificates, not parsing.
 
 \textbf{Challenges}. Developing \armor required addressing the following technical challenges. 
  \emph{First}, the \xfon specification is distributed 
@@ -81,18 +80,19 @@ and $k$ is the public-key of the entity whose certificate is being validated. Th
 but also allows one to prove correctness properties about those programs through \emph{interactive theorem proving}. 
 
 We proved the following correctness properties for our high-assurance
-implementation {\armor}\todo{\tiny We don't
-  guarantee sound, complete, or terminating chain building}: \emph{soundness} (any certificate chain deemed valid by our implementation is indeed 
-a valid chain), \emph{completeness} (any certificate chain deemed valid by the specification is indeed valid according to our implementation),  
-\emph{termination} (the implementation terminates for all finite certificate
-chains), \emph{unambiguousness of \xfon} (one bytestring cannot be the encoding
-of two distinct \xfon certificate chains), and \emph{non-malleability} (two distinct
-bytestrings cannot be the encoding of the same \xfon certificate chain)
+implementation {\armor}: \emph{soundness} of parser (any certificate deemed syntactically valid by our implementation is indeed 
+a valid certificate), \emph{completeness} of parser (any certificate deemed syntactically valid by the specification is indeed valid according to our implementation),  
+\emph{termination} of parser and semantic checker (the implementation terminates for all finite certificate
+chains), \emph{unambiguousness} of specification (one bytestring cannot be the encoding
+of two distinct \xfon certificates), and \emph{non-malleability} of specification (two distinct
+bytestrings cannot be the encoding of the same \xfon certificate)
 \cite{ramananandro2019everparse}. Once these different proof obligations 
 are discharged, we use \agda's extraction mechanism to obtain \haskell code, which can then be used as a 
-library invoked through the foreign function interfaces of different programming languages (\eg, \python). Note that, using \agda 
-as the tool of choice for formally-verification is motivated primarily by its
-small \emph{trusted computing base}.\todo{\tiny Coq has a much smaller TCB}
+library invoked through the foreign function interfaces of different programming languages (\eg, \python). 
+
+% Note that, using \agda 
+% as the tool of choice for formally-verification is motivated primarily by its
+% small \emph{trusted computing base}.\todo{\tiny Coq has a much smaller TCB}
 
 
 
@@ -137,7 +137,8 @@ is more important than runtime overhead}.
 % \says{CJ}{Add parser-independent spec of grammar.}
 \begin{enumerate}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them, facilitating development of other such formally-verified implementations in the future. 
-\item We present the design and implementation of \armor, which enjoys the \emph{soundness} and \emph{completeness} guarantees with respect to our specification.  
+\item We formally verify that our formalization of the syntactic requirements is guaranteed to be \emph{unambiguous} and \emph{non-malleable}.
+\item We present the design and implementation of \armor, which enjoys \emph{soundness} and \emph{completeness} guarantees of the syntactic requirements with respect to our specification.  
 \item We prove that our interpretation of the syntactic requirements of \xfon
   enjoys some specific properties, indicating that it is possible to develop
   efficient parsers.\todo{\tiny This needs clarification.}

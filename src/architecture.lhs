@@ -175,9 +175,8 @@ In Section 2, we discussed the RFC 5280 specification, which comprises two main
 rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization
 specifically concentrates on the \emph{consumer rules}, which are intended for
 certificate chain validation implementations.
-Additionally, RFC 5280 is categorized into \emph{syntactic} and \emph{semantic}
-rules.\todo{\tiny \emph{We} did this, not the RFC}
-A clear separation between these syntactic and semantic rules is pivotal in
+Additionally, RFC 5280 can be categorized into \emph{syntactic} and \emph{semantic}
+rules. A clear separation between these syntactic and semantic rules is pivotal in
 formally specifying requirements.
 However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the re-engineering effort by Debnath \etal~\cite{debnath2021re}. Similar to that prior work, we categorize \der restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on \der's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. 
 
@@ -230,7 +229,7 @@ However, the RSA signature verification process necessitates the application of 
 Our verification effort on the \emph{Agda} module can be decomposed to the
 verification of \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
   X.509 parser)} and the verification of \emph{semantic validation}.
-In this work, we only formally specify\todo{\tiny No formal spec} and implement the \emph{String canonicalizer} and \emph{Chain builder}, however, we do not provide any formal correctness guarantees for them. We now present a high-level overview on our verification efforts, while details on the verification and correctness proofs with their specific-challenges are discussed in Section 4. 
+In this work, we only provide implementations of the \emph{String canonicalizer} and \emph{Chain builder}, however, we do not provide any formal specification and correctness guarantees for them. We now present a high-level overview on our verification efforts, while details on the verification and correctness proofs with their specific-challenges are discussed in Section 4. 
 
 \noindent\textbf{Verification of Parsers:}  
 We conceptually separate each parser verification task into \emph{language
@@ -299,9 +298,7 @@ understand the relevant specifications X.509 and X.690 DER.
 % components are purely for specificational purposes.
 
 \textit{b. Language security verification.} We verify properties of the language specifications that give
-  confidence they meet their desired design goals.\todo{\tiny Should this be
-    included in intro contributions?}
-X.509 certificates are required to use the X.690 DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
+  confidence they meet their desired design goals. X.509 certificates are required to use the X.690 DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
 \emph{unambiguousness} (a bytestring cannot be a valid encoding of two distinct values)
 and (2) \emph{non-malleability} (two distinct bytestrings cannot be valid encodings of
 the same value). \emph{Unambiguousness} and \emph{non-malleability} are properties of a

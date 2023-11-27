@@ -44,7 +44,7 @@ noncompliance issues (\ie, being not compliant with respect to the standard
 specification), they naturally bear the risk of false negatives --- some logical flaws remain undetected, especially when those are common across all the tested implementations. In addition, they often fall short of providing any \emph{formal guarantees regarding correctness} of an \xfon implementation. This is corroborated through many high impact bugs and vulnerabilities found in some widely used applications and open-source libraries over the last decade~\cite{CVE-2020-5523, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527, CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}. In contrast, a formally-verified implementation for \xfon certificate validation can provide mathematical assurances that the implementation behaves
 correctly, setting a benchmark for developing other such implementations.
 Such a formally-verified implementation, however, is currently
-missing.\todo{\tiny Our work is a major step towards filling this gap.}
+missing, and our work is a major step towards filling this gap.
 
 \subsection{Our Objective and High-level Challenges}
 This paper addresses the aforementioned research gap by \emph{designing and developing a formally-verified implementation for \xfon certificate chain validation, named \armor}.
@@ -80,14 +80,12 @@ grammar of a \der-encoded certificate is \emph{context-sensitive}, and developin
 To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
 is insufficient because the relevant certificate field value may need to be further 
 decoded from the parsed \asnone value.
-Take the \emph{example} of the \texttt{UTCTime} format used for certificate validity
-periods.
+Take the \emph{example} of \xfon specification for using \texttt{UTCTime} format in certificate validity
+field.
 It uses a two-digit year representation, $YY$, and here lies the potential for
 misinterpretation.
 In this format, values from $00$ to $49$ are deemed to belong to the $21st$
-century and are thus interpreted as $20YY$.\todo{\tiny UTC requires a century
-  window, X.509 specifies this window}
-In contrast, values from $50$ to $99$ are associated with the $20th$ century and
+century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the $20th$ century and
 are consequently translated into $19YY$.
 This peculiarity of the \texttt{UTCTime} format allows the representation of
 years from $1950$ to $2049$.
