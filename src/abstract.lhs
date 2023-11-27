@@ -19,9 +19,7 @@
   \emph{Therefore, we set out to substantially improve this
     unsatisfactory status quo by developing a high-assurance implementation of
     the \xfon certificate chain validation, called \armor, with formal correctness
-    guarantees (\ie, soundness, completeness, termination, unambiguity, and
-    non-malleability)\todo{\tiny Maybe drop this list from abstract, lots of
-      qualifiers needed}}.
+    guarantees}.
   \armor is developed using \agda, a dependently typed
   functional programming language and interactive theorem prover, and features a
   modular architecture to cover each stage of certificate chain validation.
