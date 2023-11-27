@@ -28,7 +28,7 @@ For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
 the Agda standard library type |Fin 256| (the type for nonnegative integers
 strictly less than 256).
 \subsubsection*{Base64 Decoding}
-We hand-off the result of the PEM parser, which extracts the Base64 encoding of the
+We hand off the result of the PEM parser, which extracts the Base64 encoding of the
 certificates, to the X.509 parser, which expects an octet string, through a
 Base64 decoder that is verified with respect to an encoder.
 Specifically, we prove: 1) that the encoder always produces a valid sextet
