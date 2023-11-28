@@ -257,6 +257,7 @@ the language, and if the parser fails, it returns a proof that \emph{no} prefix
 of its input is.
 
 \subsubsection{The Type of Correct-by-Construction Parsers}
+\label{sec:s4-parsers-cbc}
 Our first step is to formally define what success in means.
 In FOL, we would express the condition for the parser's success on a prefix of
 |xs| as \(\exists \mathit{ys}\, \mathit{zs}, \mathit{xs} = \mathit{ys} +\!\!\!+
@@ -471,31 +472,41 @@ to the |prefix| consumed and |value| returned by |p xs|.
 \subsection{Semantic Validation}
 
 Our approach to semantic validation, as outlined in
-Section~\ref{sec:semantic-checker}, is separating those properties that should
+Section~TODO, is separating those properties that should
 be verified for a single certificate and those that concern the entire chain.
 For each property to validate, we formulate in Agda a predicate expressing
 satisfaction of the property by a given certificate or chain, then prove that
-these predicates are decidable.
-These decidability proofs then serve as the functions called after parsing to
-check whether the certificate or chain satisfies the property.
+these predicates are decidable (|Dec|, Section~\ref{sec:s4-parsers-cbc}).
+In what follows, we illustrate with two relatively simple concrete examples: one
+predicate for a single certificate and one for a certificate chain.
 
-We consider two concrete examples, one each for a single-certificate and
-certificate chain property.
-For a single certificate, it must be the case that the \texttt{SignatureAlgorithm} field
-must contain the same algorithm identifier as the \texttt{Signature} field of
-the \texttt{TbsCertificate} (R1 in Table~\ref{rules} of the Appendix).
+Before we illustrate with examples, we stress that the purpose of this setup is
+\emph{not} to give decidability results for the semantic checks of the \xfon
+specification, as the mere fact that they are decidable is intuitively obvious.
+Instead, and just like with our approach to verified parsing, formulating these
+semantic checks as decidability proofs (1) \emph{forces} us formalize the natural
+language property we wish to check \emph{independently of the code that performs
+the checking,} and (2) \emph{enables} us to write the checking code that is
+\emph{correct by construction,} as these decidability proofs are the themselves
+the functions called after parsing to check whether the certificate or chain
+satisfies the property.
+
+\textbf{Single certificate property.}
+For a given certificate, it must be the case that its \texttt{SignatureAlgorithm} field
+contains the same algorithm identifier as the \texttt{Signature} field of
+its \texttt{TBSCertificate} (R1 in Table~\ref{rules} of the Appendix).
 As a formula of FOL, we could express this property with respect to
 certificate \(c\) as
 \[
-  \forall s_1\, s_2, \mathit{SignAlg}(s_1,c) \land \mathit{TbsCertSignAlg}(s_2,c)
+  \forall s_1\, s_2, \mathit{SignAlg}(s_1,c) \land \mathit{TBSCertSignAlg}(s_2,c)
   \implies s_1 = s_2
 \]
-where \(\mathit{SignAlg}(s_1,c)\) and \(\mathit{TbsCertSignAlg}(s_2,c)\) express
+where \(\mathit{SignAlg}(s_1,c)\) and \(\mathit{TBSCertSignAlg}(s_2,c)\) express
 respectively the properties that \(s_1\) is the signature algorithm identifier
 of \(c\) and that \(s_2\) is the signature algorithm identifier of the
-\texttt{TbsCertificate} of \(c\).
-In Agda, we express this property, and its corresponding decidability proof, as
-follows.
+\texttt{TBSCertificate} of \(c\).
+In Agda, we express this property, and the type of its corresponding
+decidability proof, as follows (we omit the proof for space considerations).
 
 \begin{code}
 R1 : forall {@0 bs} -> Cert bs -> Set
@@ -504,16 +515,30 @@ R1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
 r1 : forall {@0 bs} (c : Cert bs) -> Dec (R1 c)
 r1 c = ...  
 \end{code}
+The predicate |R1| expresses that the two signature algorithm
+fields are equal using the binary relation |==| defined in Agda's standard library.
+Compared to the proof |r1|, |R1| is relatively simple: |==| is
+\emph{parametric} in the type of the values it relates (meaning it uses no
+specifics about the |SignAlg| type family), and is defined as the smallest
+reflexive relation.
+In contrast, the checking code |r1| \emph{must} concern itself with the
+specifics of |SignAlg|.
+In \xfon, signature algorithm fields are defined as a pair where the first
+component is an object identifier (OID) and the second is an optional parameters
+field whose type \emph{depends upon that OID.}
+So, to implement |r1| we must prove equality is decidable for OIDs
+\emph{and} for all of the signature algorithm parameter types we support.
 
+\textbf{Certificate chain property.}
 For a certificate chain, it must be the case that a certificate does not appear
 more than once in a prospective certificate path (R20 in Table~\ref{rules} of the Appendix).
 As a formula of FOL, we could express this property with respect to a
 certificate chain \(\mathit{cc}\) as
 \[
   \begin{array}{l}
-    \forall c_1\, c_2\, i_1\, i_2, \mathit{InChain}(c_1,i_1,\mathit{cc}) \land
-    \mathit{InChain}(c_2,i_2,\mathit{cc}) \land i_1 \neq i_2
-    \\ \quad \implies c_1 \neq c_2
+    \forall c_1\, c_2\, i_1\, i_2. \mathit{InChain}(c_1,i_1,\mathit{cc}) \land
+    \mathit{InChain}(c_2,i_2,\mathit{cc})
+    \\ \quad \land\ i_1 \neq i_2 \implies c_1 \neq c_2
   \end{array}
 \]
 where \(\mathit{InChain}(c_1,i_1,\mathit{cc})\) is the property that certificate
@@ -522,17 +547,27 @@ The Agda standard library provides a definition of the property that all entries
 of a list are distinct from each other, written below as |List.Unique|, as well
 as a proof that this property is decidable, written |List.unique?|, provided
 that the type of the list's elements support decidable equality.
-We have proven equality is decidable for certificates, so we can express this
-property and corresponding decidability proof in Agda as
+We express this predicate and its corresponding decidability proof in Agda as
+% We have proven equality is decidable for certificates, so we can express this
+% property and corresponding decidability proof in Agda as
 \begin{code}
 R20 : forall {@0 bs} -> Chain bs -> Set
 R20 c = List.Unique (chainToList c)
 
 r20 : forall {@0 bs} (c : Chain bs) -> Dec (R20 c)
-r20 c = List.unique?  (chainToList c)
+r20 c = List.unique? decCertEq (chainToList c)
 \end{code}
-where we have defined function |chainToList| to convert a certificate chain to a
-list of certificates.
+where function |chainToList| converts a certificate chain to a
+list of certificates and |decCertEq| is the proof that equality is decidable for
+certificates.
+Again, there is an asymmetry in the complexities of the specification and proof:
+while |List.Unique| is defined in 3 lines of code as an inductive type, the proof
+of |decCertEq| is substantially longer as it requires plumbing through the
+details of our formalization of |Cert|.
+By writing our checking function |r20| as a decision procedure, however, we do
+not have to worry that there is a mistake hidden somewhere in this complexity:
+by its very type, |r20| is \emph{correct by construction} with respect to the
+specification given by |R20|.
 % (see Section~\ref{sec:design-agda}).
 % As discussed in Section~\ref{sec:overview-agda}, 
 
