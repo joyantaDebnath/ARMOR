@@ -4,8 +4,7 @@
   building block for achieving security guarantees in many applications and protocols.
   At the core of its authentication guarantees lies the assumption 
   that one can correctly check whether a given chain of \xfon certificates 
-  is considered legitimate.
-  Implementations that realize this assumption are hailed as the ``\emph{most dangerous
+  is considered legitimate. However, implementations of the \xfon certificate chain validation are hailed as the ``\emph{most dangerous
     code in the world,}'' as noncompliance with the \xfon standard or other vulnerabilities can
   lead to interoperability issues or even impersonation attacks.
   Almost all existing efforts in evaluating the correctness of implementations of \xfon

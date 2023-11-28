@@ -39,7 +39,7 @@ machine-checked proof.}\todo{\tiny We don't completely have this yet!}
 
 Although the current paper, to the best of our knowledge, presents the first implementation of \xfon certificate 
 chain validation with a machine-checked proof of correctness, it draws inspirations from prior work in the area 
-\cite{debnath2021re, ramananandro2019everparse, ni2023asn1, tao2021dice, barenghi2018systematic, nqsb-tls}. 
+\cite{nqsb-tls, barenghi2018systematic, ramananandro2019everparse, tao2021dice, debnath2021re, ni2023asn1}. 
 % As an example, we rely on the 
 % prior re-engineering effort of the \xfon specification and implementation~\cite{debnath2021re, nqsb-tls} to distinguish between the syntactic 
 % and semantic requirements to design \armor in a modular way. 
