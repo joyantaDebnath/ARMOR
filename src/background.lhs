@@ -4,11 +4,11 @@ highlighting prior works on testing open-source \xfon implementations and
 emphasizing the motivation for our work.
 
 \subsection{Preliminaries on \xfon Certificate Chain}
-Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions.
+Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions, which is the focus of this work.
 
 \textbf{Internal Structure of a Certificate.} A version 3 certificate comprises three top-level fields: \texttt{TBSCertificate}, \texttt{SignatureAlgorithm}, and  \texttt{SignatureValue}. The \texttt{TBSCertificate} field contains information such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \texttt{TBSCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
 
-\textbf{Overview on Certificate Chain Validation.} A certificate chain is
+\textbf{Overview on Certificate Chain Validation.} Without loss of generality, a certificate chain is
 represented as a sequence of certificates, $C_1 \rightarrow C_2 \rightarrow
 \ldots \rightarrow C_{n-1} \rightarrow C_n$, where $C_1$ is the root CA
 certificate and is inherently trusted by the validator (denoted by $T(C_1) =
@@ -98,7 +98,7 @@ a mistake previously made by MatrixSSL, axTLS, and tropicSSL~\cite{symcert}.
   \centering
   \scriptsize
   \includegraphics[scale=0.73]{img/stages.drawio.pdf} \\
-  \caption{Sequential stages for certificate chain validation}
+  \caption{Conceptual workflow of certificate chain validation}
   \label{cert_validation}
 \end{figure}
 
