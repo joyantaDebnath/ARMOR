@@ -28,7 +28,7 @@ For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
 the Agda standard library type |Fin 256| (the type for nonnegative integers
 strictly less than 256).
 \subsubsection*{Base64 Decoding}
-We hand-off the result of the PEM parser, which extracts the Base64 encoding of the
+We hand off the result of the PEM parser, which extracts the Base64 encoding of the
 certificates, to the X.509 parser, which expects an octet string, through a
 Base64 decoder that is verified with respect to an encoder.
 Specifically, we prove: 1) that the encoder always produces a valid sextet
@@ -380,11 +380,12 @@ Recall that the definition of parser completeness with respect to a language |G|
 means that if an input string |xs| is in |G|, the parser accepts \emph{some
   prefix of |xs|}.
 Of course, this property in isolation does not rule out certain bad behavior
-that threatness security; specifically, it does not contrain the parser's
+that threatens security; specifically, it does not constrain the parser's
 freedom over (1) which prefix of the input is consumed, and (2) how the internal
 datastructure is constructed.
-However, and as we have discussed in Section~\ref{sec:s4-lang-spec}, these are
-properties of the \emph{language}, and not its parsers.
+However, and as we have discussed in Section~\ref{sec:s4-lang-spec}, these
+should be thought of as properties of the \emph{language}, and \emph{not} its
+parsers.
 To emphasize this, after discussing the completeness proof we will show how,
 using language properties, it can be strengthed to address the aforementioned
 security concerns.
@@ -399,7 +400,7 @@ trivSuccess : forall {G} {xs} -> G xs -> Success G xs
 completeness : forall {G} -> (p : Parser G) -> Complete G p
 completeness p xs inG = fromWitness (p xs) (trivSuccess inG)
 \end{code}
-  \caption{Parser weak completeness (definition and proof)}
+  \caption{Parser completeness (definition and proof)}
   \label{fig:s4-parser-wkcompleteness}
 \end{figure}
 
@@ -415,23 +416,33 @@ With this, the proof of |completeness| uses the function |fromWitness : {Q :
   Set} -> (d : Dec Q) -> Q -> IsYes d|, which intuitively states that if a
 proposition |Q| is true, then any decision for |Q| must be in the affirmative.
 
+
 \textbf{Strong completeness.}
+We will now see how, using language properties, our parser completeness result
+can be strengthened to rule out bad behavior that could compromises security.
+To be precise, when a string |xs| is in the language |G|, we desire that the
+parser consumes \emph{exactly} |xs|, and furthermore that there is only one way
+for it to construct the internal data representation of |G| from |xs|.
+To show both of these guarantees, it suffices that |G| satisfies the properties
+|Unambiguousness| and |NoSubstrings| (see Section~\ref{sec:s4-lang-spec}).
+
 \begin{figure}[h]
   \begin{code}
 StronglyComplete : (G : @0 List A -> Set) -> Parser G -> Set
 StronglyComplete G p = forall xs -> (inG : G xs)
   -> exists  (w : IsYes (p xs))
-             ((_ , inG) == (_ , Success.value (toWitness w)))
+             (  let s = toWitness w in
+                (xs , inG) == (Success.prefix x , Success.value s))
 
 strongCompleteness
   : forall {G} -> Unambiguous G -> NoSubstrings G
     -> (p : Parser G) -> StronglyComplete G p
-strongCompleteness ua nn p xs inG = (w , secure xs inG s)
+strongCompleteness ua ns p xs inG = (w , strong xs inG s)
   where
   w = completeness p inG
   s = toWitness w
-  secure : forall xs inG s -> (_ , inG) == (_ , Success.value s)
-  secure xs inG s with nn _ inG (Success.prefix s)
+  strong : forall xs inG s -> (_ , inG) == (_ , Success.value s)
+  strong xs inG s with ns _ inG (Success.prefix s)
   ... | refl with ua inG (Success.value s)
   ... | refl = refl
   \end{code}
@@ -439,54 +450,23 @@ strongCompleteness ua nn p xs inG = (w , secure xs inG s)
   \label{fig:s4-parser-stcompleteness}
 \end{figure}
 
-\subsubsection{Parser Failure and Completeness}
+Figure~\ref{fig:s4-parser-stcompleteness} shows the definition and proof of our
+strengthened completeness result.
+For the definition, |StronglyComplete G p| says that, if we have a proof |inG| that
+|xs| is in |G|, then not only does there exist a witness |w| that the parser
+accepts some prefix of |xs|, but prefix it consumes is |xs| and the
+proof it returns is |inG|.
+Recall that the assumption |inG| and the |value| field of the |Success| record
+serve dual roles: they are not only proofs that a string is in a language, but
+also the internal data representation of the value encoded by |xs|.
+So, saying they are equal means the internal representations are equal.
 
-\textbf{Completeness.} To finish, we now explain how our setup guarantees
-completeness.
-Assuming |G| is a language that satisfies |Unambiguous| and |Unique|
-(Figure~\ref{fig:unambig-uniq}) (in particular, our specification
-of X.509 certificates satisfies both), we are given a bytestring |xs| such that
-some prefix of |xs| is in |G| (i.e., a value of type |Success G xs|), and must
-show that our parser accepts precisely the same prefix of |xs|.
-We analyze the two possible results of running the parser.
-If the parser fails, that means \emph{no} prefix of |xs| is in |G|, but this
-contradicts our assumption, so it must be that the parser succeeds, giving us
-another value of type |Success G xs|
-By a lemma, that |G| satisfies |Unambiguous| and |Unique| gives us that
-|Success G| is also unique, meaning in particular that the two prefixes are the same.
-
-The preceding proof sketch is formalized in our Agda development.
-Figure~\ref{fig:parse-unique-complete} shows a simplified version of the proof.
-\begin{figure}[h]
-  \centering
-  \begin{code}
-uniqueParse : Unique (Success G)
-uniqueParse = ...
-
-SucceedsAndEq : forall {A} -> Dec A -> A -> Set
-SucceedsAndEq (yes x) v = x == v
-SucceedsAndEq (no x) v = False
-
-completeParse :  forall xs -> (v : Success Q xs)
-                 -> SucceedsAndEq (parse xs) v
-completeParse xs v
-  with parse xs
-... | no  x = contradiction v x
-... | yes x = uniqueParse x v
-  \end{code}
-  \caption{Unique parse and completeness}
-  \label{fig:parse-unique-complete}
-\end{figure}
-The code listing of the figure has as parameters |G : List UInt8 -> Set| (the
-language), proofs that |G| satisfies |Unambiguous| and |Unique|, and a parser
-|parse : Parser G|.
-Lemma |uniqueParse| gives the result that successful parses are unique, and the
-binary relation |SucceedsAndEq| expresses that our parser succeeds and returns a
-value equal to a specified |v| (|False| is the trivially false proposition).
-Finally, |completeParse| is the proof of completeness, which proceeds by running
-|parse xs| and inspecting the result: the case that the parser fails contradicts
-our assumption, and in the case that the parser succeeds, we invoke the lemma
-|uniqueParse|.
+The proof, |strongCompleteness|, shows that to prove |StronglyComplete|, it
+suffices that the language |G| satisfies |Unambiguous| and |NoSubstrings|.
+In the definition, we exhibit witness |w| using the previous proof
+|completeness|, and in the helper proof |strong| we use the assumptions |ns :
+NoSubstrings G| and |ua : Unambiguous G| to prove that |xs| and |inG| are equal
+to the |prefix| consumed and |value| returned by |p xs|.
 
 \subsection{Semantic Validation}
 

@@ -13,7 +13,8 @@ the architecture and the implementation details of \armor.
 
 \subsection{Background on \agda}
 \agda is a \textit{dependently-typed} functional programming
-language, meaning that types may involve term expressions.
+language, meaning that types may involve term expressions\todo{\tiny Explain:
+  program and data}.
 This capability helps express rich properties in types, and enforcing that
 programs satisfy those properties is reduced to typechecking.
 In other words, if a program compiles, it is also proven to meet the
