@@ -98,6 +98,8 @@
 
 %format Top        = "\HSSym{\top}"
 %format Bot        = "\HSSym{\bot}"
+%format Land       = "\mathrel{\HSSym{\land}}"
+%format Lor        = "\mathrel{\HSSym{\lor}}"
 %format ::         = "\mathrel{\HSSym{::}}"
 %format !!         = "\mathrel{\HSSym{!!}}"
 %format ->         = "\mathrel{\HSSym{\to}} "
@@ -109,6 +111,8 @@
 %format =?         = "\stackrel{?}{=} "
 %format <=         = "\mathrel{\HSSym{\leq}} "
 %format >=         = "\mathrel{\HSSym{\geq}} "
+%format >          = "\mathrel{\HSSym{>}} "
+%format <          = "\mathrel{\HSSym{<}} "
 
 %format :          = "\mathbin{\HSCon{:}}"
 %format ++-        = "\mathbin{\HSSym{++-}}"

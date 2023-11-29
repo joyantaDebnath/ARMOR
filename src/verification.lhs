@@ -33,8 +33,25 @@ certificates, to the X.509 parser, which expects an octet string, through a
 Base64 decoder that is verified with respect to an encoder.
 Specifically, we prove: 1) that the encoder always produces a valid sextet
 string (Base64 binary string); and 2) the encoder and decoder pair forms an
-isomorphism between octet strings and valid sextet strings.\todo{\tiny Would
-be nice to show the type signatures here, but they need cleaning up!}
+isomorphism between octet strings and valid sextet strings for encoding them.
+This is summarized below in Figure~\ref{fig:s4-base64} (for space
+considerations, all definitions have been omitted).
+
+\begin{figure}[h]
+  \begin{code}
+ValidEncoding : List UInt6 -> Set
+encode : List UInt8 -> List UInt6
+decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
+
+encodeValid : (bs : List UInt8) -> ValidEncoding (encode bs)
+
+encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
+decodeEncode :  forall bs -> (v : ValidEncoding bs)
+                -> encode (decode bs v) == bs
+  \end{code}
+  \caption{Base64 encoding and decoding (types only)}
+  \label{fig:s4-base64}
+\end{figure}
 
 
 \subsection{Independent Specification}
@@ -50,6 +67,12 @@ the inhabitation of the type |G xs|.
 
 \begin{figure}[h]
   \begin{code}
+MinRep : UInt8 -> List UInt8 -> Set
+MinRep b1 [] = Top
+MinRep b1 (b2 :: bs) =
+  (b1 > 0 Lor (b1 == 0 Land b2 >= 128))
+  Land (b1 < 255 Lor (b1 == 255 Land b2 <=127))
+    
 record IntegerValue (@0 bs : List UInt8) : Set where
   constructor mkIntVal
   field
@@ -68,34 +91,49 @@ We illustrate our approach with a concrete example: our specification of X.690
 DER integer values, shown in Figure~\ref{fig:s4-integervalue}.
 This specification takes the form of an Agda record (roughly analogous to a
 C-style \texttt{struct}) that is parameterized by a bytestring |bs|.
-The types of the fields of this record specify \emph{what it means} for |bs| to
-be a valid encoding of an integer value, \emph{and} give integer value |bs| encodes.
 \begin{itemize}
-\item \textbf{Erasure annotations.} The string |@0| marks the
-  accompanying identifier as \emph{erased at runtime}.
+\item \textbf{Minimum representation.} \xsno BER requires that the two's
+  complement encoding of an integer value consists of the minimum number of
+  octets needed for this purpose.
+  We \emph{express} this property with |MinRep|, which defines a relation between the
+  first byte of the encoding and the remaining bytes; we \emph{enforce} that the
+  property holds with field |minRep| of |IntegerValue| (in order to construct an
+  expression of type |IntegerValue bs|, we must prove that |MinRep| holds for
+  the head and tail of |bs|).
+  
+  The definition of |MinRep| proceeds by cases on whether or not the remaining
+  byte string is empty.
+  \begin{enumerate}
+  \item If it is, we return the trivially true proposition |Top|, because a
+    single byte is always minimal.
+    
+  \item Otherwise, if the bits of the first byte are all 0, the first bit of the
+    second byte must be 1 (i.e., |b2 >= 128|); and if the bits of the first byte
+    are all 1 (i.e., |b1 == 255|), then the first bit of the second byte must be
+    0 (i.e., |b2 <= 127|).
+  \end{enumerate}
+  
+\item \textbf{Erasure annotations.} The string |@0| is an annotation that marks
+  the accompanying identifier as \emph{erased at runtime}.
   In the figure, only the field |val| (the integer encoded by |bs|) is present
-  at runtime, with the remaining fields erase by Agda's GHC backend.
-  The annotations for runtime erasure not only improve the performance of ARMOR,
+  at runtime, with the remaining fields (and the parameter |bs|) erased by
+  Agda's GHC backend.
+  The annotations for runtime erasure not only improves the performance of ARMOR,
   but also serve to document, for programmers using ARMOR as a reference
   implementation, which components of the internal representation serve only
   specificational purposes.
 
 \item \textbf{Nonempty encoding.} Fields |hd|, |tl|, and |bseq| together ensure
   that the encoding of an integer value ``consists of one or more
-  octets.\todo{cite}''
+  octets.''~\cite{rec2002x}
   Specifically, |bseq| ensures that |bs| is of the form |hd :: tl|, where |hd|
   is the first content octet and |tl| contains the remaining bytes (if any).
   
-\item \textbf{Minimum representation.} X.690 BER requires that the two's
-  complement encoding of an integer value consists of the minimum number of
-  octets needed for this purpose.
-  This is enforced by the field |minRep| (we shall see the definition of the
-  relation |MinRep| shortly).\todo{\tiny Show it or drop this.}
 
 \item \textbf{Linking the value and its encoding.}
-  Field |valeq| forecloses any possibility that an inhabitant of |IntegerValue
-  bs| populates field |val| with an arbitrary integer by requiring that it
-  \emph{must} be equal to the result of decoding |bs| as a two's complement
+  Field |valeq| forecloses any possibility that an expression of type |IntegerValue
+  bs| populates the field |val| with an arbitrary integer by requiring that this
+  field \emph{must} be equal to the result of decoding |bs| as a two's complement
   binary value, where |Base256.twosComp| is the decoding operation.
 \end{itemize}
 
@@ -125,6 +163,8 @@ corresponding fields are equal --- \emph{even the purely specificaional fields.}
 Once established, the additional strength that |Unambiguous| significantly aids
 development of the verified parser; however, this means that specifications must
 be carefuly crafted so as to admit unique proof terms.
+In the case of |IntegerValue|, this means showing that any two proofs of |MinRep
+hd tl| are equal.
 
 Another challenging aspect in proving unambiguousness for X.690 DER in
 particular is the format's support for sequences that have \emph{optional} and
@@ -184,8 +224,6 @@ NonMalleable{G} R =
 For |IntegerValue| in particular, proving |NonMalleable RawIntegerValue|
 requires showing |Base256.twosComp| is itself injective.
 
-\textbf{Challenges.}\todo{\tiny Sig alg explicit null parameters}
-
 \subsubsection{No Substrings}
 The final language property we discuss, which we dub \emph{``no substrings,''}
 expresses formally the intuitive idea that a language permits parsers no degrees
@@ -203,7 +241,8 @@ Given that \xfon uses \(<T,L,V>\) encoding, it is
 unsurprising that that we are able to prove |NoSubstrings| holds for our
 specification.
 However, this property is essential to understanding our \emph{strong
-  completeness} result\todo{\tiny Forward ref} for parsing.
+  completeness} result (see Section~\ref{sec:s4-parser-sound-complete-strong})
+for parsing.
 
 \subsubsection{Summary of Language Guarantees}
 We have proven \emph{unambiguousness} for the supported subsets of formats
@@ -313,7 +352,6 @@ question, as there are some propositions which can neither be proven nor refuted
 
 We are now able to complete the definition of the type of parsers, shown below.
 \begin{figure}[h]
-  \centering
   \begin{code}
 Parser : (List UInt8 -> Set) -> Set
 Parser G = forall xs -> Dec (Success G xs)    
@@ -340,6 +378,7 @@ The clearest example of such a trade-off is in our parsers for X.690
 \texttt{Choice} values, which are implemented using back-tracking.
 
 \subsubsection{Parser Soundness, Completeness, and Strong Completeness}
+\label{sec:s4-parser-sound-complete-strong}
 We now show our formal definitions and proofs of soundness and completeness for
 parsing, beginning with soundness.
 \begin{figure}[h]
@@ -472,7 +511,7 @@ to the |prefix| consumed and |value| returned by |p xs|.
 \subsection{Semantic Validation}
 
 Our approach to semantic validation, as outlined in
-Section~TODO, is separating those properties that should
+Section~\ref{sec:s3-insights-on-tech-challenges}, is separating those properties that should
 be verified for a single certificate and those that concern the entire chain.
 For each property to validate, we formulate in Agda a predicate expressing
 satisfaction of the property by a given certificate or chain, then prove that
