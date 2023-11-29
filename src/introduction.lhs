@@ -48,6 +48,8 @@ limitations: (1) Lacks any formal guarantees; (2) Focuses only on parsing and la
 of semantic aspects; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
 parsing; (4) Focuses only on verified encoding of certificates, not parsing.
 
+\says{joy}{somewhere talk about impact and use case}
+
 \textbf{Challenges}. Developing \armor required addressing the following technical challenges. 
  \emph{First}, the \xfon specification is distributed 
 across many documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
@@ -61,7 +63,7 @@ syntactic requirements of an \xfon certificate~\cite{kaminsky2010pki, debnath202
 Thus, proving total correctness of the parser is quite complicated.
 To make matters worse, parsing just the \asnone structure from the certificate bytestream 
 is insufficient because the relevant certificate field value may need to be further 
-decoded from the parsed \asnone value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone \der parsing, decoding \asnone values, string canonicalization, chain building, semantic checking, cryptographic signature verification, hostname verification, revocation checking), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
+decoded from the parsed \asnone value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone \der parsing, decoding \asnone values, string canonicalization, chain building, semantic checking, signature verification), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
 
 \textbf{Approach}. \armor is designed and developed with modularity in mind. Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
 we modularly decompose the whole \xfon certificate chain validation 
@@ -78,6 +80,9 @@ in which the result of the validation process $r\in \{\mathsf{Invalid}, \mathsf{
 and $k$ is the public-key of the entity whose certificate is being validated. The  
 \emph{Agda} module, written in the dependently typed functional programming language \agda~\cite{bove2009brief, No07_agda}, implements all the intermediate stages (\eg, parsing, semantic checking, chain building, string canonicalization) of certificate chain validation. Notably \agda not only allows one to write programs 
 but also allows one to prove correctness properties about those programs through \emph{interactive theorem proving}. 
+
+\says{joy}{somewhere talk about relational spec, separate implementation}
+
 
 We proved the following correctness properties for our high-assurance
 implementation {\armor}: \emph{soundness} of parser (any certificate deemed syntactically valid by our implementation is indeed 

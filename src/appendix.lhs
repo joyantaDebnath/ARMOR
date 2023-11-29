@@ -65,3 +65,143 @@
   % \end{tabularx}
   % \label{ccp}
   % \end{table*}
+
+
+% \subsection{Examples of inconsistency, ambiguity, and under-specification}
+% \label{sect:bad-spec}
+
+% Perhaps unsurprisingly, the specification documents considered 
+% are all written in English, 
+% which is a natural language that is prone to inconsistency, ambiguity and 
+% misinterpretation, and we have indeed observed several instances of 
+% problematic clauses in the RFC 5280. Here we give a few illustrative examples.
+
+% Regarding the requirements on serial number, in Section 4.1.2.2, RFC 5280 says:
+
+% \quoteRFC{The serial number MUST be a positive integer assigned by the CA to 
+% each certificate...CAs MUST force the serial Number to be a non-negative 
+% integer...Non-conforming CAs may issue certificates with serial numbers that 
+% are negative or zero. Certificate users SHOULD be prepared to gracefully handle 
+% such certificates.}
+
+% The first sentence is inconsistent with the last sentence: one excludes zero, 
+% while 
+% the other allows it.
+% An 
+% errata 
+% on this has been 
+% filed~\footnote{\url{https://www.rfc-editor.org/errata/eid3200}} back in 2012
+% but at the time of writing it this does not seem to be included in any RFC 
+% updates or clarifications.
+%
+%has a status of ``held for document updated'' and 
+%is 
+%not ``verified''.
+
+% We now give an example of requirements that we consider to be ambiguous. 
+% Regarding the contents of the CRL distribution points extension, in Section 
+% 4.2.1.13, RFC 5280 says:
+
+% \quoteRFC{
+% 	A DistributionPoint consists of three fields,
+% 	each of which is optional: distributionPoint, reasons, and cRLIssuer.
+% 	While each of these fields is optional, a DistributionPoint MUST NOT
+% 	consist of only the reasons field; either distributionPoint or
+% 	cRLIssuer MUST be present.  If the certificate issuer is not the CRL
+% 	issuer, then the cRLIssuer field MUST be present and contain the 
+% 	Name
+% 	of the CRL issuer.  If the certificate issuer is also the CRL issuer,
+% 	then conforming CAs MUST omit the cRLIssuer field and MUST 
+% 	include
+% 	the distributionPoint field.
+% }
+
+% However, it is not immediately clear whether the \emph{\footnotesize 
+% \textsf{either ... or ... }}
+% clause should be 
+% interpreted as an \emph{exclusive or} ($\oplus$), or should it be represented 
+% with a \emph{logical or} ($\lor$). If one assumes the \emph{exclusive or} 
+% interpretation, 
+% then the \emph{\footnotesize \textsf{MUST omit}} clause in the 
+% last sentence 
+% of the quote seems to be somewhat redundant, as it is already implied by the 
+% later
+% \emph{\footnotesize \textsf{MUST include}} clause of the same sentence. 
+% However, if \emph{logical or} is 
+% indeed the correct interpretation, 
+% that is, it is acceptable for both \texttt{distributionPoint} 
+% and \texttt{cRLIssuer} to be present,
+% then the \emph{\footnotesize \textsf{either 
+% 		... or ...}} could have been written as \emph{\footnotesize \textsf{at 
+% 		least one 
+% 		of ... and ...}} to make it less confusing. 
+% 	Such interpretation matters 
+% 		because it 
+% outlines the correct combinations of the fields that constitute the CRL 
+% distribution points extension,
+% %(in this case the 
+% %CRL distribution points), 
+% and affects what should be deemed as syntactically correct by the parser.
+
+% Additional, we argue that RFC 5280 also suffers from the problem of 
+% under-specification. Many clauses concerning the choice of values and options 
+% are stipulated as \emph{producer rules} (\eg, \emph{\footnotesize 
+% 	\textsf{conforming CAs must ...}}), but it is not immediately apparent 
+% 	whether some or all of these should also be enforced by the consumer. In 
+% 	some cases, RFC 5280 mentioned that certificate user should 
+% 	\emph{\footnotesize \textsf{gracefully handle}} certain non-conforming 
+% 	inputs, without really defining what needs to happen. Does that mean the 
+% 	validation should not crash? Should the non-conforming inputs be rejected 
+% 	or processed as normal? RFC 5280 is not explicit on those questions. 
+% 	Similarly, it also did not make clear on what should the certificate user 
+% 	do 
+% 	in cases where the certificate itself violates the DER.
+
+
+
+  % \subsection{Examples on RFC 5280 rules}
+  %  \label{rfcrulex}
+  % \begin{table}[h]
+  % \setlength\extrarowheight{1.2pt}
+  % \setlength{\tabcolsep}{1.5pt}
+  % \centering
+  % \sffamily\tiny
+  %   \caption{(todo: update table) Example of producer and consumer rules\label{tab:prodconex}}
+  % \vspace{-1.5em}
+  % \sffamily\tiny
+  %   \begin{tabular}{c||l||l}
+  %   \textbf{Field} &
+  %     \textbf{Syntactic Requirement} &
+  %     \textbf{Semantic Requirement} \\ \hline
+  %   Version &
+  %     Version  $::=$  INTEGER  \{  v1(0), v2(1), v3(2)  \} &
+  %     \begin{tabular}[c]{@@{}l@@{}}When extensions are used,\\ as expected  in this profile,\\ Version MUST be 3 (value is 2).\end{tabular} \\ \hline
+  %   \begin{tabular}[c]{@@{}l@@{}}KeyUsage\\ Extension\end{tabular} &
+  %     \begin{tabular}[c]{@@{}l@@{}}KeyUsage $::=$ BIT STRING \{\\ digitalSignature (0), nonRepudiation (1),\\ keyEncipherment (2), dataEncipherment (3),\\ keyAgreement (4), keyCertSign (5), cRLSign (6),\\ encipherOnly (7), decipherOnly (8) \}\end{tabular} &
+  %     \begin{tabular}[c]{@@{}l@@{}}When the KeyUsage extension\\ appears in a  certificate, at least\\ one of the bits MUST be set to 1.\end{tabular} \\
+  %   \end{tabular}
+  %   \vspace{-1.1em}
+  %   \end{table}
+
+  
+% \begin{table}[h]
+%   \setlength\extrarowheight{1.2pt}
+%   \setlength{\tabcolsep}{1.5pt}
+%   \centering
+%   \sffamily\tiny
+%     \caption{(todo: update table) Example of syntactic and semantic requirements\label{tab:synsemex}}
+%   \vspace{-1.5em}
+%   \sffamily\tiny
+%     \begin{tabular}{c||l||l}
+%     \textbf{Field} &
+%       \textbf{Syntactic Requirement} &
+%       \textbf{Semantic Requirement} \\ \hline
+%     Version &
+%       Version  $::=$  INTEGER  \{  v1(0), v2(1), v3(2)  \} &
+%       \begin{tabular}[c]{@@{}l@@{}}When extensions are used,\\ as expected  in this profile,\\ Version MUST be 3 (value is 2).\end{tabular} \\ \hline
+%     \begin{tabular}[c]{@@{}l@@{}}KeyUsage\\ Extension\end{tabular} &
+%       \begin{tabular}[c]{@@{}l@@{}}KeyUsage $::=$ BIT STRING \{\\ digitalSignature (0), nonRepudiation (1),\\ keyEncipherment (2), dataEncipherment (3),\\ keyAgreement (4), keyCertSign (5), cRLSign (6),\\ encipherOnly (7), decipherOnly (8) \}\end{tabular} &
+%       \begin{tabular}[c]{@@{}l@@{}}When the KeyUsage extension\\ appears in a  certificate, at least\\ one of the bits MUST be set to 1.\end{tabular} \\
+%     \end{tabular}
+%     \vspace{-1.1em}
+%     \end{table}

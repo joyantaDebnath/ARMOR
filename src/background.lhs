@@ -46,93 +46,103 @@ correctly, setting a benchmark for developing other such implementations.
 Such a formally-verified implementation, however, is currently
 missing, and our work is a major step towards filling this gap.
 
-\subsection{Our Objective and High-level Challenges}
-This paper addresses the aforementioned research gap by \emph{designing and developing a formally-verified implementation for \xfon certificate chain validation, named \armor}.
-Concretely, our primary goal is to \emph{check whether a given X.509
-  implementation is compliant with the X.509 specification}.\todo{\tiny Not
-  congruent with intro (\armor as app library)} In general, to prove the
-compliance of a given X.509 implementation ($I$), we have to formally specify
-the requirements ($\phi$) of valid X.509 certificate chains and then prove that
-the implementation $I$ satisfies the formal specification $\phi$ (\ie, $I
-\models \phi$), writing machine-checked proofs using any interactive theorem
-prover.\todo{\tiny not doing this for arbitrary implementations}
 
-\subsubsection*{Challenges} There exists several challenges to develop a formally-verified X.509 implementation.
+\subsection{Overarching Objective}
 
-\textbf{a. Natural Language Specifications:} The \xfon specification is distributed 
-across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
-5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
-4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC
-4518~\cite{zeilenga2006lightweight}), and its natural language specification has been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}\says{joy}{need an example}. Moreover, the specification for version 3 \xfon certificates, RFC 5280, does not only encompass rules for certificate issuers (\ie, producer rules) but also for the implementations that validate certificate chains (\eg, consumer rules). Additionally, RFC 5280 can be categorized into syntactic and semantic rules. The syntactic rules are concerned with the parsing of an X.509 certificate serialized as a byte stream, while the semantic rules impose constraints on the values of individual fields within a certificate and on the relationships between field values across different certificates in a chain. These intertwined sets of rules further complicate the specification, making it challenging to determine how \xfon implementations should respond in certain cases (\ie, whether to accept or reject an input).
-
-\textbf{b. Parsing and Decoding Complexities:} The internal data structure of an \xfon certificate, while described in the
-\emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
-the \xsno Distinguished Encoding Rules (\der)~\cite{rec2002x}.
-This \der representation of the certificate byte stream internally follows a $<T, L, V>$ structure to represent each certificate field, where $T$ denotes the
-type, $V$ indicates the actual content, and $L$ signifies the length in bytes of
-the $V$ field. Additionally, the $V$ field can include nested $<T, L, V>$ structures,
-adding additional layers of complexity to the binary data. Parsing such a binary
-data is challenging since it always requires passing the value of the $L$ field
-(length) to accurately parse the subsequent $V$ field. Therefore, the internal
-grammar of a \der-encoded certificate is \emph{context-sensitive}, and developing a
-\emph{correct} parser for such a grammar is not trivial~\cite{kaminsky2010pki, debnath2021re}. 
-
-To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
-is insufficient because the relevant certificate field value may need to be further 
-decoded from the parsed \asnone value.
-Take the \emph{example} of \xfon specification for using \texttt{UTCTime} format in certificate validity
-field.
-It uses a two-digit year representation, $YY$, and here lies the potential for
-misinterpretation.
-In this format, values from $00$ to $49$ are deemed to belong to the $21st$
-century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the $20th$ century and
-are consequently translated into $19YY$.
-This peculiarity of the \texttt{UTCTime} format allows the representation of
-years from $1950$ to $2049$.
-Therefore, library developers need to be very careful to decode the actual value of \texttt{UTCTime}
-to avoid potential certificate chain validation errors, 
-a mistake previously made by MatrixSSL, axTLS, and tropicSSL~\cite{symcert}.
+talk about the overarching goal (formally verified implementation, mention the name ARMOR) \\ 
+high-level steps, our step merge correct-by-construction, \\
+mention inspiration from prior work, our difference with the prior works [everparse, ceres, etc.] \\
+impact and use case of our work \\
 
 
-\begin{figure}[h]
-  \centering
-  \scriptsize
-  \includegraphics[scale=0.73]{img/stages.drawio.pdf} \\
-  \caption{Conceptual workflow of certificate chain validation}
-  \label{cert_validation}
-\end{figure}
+
+% \subsection{Goal and Challenges}
+% This paper addresses the aforementioned research gap by \emph{designing and developing a formally-verified implementation for \xfon certificate chain validation, named \armor}.
+% Concretely, our primary goal is to \emph{check whether a given X.509
+%   implementation is compliant with the X.509 specification}.\todo{\tiny Not
+%   congruent with intro (\armor as app library)} In general, to prove the
+% compliance of a given X.509 implementation ($I$), we have to formally specify
+% the requirements ($\phi$) of valid X.509 certificate chains and then prove that
+% the implementation $I$ satisfies the formal specification $\phi$ (\ie, $I
+% \models \phi$), writing machine-checked proofs using any interactive theorem
+% prover.\todo{\tiny not doing this for arbitrary implementations}
+
+% \subsubsection*{Challenges} There exists several challenges to develop a formally-verified X.509 implementation.
+
+% \textbf{a. Natural Language Specifications:} The \xfon specification is distributed 
+% across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
+% 5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
+% 4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC
+% 4518~\cite{zeilenga2006lightweight}), and its natural language specification has been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}\says{joy}{need an example}. Moreover, the specification for version 3 \xfon certificates, RFC 5280, does not only encompass rules for certificate issuers (\ie, producer rules) but also for the implementations that validate certificate chains (\eg, consumer rules). Additionally, RFC 5280 can be categorized into syntactic and semantic rules. The syntactic rules are concerned with the parsing of an X.509 certificate serialized as a byte stream, while the semantic rules impose constraints on the values of individual fields within a certificate and on the relationships between field values across different certificates in a chain. These intertwined sets of rules further complicate the specification, making it challenging to determine how \xfon implementations should respond in certain cases (\ie, whether to accept or reject an input).
+
+% \textbf{b. Parsing and Decoding Complexities:} The internal data structure of an \xfon certificate, while described in the
+% \emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
+% the \xsno Distinguished Encoding Rules (\der)~\cite{rec2002x}.
+% This \der representation of the certificate byte stream internally follows a $<T, L, V>$ structure to represent each certificate field, where $T$ denotes the
+% type, $V$ indicates the actual content, and $L$ signifies the length in bytes of
+% the $V$ field. Additionally, the $V$ field can include nested $<T, L, V>$ structures,
+% adding additional layers of complexity to the binary data. Parsing such a binary
+% data is challenging since it always requires passing the value of the $L$ field
+% (length) to accurately parse the subsequent $V$ field. Therefore, the internal
+% grammar of a \der-encoded certificate is \emph{context-sensitive}, and developing a
+% \emph{correct} parser for such a grammar is not trivial~\cite{kaminsky2010pki, debnath2021re}. 
+
+% To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
+% is insufficient because the relevant certificate field value may need to be further 
+% decoded from the parsed \asnone value.
+% Take the \emph{example} of \xfon specification for using \texttt{UTCTime} format in certificate validity
+% field.
+% It uses a two-digit year representation, $YY$, and here lies the potential for
+% misinterpretation.
+% In this format, values from $00$ to $49$ are deemed to belong to the $21st$
+% century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the $20th$ century and
+% are consequently translated into $19YY$.
+% This peculiarity of the \texttt{UTCTime} format allows the representation of
+% years from $1950$ to $2049$.
+% Therefore, library developers need to be very careful to decode the actual value of \texttt{UTCTime}
+% to avoid potential certificate chain validation errors, 
+% a mistake previously made by MatrixSSL, axTLS, and tropicSSL~\cite{symcert}.
 
 
-\textbf{c. Overall Complexities:} The \xfon certificate chain validation
-algorithm can be conceptually decomposed into different stages (see
-Figure~\ref{cert_validation}). In general, the algorithm receives two
-\emph{Privacy Enhanced Mail} (\pem)~\cite{balenson1993privacy} formatted
-certificate files and the current system time as inputs. One \pem file contains
-the end-user certificate and the relevant CA certificates to assist building
-legitimate chains, while the other \pem file contains the certificates of
-trusted CAs. \emph{First}, \circled{1} these \pem inputs are parsed to get each
-certificate in their \basesf format, and then \circled{2} the \basesf decoder is
-applied to each certificate to get its serialized byte stream in \der.
-\circled{3} Each \der certificate is then parsed into an intermediate
-representation for the next validation stages. Prior to \circled{6} enforcing
-the semantic checks (\eg, expiration date check, signature verification), as
-specified in RFC 5280~\cite{cooper2008internet}, \circled{4} string
-canonicalization and \circled{5} chain building are sequentially performed.
-String canonicalization is a type of string conversion to ensure all the strings
-in a certificate are decoded in their \emph{normalized}
-forms~\cite{zeilenga2006lightweight}, and chain building generates a candidate
-certification path from a trusted CA to the end-user certificate~\cite{cooper2005rfc}.
+% \begin{figure}[h]
+%   \centering
+%   \scriptsize
+%   \includegraphics[scale=0.73]{img/stages.drawio.pdf} \\
+%   \caption{Conceptual workflow of certificate chain validation}
+%   \label{cert_validation}
+% \end{figure}
 
-Each of these validation stages present their own challenges. For example, building a valid certification path can be difficult due to the lack of concrete
-directions as well as the possibility of having multiple valid certificate
-chains, since a single certificate can be cross-signed by more than one CA~\cite{path}.
-Converting strings to their \emph{normalized} forms is also a complex
-process, since the number of character sets is humongous considering all the
-languages worldwide. Moreover, before the signature verification (as part of semantic validation), the implementation needs to carefully
-parse the actual contents of the \texttt{SignatureValue} field with cryptographic operations to prevent attacks (\eg, \emph{RSA signature forgery}~\cite{finney2006bleichenbacher,
-  bleichenbacher1998chosen}).
-While these intermediate stages are conceptually straightforward, implementing
-them securely is nontrivial.
+
+% \textbf{c. Overall Complexities:} The \xfon certificate chain validation
+% algorithm can be conceptually decomposed into different stages (see
+% Figure~\ref{cert_validation}). In general, the algorithm receives two
+% \emph{Privacy Enhanced Mail} (\pem)~\cite{balenson1993privacy} formatted
+% certificate files and the current system time as inputs. One \pem file contains
+% the end-user certificate and the relevant CA certificates to assist building
+% legitimate chains, while the other \pem file contains the certificates of
+% trusted CAs. \emph{First}, \circled{1} these \pem inputs are parsed to get each
+% certificate in their \basesf format, and then \circled{2} the \basesf decoder is
+% applied to each certificate to get its serialized byte stream in \der.
+% \circled{3} Each \der certificate is then parsed into an intermediate
+% representation for the next validation stages. Prior to \circled{6} enforcing
+% the semantic checks (\eg, expiration date check, signature verification), as
+% specified in RFC 5280~\cite{cooper2008internet}, \circled{4} string
+% canonicalization and \circled{5} chain building are sequentially performed.
+% String canonicalization is a type of string conversion to ensure all the strings
+% in a certificate are decoded in their \emph{normalized}
+% forms~\cite{zeilenga2006lightweight}, and chain building generates a candidate
+% certification path from a trusted CA to the end-user certificate~\cite{cooper2005rfc}.
+
+% Each of these validation stages present their own challenges. For example, building a valid certification path can be difficult due to the lack of concrete
+% directions as well as the possibility of having multiple valid certificate
+% chains, since a single certificate can be cross-signed by more than one CA~\cite{path}.
+% Converting strings to their \emph{normalized} forms is also a complex
+% process, since the number of character sets is humongous considering all the
+% languages worldwide. Moreover, before the signature verification (as part of semantic validation), the implementation needs to carefully
+% parse the actual contents of the \texttt{SignatureValue} field with cryptographic operations to prevent attacks (\eg, \emph{RSA signature forgery}~\cite{finney2006bleichenbacher,
+%   bleichenbacher1998chosen}).
+% While these intermediate stages are conceptually straightforward, implementing
+% them securely is nontrivial.
 
 
 

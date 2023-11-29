@@ -637,6 +637,8 @@
 \lhsinclude{architecture}
 %include src/verification.lhs
 \lhsinclude{verification}
+%include src/implementations.lhs
+\lhsinclude{implementations}
 %include src/evaluation.lhs
 \lhsinclude{evaluation}
 %include src/discussion.lhs
