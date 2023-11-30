@@ -1,10 +1,10 @@
 \section{Discussion}
 
-\subsection{Supported Features}
+% \subsection{Supported Features}
 
-\subsection{Unsupported Features}
+% \subsection{Unsupported Features}
 
-\subsection{Threats to Validity}
+% \subsection{Threats to Validity}
 
 
 
