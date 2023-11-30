@@ -12,12 +12,18 @@ entity $e_1$ wants to check whether the certificate of another entity $e_2$ is a
 trust anchor (\ie, an issuer who is unconditionally trusted by $e_1$) and then attempts to extend this absolute trust through a chain of input certificates, 
 all the way down to $e_2$.
 
-Implementations of \xfon certificate chain validation, hailed as the ``\emph{most dangerous code in the world}''~\cite{mdcode}, are thus critical 
-to ensuring the authentication guarantees promised by the \xfon PKI~\cite{cooper2008internet}. Along with its authentication guarantees, 
-\xfon also provides a scalable and flexible mechanism for public-key distribution. These desirable guarantees of \xfon PKI 
-are often used as fundamental building blocks for achieving other security assurances such as \emph{confidentiality}, \emph{integrity}, and 
-\emph{non-repudiation} in many applications, including but not limited to SSL/TLS, IPSec, HTTPS, Email, DNS over HTTPS/TLS, WiFi, code signing, 
-secure boot, firmware/software verification, and secure software update. 
+Implementations of \xfon certificate chain validation, hailed
+as the ``\emph{most dangerous code in the world}''~\cite{mdcode}, are thus
+critical for ensuring the authentication guarantees promised by \xfon
+PKI~\cite{cooper2008internet}.
+Along with its authentication guarantees, \xfon also provides a scalable and
+flexible mechanism for public-key distribution.
+These desirable guarantees of \xfon PKI are often used as fundamental building
+blocks for achieving other security assurances such as \emph{confidentiality},
+\emph{integrity}, and  \emph{non-repudiation} in many applications, including
+but not limited to SSL/TLS, IPSec, HTTPS, Email, DNS over HTTPS/TLS, WiFi, code
+signing,  secure boot, firmware/software verification, and secure software
+update.
 % 
 % 
 Given its pivotal role in the overall system, software, and communication security, ensuring the \emph{correctness} 
@@ -40,9 +46,9 @@ Although the current paper, to the best of our knowledge, presents the first imp
 chain validation with machine-checked proofs of correctness, it draws inspirations from prior work in the area 
 \cite{nqsb-tls, barenghi2018systematic, ramananandro2019everparse, tao2021dice, debnath2021re, ni2023asn1}. 
 However, in comparison to \armor, prior work has at least one of the following 
-limitations: (1) Lacks any formal guarantees; (2) Focuses only on parsing and lacks formal correctness guarantees
-of semantic aspects; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
-parsing; (4) Focuses only on verified encoding of certificates, not parsing.
+limitations: (1) lacks any formal guarantees; (2) focuses only on parsing and lacks formal correctness guarantees
+of semantic aspects; (3) lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
+parsing; (4) focuses only on verified encoding of certificates, not parsing.
 
 
 \textbf{Challenges}. Developing \armor required addressing the following technical challenges. 
@@ -71,12 +77,25 @@ necessary inputs (\eg, current system time, trust anchors), and returns a pair $
 in which the result of the validation process $r\in \{\mathsf{Invalid}, \mathsf{Valid}\}$ 
 and $k$ is the public-key of the entity whose certificate is being validated. The  
 other modules, written in a dependently typed functional programming language called \agda~\cite{bove2009brief, No07_agda}, implements all the intermediate stages of certificate chain validation. Notably \agda not only allows one to write programs 
-but also allows one to prove correctness properties about those programs through \emph{interactive theorem proving}. 
+but also to prove correctness properties about those programs through \emph{interactive theorem proving}. 
 
-For our approach to verify the parsers, we use \emph{relational} specifications of the language, which provides us with parser-independent formalizations of the PEM, Base64, \xsno DER, and \xfon formats. This greatly reduces the complexity of the specifications and provides a clear distinction between correctness properties of the \emph{language} and the \emph{parser}. For example, we proved that our \xsno DER and \xfon parsers are \emph{sound} (any certificate deemed syntactically valid by our implementation is indeed a valid certificate) and \emph{complete} (any certificate deemed syntactically valid by the specification is indeed valid according to our implementation) and their specifications are \emph{unambiguous} (one bytestring cannot be the encoding
-of two distinct \xfon certificates) and \emph{non-malleable} (two distinct bytestrings cannot be the encoding of the same \xfon certificate). Once these different proof obligations 
-are discharged, we use \agda's extraction mechanism to obtain \haskell code, which can then be used as a 
-library invoked through any imperative programming language (\eg, \python). 
+For our approach to parser verification, we use \emph{relational,
+  parser-independent} specifications of the PEM, \xsno DER, and \xfon formats.
+Compared to approaches that verify parsers with respect to serializers, our
+approach greatly reduces the complexity of the specifications and provides a
+clear distinction between correctness properties of the \emph{language} and the
+\emph{parser}.
+To illustrate this distinction, for our \xsno DER and \xfon \emph{parsers} we have
+proven \emph{soundness} (any bytestring accepted by the parsers conforms to the
+format specification) and \emph{completeness} (any bytestring that conforms to
+the format specification is accepted by the parser), and for our \xsno DER and
+\xfon \emph{language formalizations} we have proven \emph{unambiguousness}
+(e.g., onebytestring cannot be the encoding of two distinct \xfon certificates)
+and \emph{non-malleability} (e.g., two distinct bytestrings cannot be the
+encoding of the same \xfon certificate).
+Once these different proof obligations are discharged, we use \agda's extraction
+mechanism to obtain \haskell code, which can then be used as an application invoked
+through any imperative programming language (\eg, \python). 
 
 
 % We proved the following correctness properties for the parsers: \emph{soundness} (any input deemed syntactically valid by our implementation is indeed 
@@ -104,9 +123,10 @@ library invoked through any imperative programming language (\eg, \python).
 % for \xfon, although the grammar itself is context-sensitive. 
 
 \textbf{Evaluation}. As \armor, or any formally verified software, is only as
-good as its specification, it is crucial to ensure that our interpretation of
-the specification is consistent with other implementations.
-To check the correctness of the specification, we differentially test \armor against $11$ open-source 
+good as its specification, it is crucial that we compare it to other
+implementations to gain assurance our interpretation of the natural language
+specification is correct.
+To check the correctness of our specification, we differentially test \armor against $11$ open-source 
 \xfon libraries. To carry out this differential analysis, we use the following two datasets of input certificate chains: 
 (1) a dataset of $2$ million certificates randomly selected from a snapshot of $1.5$ billion real certificates gathered from the \censys~\cite{censys} certificate repository; 
 (2) a dataset of $1$ million certificates generated by the \frankencert tool~\cite{frank} to mimic bad inputs. 
@@ -128,7 +148,21 @@ is more important than runtime overhead}.
 
 
 \textbf{Use Cases.} We expect \armor can substantially improve the security 
-and privacy of applications that rely on \xfon for authentication and public-key distribution. Notable among these applications is TLS protocol. Although there is a formally verified implementation of TLS 1.2~\cite{bhargavan2016mitls}, it assumes that the \xfon certificate validation implementation is correct. \armor can remove this critical but not necessarily reasonable assumption as a drop-in replacement for the chain validation task. To justify the practicality of this claim, we integrated \armor with the TLS 1.3 implementation of \mbedtls and tested with the widely-used data transfer tool \curl. We found that \armor introduces reasonable overhead during TLS handshake. Moreover, \armor can be used as a \emph{test oracle} during software testing of \xfon implementations for finding logical bugs. 
+and privacy of applications that rely on \xfon for authentication and public-key
+distribution. Notable among these applications is the TLS protocol.
+Although there is a formally verified implementation of TLS
+1.2~\cite{bhargavan2016mitls}, it assumes that the \xfon certificate validation
+implementation is correct.
+\armor can remove this critical but not necessarily reasonable assumption as a
+drop-in replacement for the chain validation task.
+To justify the practicality of this claim, we integrated \armor with the TLS 1.3
+implementation of \mbedtls and tested with the widely-used data transfer tool
+\curl. We found that \armor introduces reasonable overhead during TLS handshake.
+Another use case of \armor is as a \emph{test oracle} during software testing of
+\xfon implementations for finding logical bugs.
+Finally, our relational language specifications can serve as a separate,
+formal reference for programmers seeking to understand the natural language
+documents specifying \xfon DER and \xsno.
 
 % \says{JD}{need to be more specific on which modules are formally proved. soundess and completeness are part of parser, not semantic validation. also, the properties are defined in terms of chain. are we sure?}
 
@@ -138,7 +172,7 @@ and privacy of applications that rely on \xfon for authentication and public-key
 % \says{CJ}{Add parser-independent spec of grammar.}
 \begin{enumerate}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them, facilitating development of other such formally-verified implementations in the future. 
-\item We prove that our formalization of the \xfon syntactic requirements is guaranteed to be \emph{unambiguous} and \emph{non-malleable}.
+\item We prove that our formalization of the \xfon syntactic requirements is \emph{unambiguous} and \emph{non-malleable}.
 \item We present the design and implementation of \armor, which enjoys \emph{soundness} and \emph{completeness} guarantees of the parsers with respect to our formalized specification.  
 % \item We prove that our interpretation of the syntactic requirements of \xfon
 %   enjoys some specific properties, indicating that it is possible to develop
