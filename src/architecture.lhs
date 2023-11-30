@@ -1,7 +1,7 @@
 % \section{Design of \armor} 
-% The development of \armor entails four critical steps: (1) Consulting the X.509
+% The development of \armor entails four critical steps: (1) Consulting the \xfon
 % specifications to extract the requirements for certificate chain validation and
-% then formally represent them; (2) Developing the actual implementation for X.509
+% then formally represent them; (2) Developing the actual implementation for \xfon
 % certificate chain validation; (3) Employing an interactive theorem prover to
 % prove that the implementation meets the specified criteria;\todo{\tiny The
 %   separation between (2) and (3) is misleading, impls are correct by construction} and (4) Extracting
@@ -82,13 +82,13 @@
 % % % Note that we can generate an executable binary of the implementation by first compiling the \agda source code into \haskell and then using a \haskell compiler to compile the generated \haskell code into a binary. 
 
 % % % As an example of \agda's syntax, consider representing the \agda boolean values
-% % % in their \xsno \der counterparts.
+% % % in their \xsno DER counterparts.
 % % % As per the Basic Encoding Rules (\ber)~\cite{rec2002x}, boolean values must
 % % % comprise a singular octet, with $False$ denoted by setting all bits to $0$ and
 % % % $True$ denoted by setting at least one bit to $1$.
-% % % The \der further mandates that the value $True$ is signified by setting all bits
+% % % The DER further mandates that the value $True$ is signified by setting all bits
 % % % to $1$.
-% % % We capture these requirements of \der boolean in \agda by defining a type that
+% % % We capture these requirements of DER boolean in \agda by defining a type that
 % % % holds not only the boolean value and its $8$-bit numerical representation but
 % % % also a proof that this representation is correct.
 % % % To further illustrate, let us look at the \agda code below.  
@@ -109,13 +109,13 @@
 % % %     @0 vr : BoolRep v b
 % % %     @0 bseq : bs == [ b ]
 % % %   \end{code}
-% % %   \caption{\agda example for representing \der boolean type}
+% % %   \caption{\agda example for representing DER boolean type}
 % % %   \label{fig:code1}
 % % % \end{figure}
 
 % % % Here, |BoolRep| is a dependent type representing a binary relationship between
 % % % \agda |Bool| values (\ie, true, false) and |UInt8| (\ie, 8-bit unsigned
-% % % integers or octet values stipulated by the \xsno \der), where the |falser|
+% % % integers or octet values stipulated by the \xsno DER), where the |falser|
 % % % constructor associates the false boolean value with $0$, and the |truer|
 % % % constructor associates true with $255$. The function |UInt8.fromN| transforms
 % % % a non-negative unbounded integer into its equivalent |UInt8| representation.
@@ -152,7 +152,7 @@
 %   \centering
 %   \scriptsize
 %   \includegraphics[scale=0.65]{img/armor.drawio.pdf} \\
-%   Sub-modules marked with green color in Agda module are formally-verified \\
+%   Sub-modules marked with green color in \agda module are formally-verified \\
 %   \vspace{0.2cm}
 %   \caption{Architecture of \armor}
 %   \label{armor}
@@ -165,9 +165,9 @@
 % manageability of the implementation, and also formal verification
 % efforts.\todo{\tiny Need map key, also explain in prose.}\todo{\tiny Table
 %   summary of formal guarantees?}
-% Figure~\ref{armor} depicts the architecture of \armor, which is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{Agda} module (implemented in the \agda). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives the inputs and \circled{B} forwards those inputs to the \emph{Main} sub-module of the \emph{Agda} module. The \emph{Main} sub-module then sequentially utilizes the \emph{PEM parser} (\circled{C} -- \circled{D}), \emph{Base64 decoder} (\circled{E} -- \circled{F}), and \emph{DER parser} (\circled{G} -- \circled{H}) to parse the input certificate files and represent all input certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into their internal data structures. Then, (\circled{I} -- \circled{L}) it invokes the \emph{Chain builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trusted CA certificate. Note that, our chain building process depends on matching the \texttt{Subject} and \texttt{Issuer} names of subsequent certificates in a chain. This matching algorithm is defined in Section 7.1 of RFC 5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. Thus, during chain building, (\circled{G} -- \circled{H}) the \emph{String canonicalizer} is called to normalize the \texttt{Subject} and \texttt{Issuer} names.
+% Figure~\ref{armor} depicts the architecture of \armor, which is divided into two main modules: the \emph{Python} module (implemented in \python) and the \emph{\agda} module (implemented in the \agda). Each module includes several sub-modules. \circled{A} The \emph{Driver} sub-module of the \emph{Python} module receives the inputs and \circled{B} forwards those inputs to the \emph{Main} sub-module of the \emph{\agda} module. The \emph{Main} sub-module then sequentially utilizes the \emph{PEM parser} (\circled{C} -- \circled{D}), \emph{Base64 decoder} (\circled{E} -- \circled{F}), and \emph{DER parser} (\circled{G} -- \circled{H}) to parse the input certificate files and represent all input certificates (end-user certificate, associated CA certificates, and trusted CA certificates) into their internal data structures. Then, (\circled{I} -- \circled{L}) it invokes the \emph{Chain builder} to generate all possible certificate chains from the parsed data, ensuring each chain originates from a trusted CA certificate. Note that, our chain building process depends on matching the \texttt{Subject} and \texttt{Issuer} names of subsequent certificates in a chain. This matching algorithm is defined in Section 7.1 of RFC 5280 and necessitates all the strings to undergo a preprocessing phase using the LDAP \stringprep profile, as described in RFC-4518~\cite{zeilenga2006lightweight}. Thus, during chain building, (\circled{G} -- \circled{H}) the \emph{String canonicalizer} is called to normalize the \texttt{Subject} and \texttt{Issuer} names.
   
-%   Next, (\circled{M} -- \circled{N}) the \emph{Main} sub-module tests each candidate chain for semantic validation. If any of the candidate chains passes the semantic validation, \circled{O} the \emph{Main} sub-module informs the \emph{Driver} in the \emph{Python} module. Notably, the \emph{Semantic validator} in the \emph{Agda} module does not perform any signature verification on the candidate chains since we do not implement and formally verify cryptographic operations in \armor. Hence, (\circled{P} -- \circled{U}) the \emph{Driver} in the \emph{Python} module calls upon the external \emph{Signature Verifier} for this task. The \emph{Signature verifier}, in turn, employs two formally-verified libraries -- (\circled{Q} -- \circled{R}) \haclstar~\cite{zinzindohoue2017hacl} and (\circled{S} -- \circled{T}) \morpheus~\cite{yahyazadeh2021morpheus} for the required cryptographic operations (details on \armor's signature verification is discussed later). Once the signature verification is successful, \circled{U} the \emph{Driver} is notified, and \circled{V} it then outputs the final chain validation result and the public-key of the end-user certificate.
+%   Next, (\circled{M} -- \circled{N}) the \emph{Main} sub-module tests each candidate chain for semantic validation. If any of the candidate chains passes the semantic validation, \circled{O} the \emph{Main} sub-module informs the \emph{Driver} in the \emph{Python} module. Notably, the \emph{Semantic validator} in the \emph{\agda} module does not perform any signature verification on the candidate chains since we do not implement and formally verify cryptographic operations in \armor. Hence, (\circled{P} -- \circled{U}) the \emph{Driver} in the \emph{Python} module calls upon the external \emph{Signature Verifier} for this task. The \emph{Signature verifier}, in turn, employs two formally-verified libraries -- (\circled{Q} -- \circled{R}) \haclstar~\cite{zinzindohoue2017hacl} and (\circled{S} -- \circled{T}) \morpheus~\cite{yahyazadeh2021morpheus} for the required cryptographic operations (details on \armor's signature verification is discussed later). Once the signature verification is successful, \circled{U} the \emph{Driver} is notified, and \circled{V} it then outputs the final chain validation result and the public-key of the end-user certificate.
 
 % \subsubsection{Our Insights on Technical Challenges} We now discuss our design choices to tackle the challenges discussed on Section 2. 
 
@@ -179,10 +179,10 @@
 % Additionally, RFC 5280 can be categorized into \emph{syntactic} and \emph{semantic}
 % rules. A clear separation between these syntactic and semantic rules is pivotal in
 % formally specifying requirements.
-% However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the re-engineering effort by Debnath \etal~\cite{debnath2021re}. Similar to that prior work, we categorize \der restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on \der's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. 
+% However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the re-engineering effort by Debnath \etal~\cite{debnath2021re}. Similar to that prior work, we categorize DER restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on DER's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. 
 
 % \textit{b. Choosing the level of specificity.}
-% While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. In addition, RFC 5280 puts additional restrictions on certain \der rules to be used for the Internet. Therefore, we aim to create a formally verified implementation that focuses primarily on the most commonly used subset of the standard specifications. For example, in our current configuration of \armor, we support $10$ certificate extensions. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. When any other extension is present, we only consume the corresponding bytes of the extension to continue parsing rest of the certificate fields. Table~\ref{extfreq} shows our analysis on the frequency of different extensions based on $1.5$ billion real certificates collected from the \censys~\cite{censys} certificate repository in January $2022$. Based on this measurement study, we support the following extensions: Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
+% While the \xsno DER and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. In addition, RFC 5280 puts additional restrictions on certain DER rules to be used for the Internet. Therefore, we aim to create a formally verified implementation that focuses primarily on the most commonly used subset of the standard specifications. For example, in our current configuration of \armor, we support $10$ certificate extensions. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. When any other extension is present, we only consume the corresponding bytes of the extension to continue parsing rest of the certificate fields. Table~\ref{extfreq} shows our analysis on the frequency of different extensions based on $1.5$ billion real certificates collected from the \censys~\cite{censys} certificate repository in January $2022$. Based on this measurement study, we support the following extensions: Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
 
 % \begin{table}[h]
 %   \captionsetup{font=footnotesize}
@@ -228,9 +228,9 @@
 
 % \subsubsection{Verification Overview}
 % \label{sec:s3-verification-overview}
-% Our verification effort on the \emph{Agda} module can be decomposed to the
-% verification of \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
-%   X.509 parser)} and the verification of \emph{semantic validation}.
+% Our verification effort on the \emph{\agda} module can be decomposed to the
+% verification of \emph{parsers (\ie, PEM parser, Base64 decoder, \xsno DER and
+%   \xfon parser)} and the verification of \emph{semantic validation}.
 % In this work, we only provide implementations of the \emph{String canonicalizer} and \emph{Chain builder}, however, we do not provide any formal specification and correctness guarantees for them. We now present a high-level overview on our verification efforts, while details on the verification and correctness proofs with their specific-challenges are discussed in Section 4. 
 
 % \noindent\textbf{Verification of Parsers:}  
@@ -239,7 +239,7 @@
 %   correctness verification}. Since \agda enforces termination
 % for all definitions, we automatically get the \emph{termination} guarantee for each parser.
 
-% \textit{a. Language specification.} We provide parser-independent formalizations of the PEM, Base64, X.690
+% \textit{a. Language specification.} We provide parser-independent formalizations of the PEM, Base64, \xsno
 %   DER, and \xfon formats, greatly reducing the complexity of the specification
 %   and increasing trust that they faithfully capture the natural language description. Much current research~\cite{ni2023asn1, ramananandro2019everparse}
 % for applying formal methods to parsing uses serializers to specify the
@@ -256,21 +256,21 @@
 % natural language description.
 % This second point in particular means the formal specification can serve as a
 % machine-checked, rigorous alternative to the latter for developers seeking to
-% understand the relevant specifications X.509 and X.690 DER. 
+% understand the relevant specifications \xfon and \xsno DER. 
 
 % % More concretely, the relational specifications we propose to give are of the
 % % following form.
 % % For a given language \(G\) with alphabet \(\Sigma\), a family of types
 % % \(\mathit{GSpec}\ \mathit{xs}\) where the family \(\mathit{GSpec}\) is indexed
 % % by strings \(\mathit{xs} \in \Sigma^*\) over the alphabet (for PEM the alphabet
-% % is characters, for X.690 it is unsigned 8-bit integers).
+% % is characters, for \xsno it is unsigned 8-bit integers).
 % % Such a family of types can serve the dual role as the internal representation of
 % % the value encoded by \(\mathit{xs}\), i.e., a value of type \(\mathit{GSpec}\
 % % \mathit{xs}\) is not only a proof that \(\mathit{xs}\) is in the language \(G\),
 % % but also the internal representation of the value decoded from \(\mathit{xs}\).
 
 % % \emph{Example:}
-% % As a short example, the X.690 DER specification requires that signed integer
+% % As a short example, the \xsno DER specification requires that signed integer
 % % values be encoded in the minimal number of bytes needed to express that value in
 % % binary two's complement.
 % % This can be concisely expressed as a type family that maps the empty bytestring
@@ -288,23 +288,23 @@
 % % \emph{Proof Term Erasure:}
 % % While convenient for proving, naively mixing data and specification can
 % % have undesirable effects on runtime performance.
-% % This is because in languages like Agda, proofs \emph{are} programs, and so they
+% % This is because in languages like \agda, proofs \emph{are} programs, and so they
 % % carry computational content.
-% % To prevent issue, we will leverage Agda's support for \emph{run-time
+% % To prevent issue, we will leverage \agda's support for \emph{run-time
 % %   irrelevance} through erasure annotations, ensuring that computations existing
 % % only for specificational purposes are
-% % removed from compiled Haskell code by Agda's GHC backend, and therefore have no
+% % removed from compiled Haskell code by \agda's GHC backend, and therefore have no
 % % effect on performance.
 % % As a nice corollary to this, this improves the usability of our library as an
 % % machine-checked alternative to the relevant RFCs by clearly marking which
 % % components are purely for specificational purposes.
 
 % \textit{b. Language security verification.} We verify properties of the language specifications that give
-%   confidence they meet their desired design goals. X.509 certificates are required to use the X.690 DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
+%   confidence they meet their desired design goals. \xfon certificates are required to use the \xsno DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
 % \emph{unambiguousness} (a bytestring cannot be a valid encoding of two distinct values)
 % and (2) \emph{non-malleability} (two distinct bytestrings cannot be valid encodings of
 % the same value). \emph{Unambiguousness} and \emph{non-malleability} are properties of a
-% given language, and proofs of these properties for \xfon and X.690 DER 
+% given language, and proofs of these properties for \xfon and \xsno DER 
 % provide high-assurance for these formats \emph{themselves}, rather than for
 % parser and serializer implementations.
 % Our approach of giving parser-independent, relational specifications of
@@ -366,7 +366,7 @@
 % % \mypara{Certificate Chain Building}
 % % \emph{We propose to develop a verified implementation of string preparation and
 % %   chain building}. 
-% % Recall that a certificate chain is a sequence of X.509 certificates that begins
+% % Recall that a certificate chain is a sequence of \xfon certificates that begins
 % % with the certificate of the entity being authenticated, ends with a trusted CA
 % % certificate, and has the property that for every adjacent pair of certificates,
 % % the first is signed by the owner of the second.
@@ -415,16 +415,16 @@
 
 
 
-\section{Design of ARMOR} This section presents the technical challenges of our work, our insights on addressing the challenges, and finally an overview of ARMOR's architecture.
+\section{Design of \armor} This section presents the technical challenges of our work, our insights on addressing the challenges, and finally an overview of \armor's architecture.
 
 \subsection{Technical Challenges}
-% There are several challenges for to our work.
+There are several challenges for to our work.
 
 \subsubsection{Complexities in specifications} \label{tc1} The \xfon specification is distributed 
 across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
 5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
 4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC
-4518~\cite{zeilenga2006lightweight}), and its natural language specification has been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}. For example, regarding the requirements on certificate \emph{serial number}, the specification for version 3 \xfon certificates, RFC 5280~\cite{cooper2008internet} states the following quote. Here, the first sentence is inconsistent with the last sentence since one excludes zero as serial number but the other one allows it. 
+4518~\cite{zeilenga2006lightweight}), and its natural language specification has been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}. For example, regarding the requirements on certificate \emph{serial number}, the specification for version 3 \xfon certificates, RFC 5280~\cite{cooper2008internet} states the following quote. Here, the first sentence is inconsistent with the last sentence since one excludes zero as serial number but the other one allows it.
 
 \quoteRFC{The serial number MUST be a positive integer assigned by the CA to 
 each certificate...CAs MUST force the serial Number to be a non-negative 
@@ -432,18 +432,18 @@ integer...Non-conforming CAs may issue certificates with serial numbers that
 are negative or zero. Certificate users SHOULD be prepared to gracefully handle 
 such certificates.}
 
-Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie, producer rules) but also for the implementations that validate certificate chains (\eg, consumer rules). In another way, RFC 5280 can be categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic rules are concerned with the parsing of an X.509 certificate serialized as a byte stream, the semantic rules impose constraints on the values of individual fields within a certificate and on the relationships between field values across different certificates in a chain. Unfortunately, these intertwined sets of rules further complicate the specification, making it challenging to determine how an \xfon implementation should respond in certain cases (\ie, whether to accept or reject an input).
+Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie, \emph{producer} rules) but also for the implementations that validate certificate chains (\eg, \emph{consumer} rules). In another way, RFC 5280 can be categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic rules are concerned with the parsing of an \xfon certificate serialized as a byte stream, the semantic rules impose constraints on the values of individual fields within a certificate and on the relationships between field values across different certificates in a chain. Unfortunately, these intertwined sets of rules further complicate the specification, making it challenging to determine how an \xfon implementation should respond in certain cases (\ie, whether to accept or reject an input).
 
 \subsubsection{Complexities in DER parsing} The internal data structure of an \xfon certificate, while described in the
 \emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
-the \xsno Distinguished Encoding Rules (\der)~\cite{rec2002x}.
-This \der representation of the certificate byte stream internally follows a $<T, L, V>$ structure to represent each certificate field, where $T$ denotes the
+the \xsno Distinguished Encoding Rules (DER)~\cite{rec2002x}.
+This DER representation of the certificate byte stream internally follows a $<T, L, V>$ structure to represent each certificate field, where $T$ denotes the
 type, $V$ indicates the actual content, and $L$ signifies the length in bytes of
 the $V$ field. Additionally, the $V$ field can include nested $<T, L, V>$ structures,
 adding additional layers of complexity to the binary data. Parsing such a binary
 data is challenging and error-prone since it always requires passing the value of the $L$ field
 (length) to accurately parse the subsequent $V$ field. Since the internal
-grammar of a \der-encoded certificate is \emph{context-sensitive}, developing a
+grammar of a DER-encoded certificate is \emph{context-sensitive}, developing a
 \emph{correct} parser for such a grammar is not trivial~\cite{kaminsky2010pki, debnath2021re}. 
 
 To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
@@ -473,9 +473,9 @@ a mistake previously found by Chau \etal~\cite{symcert} in some TLS libraries (\
 
 
 \subsubsection{Complexities in individual stages} The \xfon certificate chain validation
-algorithm can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone \der parsing, decoding \asnone values, string canonicalization, chain building, semantic checking, signature verification), each of which has its own challenges. For example, (1) building a valid \emph{certification path} can be difficult due to the lack of concrete
+algorithm can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain building, semantic checking, signature verification), each of which has its own challenges. For example, (1) building a valid \emph{certification path} can be difficult due to the lack of concrete
 directions as well as the possibility of having multiple valid certificate
-chains, since a single certificate can be cross-signed by more than one CA~\cite{path}.
+chains~\cite{path}.
 (2) String canonicalization, where strings are converted to their \emph{normalized} forms, is also a complex
 process, since the number of character sets is humongous considering all the
 languages worldwide. (3) During signature verification, the implementation needs to carefully
@@ -491,8 +491,8 @@ them securely is not trivial.
 % legitimate chains, while the other \pem file contains the certificates of
 % trusted CAs. \emph{First}, \circled{1} these \pem inputs are parsed to get each
 % certificate in their \basesf format, and then \circled{2} the \basesf decoder is
-% applied to each certificate to get its serialized byte stream in \der.
-% \circled{3} Each \der certificate is then parsed into an intermediate
+% applied to each certificate to get its serialized byte stream in DER.
+% \circled{3} Each DER certificate is then parsed into an intermediate
 % representation for the next validation stages. Prior to \circled{6} enforcing
 % the semantic checks (\eg, expiration date check, signature verification), as
 % specified in RFC 5280~\cite{cooper2008internet}, \circled{4} string
@@ -514,12 +514,12 @@ them securely is not trivial.
 % them securely is nontrivial.
 
 \subsection{Our Insights} 
-% We now discuss some design choices of our approach.
+We now discuss some design choices of our approach.
 \label{sec:s3-insights-on-tech-challenges}
 \subsubsection{Modular decomposition} Inspired by previous re-engineering efforts~\cite{debnath2021re, nqsb-tls}, we design and develop \armor with modularity. The entire process is broken down into smaller, manageable modules and each module is designed to perform a specific function, such as parsing, chain building, string canonicalization, and semantic validation. Such modularization allows us to precisely specify the requirements for each module and independently establish their correctness with machine-checked proofs. In addition, instead of trying to accomplish everything in a single step, this modularization allows us to undertake the chain validation task in multiple passes, increasing the simplicity and manageability of the overall process.
 
 \subsubsection{Specificity} As discussed in Section~\ref{tc1}, RFC 5280 comprises two main rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization specifically concentrates on the \emph{consumer rules}, which are intended for
-certificate chain validation implementations. Additionally, a clear separation between the syntactic and semantic rules is pivotal in formally specifying the chain validation requirements. However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the prior work\cite{debnath2021re, nqsb-tls}. We categorize \der restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on \der's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. Finally, we focus primarily on the most commonly used subset of the standard specifications. While the \xsno \der and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. Thus, we did measurement studies on real-world certificate dataset to figure out which features to support or not (see Section 5 for details). 
+certificate chain validation implementations. Additionally, a clear separation between the syntactic and semantic rules is pivotal in formally specifying the chain validation requirements. However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the prior work\cite{debnath2021re, nqsb-tls}. We categorize DER restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on DER's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. Finally, we focus primarily on the most commonly used subset of the standard specifications. While the \xsno DER and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. Thus, we did measurement studies on real-world certificate dataset to figure out which features to support or not (see Section 5 for details). 
 
 \subsubsection{No verification of cryptographic operations} Verification of cryptographic
 operations is out-of-scope for this work. Therefore, we do not provide any formal specification and correctness guarantee for the signature verification stage. This design choice allows us to focus on the formal verification of rest of the modules while outsourcing the computationally-intensive signature verification process to external well-known libraries.
@@ -580,8 +580,8 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
   \end{figure}
   
   
-  Figure~\ref{armor} shows a high-level overview of the architecture and the workflow of ARMOR. ARMOR \circled{A} takes a list of input certificates (\ie, end-user certificate and relevant CA certificates), a list of trusted CA certificates, the current system time, and optionally the expected certificate purpose as input and \circled{L} returns the
-  certificate validation result (\ie, verdict) as well as the public-key of the end-user certificate as output. ARMOR's architecture is modular, comprising several distinct components. Concretely, \circled{B} The PEM Parser reads a PEM certificate file and converts each certificate in the PEM file into its Base64 encoded format. \circled{C} The Base64 Decoder decodes each certificate into DER byte streams. \circled{D} -- \circled{E} The X.690 DER parser and X.509 parser collaboratively parse the DER byte stream and convert each certificate into an intermediate representation (X.509 IR). \circled{F} The Chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the String canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The Semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the Driver whether any chain passes all the semantic checks. In this design, the Driver is the central component that orchestrates the entire process. The Driver's role is multifaceted: (1) it activates the Parser modules with the correct input; (2) it initiates the Chain builder to form candidate chains; (3) it directs the Semantic validator with the required input; (4) upon success of the previous stages, the Driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
+  Figure~\ref{armor} shows a high-level overview of the architecture and the workflow of \armor. \armor \circled{A} takes a list of input certificates (\ie, end-user certificate and relevant CA certificates), a list of trusted CA certificates, the current system time, and optionally the expected certificate purpose as input and \circled{L} returns the
+  certificate validation result (\ie, verdict) as well as the public-key of the end-user certificate as output. \armor's architecture is modular, comprising several distinct components. Concretely, \circled{B} The PEM Parser reads a PEM certificate file and converts each certificate in the PEM file into its Base64 encoded format. \circled{C} The Base64 Decoder decodes each certificate into DER byte streams. \circled{D} -- \circled{E} The \xsno DER parser and \xfon parser collaboratively parse the DER byte stream and convert each certificate into an intermediate representation (\xfon IR). \circled{F} The chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the driver whether any chain passes all the semantic checks. In this design, the driver is the central component that orchestrates the entire process. The driver's role is multifaceted: (1) it activates the parser modules with the correct input; (2) it initiates the chain builder to form candidate chains; (3) it directs the semantic validator with the required input; (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
   
 % \subsection{Verified Modules and Correctness Guarantees} 
 
@@ -591,7 +591,7 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 
 % \label{sec:s3-verification-overview}
 
-% As shown in Figure~\ref{armor}, we provide formal correctness guarantee for the following modules: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and X.509 parsers)}, \emph{Semantic validator}, \emph{Chain builder}, and \emph{String canonicalizer}. For formal verification, we use the \agda interactive theorem prover~\cite{bove2009brief, No07_agda}.
+% As shown in Figure~\ref{armor}, we provide formal correctness guarantee for the following modules: \emph{parsers (\ie, PEM parser, Base64 decoder, \xsno DER and \xfon parsers)}, \emph{Semantic validator}, \emph{Chain builder}, and \emph{String canonicalizer}. For formal verification, we use the \agda interactive theorem prover~\cite{bove2009brief, No07_agda}.
 
 % \subsubsection*{Preliminaries on Verification Tool}
 % \agda is a \textit{dependently-typed} functional programming
@@ -669,7 +669,7 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 %   correctness verification}. Since \agda enforces termination
 % for all definitions, we automatically get the \emph{termination} guarantee for each parser.
 
-% \textit{a. Language specification.} We provide parser-independent formalizations of the PEM, Base64, X.690
+% \textit{a. Language specification.} We provide parser-independent formalizations of the PEM, Base64, \xsno
 %   DER, and \xfon formats, greatly reducing the complexity of the specification
 %   and increasing trust that they faithfully capture the natural language description. Much current research~\cite{ni2023asn1, ramananandro2019everparse}
 % for applying formal methods to parsing uses serializers to specify the
@@ -686,20 +686,20 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 % natural language description.
 % This second point in particular means the formal specification can serve as a
 % machine-checked, rigorous alternative to the latter for developers seeking to
-% understand the relevant specifications X.509 and X.690 DER. 
+% understand the relevant specifications \xfon and \xsno DER. 
 
 % More concretely, the relational specifications we propose to give are of the
 % following form.
 % For a given language \(G\) with alphabet \(\Sigma\), a family of types
 % \(\mathit{GSpec}\ \mathit{xs}\) where the family \(\mathit{GSpec}\) is indexed
 % by strings \(\mathit{xs} \in \Sigma^*\) over the alphabet (for PEM the alphabet
-% is characters, for X.690 it is unsigned 8-bit integers).
+% is characters, for \xsno it is unsigned 8-bit integers).
 % Such a family of types can serve the dual role as the internal representation of
 % the value encoded by \(\mathit{xs}\), i.e., a value of type \(\mathit{GSpec}\
 % \mathit{xs}\) is not only a proof that \(\mathit{xs}\) is in the language \(G\),
 % but also the internal representation of the value decoded from \(\mathit{xs}\).
 
-% % As a short example, the X.690 DER specification requires that signed integer
+% % As a short example, the \xsno DER specification requires that signed integer
 % % values be encoded in the minimal number of bytes needed to express that value in
 % % binary two's complement.
 % % This can be concisely expressed as a type family that maps the empty bytestring
@@ -717,23 +717,23 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 % % \emph{Proof Term Erasure:}
 % % While convenient for proving, naively mixing data and specification can
 % % have undesirable effects on runtime performance.
-% % This is because in languages like Agda, proofs \emph{are} programs, and so they
+% % This is because in languages like \agda, proofs \emph{are} programs, and so they
 % % carry computational content.
-% % To prevent issue, we will leverage Agda's support for \emph{run-time
+% % To prevent issue, we will leverage \agda's support for \emph{run-time
 % %   irrelevance} through erasure annotations, ensuring that computations existing
 % % only for specificational purposes are
-% % removed from compiled Haskell code by Agda's GHC backend, and therefore have no
+% % removed from compiled Haskell code by \agda's GHC backend, and therefore have no
 % % effect on performance.
 % % As a nice corollary to this, this improves the usability of our library as an
 % % machine-checked alternative to the relevant RFCs by clearly marking which
 % % components are purely for specificational purposes.
 
 % \textit{b. Language security verification.} We verify properties of the language specifications that give
-%   confidence they meet their desired design goals. X.509 certificates are required to use the X.690 DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
+%   confidence they meet their desired design goals. \xfon certificates are required to use the \xsno DER, a set of encoding rules for ASN.1 types that is meant to ensure (1)
 % \emph{unambiguousness} (a bytestring cannot be a valid encoding of two distinct values)
 % and (2) \emph{non-malleability} (two distinct bytestrings cannot be valid encodings of
 % the same value). \emph{Unambiguousness} and \emph{non-malleability} are properties of a
-% given language, and proofs of these properties for \xfon and X.690 DER 
+% given language, and proofs of these properties for \xfon and \xsno DER 
 % provide high-assurance for these formats \emph{themselves}, rather than for
 % parser and serializer implementations.
 % Our approach of giving parser-independent, relational specifications of
@@ -795,7 +795,7 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 % % \mypara{Certificate Chain Building}
 % % \emph{We propose to develop a verified implementation of string preparation and
 % %   chain building}. 
-% % Recall that a certificate chain is a sequence of X.509 certificates that begins
+% % Recall that a certificate chain is a sequence of \xfon certificates that begins
 % % with the certificate of the entity being authenticated, ends with a trusted CA
 % % certificate, and has the property that for every adjacent pair of certificates,
 % % the first is signed by the owner of the second.
@@ -853,7 +853,7 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 %   \hline
 %   \multicolumn{5}{||c||}{\textit{Correctness Properties}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \\ \hline
 %   \multicolumn{1}{||c||}{\textbf{Soundness}}                                                                                              & \multicolumn{1}{c||}{\textbf{Completeness}}                                                                                           & \multicolumn{1}{c||}{\textbf{Termination}}                                                                                            & \multicolumn{1}{c||}{\textbf{Unambiguisness}}                                                 & \textbf{Non-malleable}                                                                    \\ \hline
-%   \multicolumn{1}{||c||}{\begin{tabular}[c]{@@{}c@@{}}All parsers\\ Semantic validator\\ String canonicalizer\\ Chain builder\end{tabular}} & \multicolumn{1}{c||}{\begin{tabular}[c]{@@{}c@@{}}All parsers\\ Semantic validator\\ String canonicalizer\\ Chain builder\end{tabular}} & \multicolumn{1}{c||}{\begin{tabular}[c]{@@{}c@@{}}All parsers\\ Semantic validator\\ String canonicalizer\\ Chain builder\end{tabular}} & \multicolumn{1}{c||}{\begin{tabular}[c]{@@{}c@@{}}Specifications of\\ all parsers\end{tabular}} & \begin{tabular}[c]{@@{}c@@{}}Specifications of\\ X.690 DER and\\ X.509 parsers\end{tabular} \\ \hline
+%   \multicolumn{1}{||c||}{\begin{tabular}[c]{@@{}c@@{}}All parsers\\ Semantic validator\\ String canonicalizer\\ Chain builder\end{tabular}} & \multicolumn{1}{c||}{\begin{tabular}[c]{@@{}c@@{}}All parsers\\ Semantic validator\\ String canonicalizer\\ Chain builder\end{tabular}} & \multicolumn{1}{c||}{\begin{tabular}[c]{@@{}c@@{}}All parsers\\ Semantic validator\\ String canonicalizer\\ Chain builder\end{tabular}} & \multicolumn{1}{c||}{\begin{tabular}[c]{@@{}c@@{}}Specifications of\\ all parsers\end{tabular}} & \begin{tabular}[c]{@@{}c@@{}}Specifications of\\ \xsno DER and\\ \xfon parsers\end{tabular} \\ \hline
 %   \end{tabular}
 %   \end{table*}
 

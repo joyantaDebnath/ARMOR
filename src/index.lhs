@@ -172,6 +172,7 @@
 \newcommand{\armor}{\ensuremath{\mathsf{ARMOR}}\xspace}
 \newcommand{\curl}{\ensuremath{\mathsf{Curl}}\xspace}
 \newcommand{\ceres}{\ensuremath{\mathsf{CERES}}\xspace}
+\newcommand{\antlr}{\ensuremath{\mathsf{ANTLR}}\xspace}
 \newcommand{\mbedtls}{\ensuremath{\mathsf{Mbed\mspace{4mu} TLS}}\xspace}
 \newcommand{\openssl}{\ensuremath{\mathsf{OpenSSL}}\xspace}
 \newcommand{\gnutls}{\ensuremath{\mathsf{GnuTLS}}\xspace}

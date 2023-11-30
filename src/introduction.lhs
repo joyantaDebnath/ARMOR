@@ -39,8 +39,6 @@ machine-checked proofs.}
 Although the current paper, to the best of our knowledge, presents the first implementation of \xfon certificate 
 chain validation with machine-checked proofs of correctness, it draws inspirations from prior work in the area 
 \cite{nqsb-tls, barenghi2018systematic, ramananandro2019everparse, tao2021dice, debnath2021re, ni2023asn1}. 
-As an example, we rely on the 
-prior re-engineering effort of the \xfon specification and implementation~\cite{debnath2021re, nqsb-tls} to distinguish between the syntactic and semantic requirements of \xfon to design \armor in a modular way. 
 However, in comparison to \armor, prior work has at least one of the following 
 limitations: (1) Lacks any formal guarantees; (2) Focuses only on parsing and lacks formal correctness guarantees
 of semantic aspects; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 

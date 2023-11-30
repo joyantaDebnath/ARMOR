@@ -50,15 +50,24 @@ missing, and our work is a major step towards filling this research gap.
 
 
 \subsection{Overarching Objective}
-This paper addresses the aforementioned research gap by \emph{designing and developing a high-assurance implementation for \xfon certificate chain validation, named \armor, with machine-checked proofs for its correctness guarantees}. In general, to achieve this goal, we have to formally specify the requirements ($\phi$) of valid X.509 certificate chains and then prove that
+This paper addresses the aforementioned research gap by \emph{designing and developing a high-assurance implementation for \xfon certificate chain validation, named \armor, with machine-checked proofs for its correctness guarantees}. In general, to achieve this goal, we have to formally specify the requirements ($\phi$) of valid \xfon certificate chains and then prove that
 our implementation $I$ satisfies the formal specification $\phi$ (\ie, $I
-\models \phi$), using a suitable interactive interactive theorem
-prover. Although the current paper, to the best of our knowledge, presents the first high-assurance implementation of \xfon certificate chain validation with correctness guarantees, it draws inspirations from prior work in the area 
-\cite{nqsb-tls, barenghi2018systematic, ramananandro2019everparse, tao2021dice, debnath2021re, ni2023asn1}. 
-% For example, we rely on the re-engineering efforts of the \xfon specification and implementation~\cite{debnath2021re, nqsb-tls} to distinguish between the syntactic and semantic requirements to design \armor in a modular way. 
-However, in comparison to \armor, prior work has at least one of the following 
-limitations: (1) Lacks any formal guarantees~\cite{nqsb-tls, debnath2021re}; (2) Focuses only on parsing and lacks formal correctness guarantees
-of semantic aspects~\cite{}; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
-parsing~\cite{}; (4) Focuses only on verified encoding of certificates, not parsing~\cite{}. Since \armor offers higher assurances than these prior work, we expect it to substantially improve the security and privacy of applications that rely on \xfon for authentication and public-key distribution.
+\models \phi$).
+
+\textbf{Difference with prior work.} Although the current paper presents the first high-assurance implementation of \xfon certificate chain validation with correctness guarantees, it draws inspirations from prior work in the area.
+As an example, we rely on the 
+prior re-engineering effort of the \xfon specification and implementation (CERES~\cite{debnath2021re}, nqsb-TLS~\cite{nqsb-tls}, Hammurabi~\cite{ni2023asn1}) to distinguish between the syntactic and semantic requirements of \xfon and design \armor in a modular way. However, in comparison to \armor, these works lack any formal correctness guarantees. Although Ramananandro \etal proposed EverParse~\cite{ramananandro2019everparse}, a framework for generating verified parsers and serializers from Type-Length-Value ($<T, L, V>$) binary message format descriptions, with memory safety, functional correctness (parsing is the inverse of serialization), and non-malleable guarantees, it only focuses on parsing, does not provide explicit proof of \emph{soundness} and \emph{completeness} of certificate 
+parsing, and lacks formal correctness guarantees of other stages of the certificate chain validation. Barenghi \etal proposed an approach to automatically generate a parser for \xfon with the \antlr parser generator~\cite{barenghi2018systematic}, however they do major simplifications of the \xfon grammar to avoid complexities in parsing. Tao \etal developed a memory-safe and formally correct encoder for \xfon certificates~\cite{tao2021dice}, while our work does the reverse task, \emph{certificate decoding}.
+
+
+
+
+
+
+
+% However, in comparison to \armor, prior work has at least one of the following 
+% limitations: (1) Lacks any formal guarantees~\cite{nqsb-tls, debnath2021re}; (2) Focuses only on parsing and lacks formal correctness guarantees
+% of semantic aspects~\cite{}; (3) Lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
+% parsing~\cite{}; (4) Focuses only on verified encoding of certificates, not parsing~\cite{}. Since \armor offers higher assurances than these prior work, we expect it to substantially improve the security and privacy of applications that rely on \xfon for authentication and public-key distribution.
 
 
