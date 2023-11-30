@@ -138,8 +138,8 @@ and privacy of applications that rely on \xfon for authentication and public-key
 % \says{CJ}{Add parser-independent spec of grammar.}
 \begin{enumerate}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them, facilitating development of other such formally-verified implementations in the future. 
-\item We formally verify that our formalization of the syntactic requirements is guaranteed to be \emph{unambiguous} and \emph{non-malleable}.
-\item We present the design and implementation of \armor, which enjoys \emph{soundness} and \emph{completeness} guarantees of the parsers with respect to our specification.  
+\item We prove that our formalization of the \xfon syntactic requirements is guaranteed to be \emph{unambiguous} and \emph{non-malleable}.
+\item We present the design and implementation of \armor, which enjoys \emph{soundness} and \emph{completeness} guarantees of the parsers with respect to our formalized specification.  
 % \item We prove that our interpretation of the syntactic requirements of \xfon
 %   enjoys some specific properties, indicating that it is possible to develop
 %   efficient parsers.\todo{\tiny This needs clarification.}

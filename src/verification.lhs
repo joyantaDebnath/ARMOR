@@ -620,6 +620,28 @@ specification given by |R20|.
 
 
 
+\begin{table*}[h]
+  % \captionsetup{font=footnotesize}
+  \centering
+  \sffamily\scriptsize
+      \setlength\extrarowheight{1.5pt}
+      \setlength{\tabcolsep}{1.5pt}
+      \caption{Summary of correctness guarantees for each module}
+      \sffamily\scriptsize
+      \label{sum-ver}
+  \centering
+  \begin{tabular}{l||c||c||c||c||c||c||}
+  \cline{2-7}
+  \textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                                                & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}                                             & \textbf{\begin{tabular}[c]{@@{}c@@{}}X.690 DER and\\ X.509 Parsers\end{tabular}}                   & 
+  \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}} & 
+  \textbf{\begin{tabular}[c]{@@{}c@@{}}String \\ Canonicalizer\end{tabular}} & 
+  \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}} \\ \hline
+  \multicolumn{1}{||l||}{\textbf{\begin{tabular}[c]{@@{}l@@{}}Implementation\\ Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Soundness-by-construction\\ Completeness-by-construction\\ Maximality\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness-by-construction\\ Completeness-by-construction\\ Isomorphism\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness-by-construction\\ Completeness-by-construction\end{tabular} &                                                                   &                                                                          & Correct-by-construction                                               \\ \hline
+  \multicolumn{1}{||l||}{\textbf{\begin{tabular}[c]{@@{}l@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguousness                                                                                               &                                                                                                                & \begin{tabular}[c]{@@{}c@@{}}Unambiguousness\\ Non-malleability\\ No-substrings\end{tabular}       &                                                                   &                                                                          & N/A                                                                   \\ \hline
+  \end{tabular}
+  \end{table*}
+
+
 
 % This section details the design and verified guarantees of our parser and
 % semantic checker modules.
