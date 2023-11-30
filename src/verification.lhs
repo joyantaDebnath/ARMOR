@@ -67,7 +67,66 @@ Because of this, in the definition of |head| we do not need to consider the case
 that the argument is an empty list. Through a process called \emph{dependent
   pattern matching}~\cite{Co92_Pattern-Dependent-Types}, \agda determines that
 the equation \(0 = 1 + n\) is impossible to solve for the natural numbers, and
-thus the empty list can never be a well-typed argument to |head|.
+thus the empty list can never be a well-typed argument to |head|. \\
+
+\says{joy}{needs to introduce the table somewhere} \\
+\says{joy}{Maximality} \\
+\says{joy}{Termination} \\
+
+\begin{table*}[h]
+  % \captionsetup{font=footnotesize}
+\centering
+\sffamily\scriptsize
+  \setlength\extrarowheight{1.5pt}
+  \setlength{\tabcolsep}{1.5pt}
+  \caption{Summary of correctness guarantees for each module (incomplete)}
+  \sffamily\scriptsize
+  \label{sum-ver}
+\centering
+\begin{tabular}{c||c||c||c||c||c||c||}
+\cline{2-7}
+\textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}X.690 DER and\\ X.509 Parsers\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}String \\ Canonicalizer\end{tabular}} & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Implementation\\ Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Maximality\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & .....                                                                    & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguousness                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguousness\\ Non-malleability\\ No-substrings\end{tabular} & N/A                                                                            & ......                                                                   & N/A                                                                            \\ \hline
+\end{tabular}
+\end{table*}
+
+
+\subsection{Input Strings} \says{joy}{needs a proper place to put this section}
+Inputs to our parser have types of the form |List A|, where |A| is the type of
+the language alphabet.
+For our PEM parser, this is |Char|, Agda's primitive type for character
+literals.
+For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
+the Agda standard library type |Fin 256| (the type for nonnegative integers
+strictly less than 256).
+
+\subsection{Summary of Base64 Decoding} \says{joy}{needs a proper place to put this section}
+We hand off the result of the PEM parser, which extracts the Base64 encoding of the
+certificates, to the X.509 parser, which expects an octet string, through a
+Base64 decoder that is verified with respect to an encoder.
+Specifically, we prove: 1) that the encoder always produces a valid sextet
+string (Base64 binary string); and 2) the encoder and decoder pair forms an
+isomorphism between octet strings and valid sextet strings for encoding them.
+This is summarized below in Figure~\ref{fig:s4-base64} (for space
+considerations, all definitions have been omitted).
+
+\begin{figure}[h]
+  \begin{code}
+ValidEncoding : List UInt6 -> Set
+encode : List UInt8 -> List UInt6
+decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
+
+encodeValid : (bs : List UInt8) -> ValidEncoding (encode bs)
+
+encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
+decodeEncode :  forall bs -> (v : ValidEncoding bs)
+                -> encode (decode bs v) == bs
+  \end{code}
+  \caption{Base64 encoding and decoding (types only)}
+  \label{fig:s4-base64}
+\end{figure}
+
 
 \subsection{Verification of Parsers} We conceptually separate each parser verification task into \emph{language
 specification}, \emph{language security verification}, and \emph{parser correctness verification}.
@@ -620,26 +679,6 @@ specification given by |R20|.
 
 
 
-\begin{table*}[h]
-  % \captionsetup{font=footnotesize}
-  \centering
-  \sffamily\scriptsize
-      \setlength\extrarowheight{1.5pt}
-      \setlength{\tabcolsep}{1.5pt}
-      \caption{Summary of correctness guarantees for each module}
-      \sffamily\scriptsize
-      \label{sum-ver}
-  \centering
-  \begin{tabular}{l||c||c||c||c||c||c||}
-  \cline{2-7}
-  \textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                                                & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}                                             & \textbf{\begin{tabular}[c]{@@{}c@@{}}X.690 DER and\\ X.509 Parsers\end{tabular}}                   & 
-  \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}} & 
-  \textbf{\begin{tabular}[c]{@@{}c@@{}}String \\ Canonicalizer\end{tabular}} & 
-  \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}} \\ \hline
-  \multicolumn{1}{||l||}{\textbf{\begin{tabular}[c]{@@{}l@@{}}Implementation\\ Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Soundness-by-construction\\ Completeness-by-construction\\ Maximality\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness-by-construction\\ Completeness-by-construction\\ Isomorphism\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness-by-construction\\ Completeness-by-construction\end{tabular} &                                                                   &                                                                          & Correct-by-construction                                               \\ \hline
-  \multicolumn{1}{||l||}{\textbf{\begin{tabular}[c]{@@{}l@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguousness                                                                                               &                                                                                                                & \begin{tabular}[c]{@@{}c@@{}}Unambiguousness\\ Non-malleability\\ No-substrings\end{tabular}       &                                                                   &                                                                          & N/A                                                                   \\ \hline
-  \end{tabular}
-  \end{table*}
 
 
 
