@@ -536,7 +536,7 @@ Instead, and just like with our approach to verified parsing, formulating these
 semantic checks as decidability proofs (1) \emph{forces} us formalize the natural
 language property we wish to check \emph{independently of the code that performs
 the checking,} and (2) \emph{enables} us to write the checking code that is
-\emph{correct-by-construction,} as these decidability proofs are the themselves
+\emph{correct-by-construction}, as these decidability proofs are the themselves
 the functions called after parsing to check whether the certificate or chain
 satisfies the property.
 

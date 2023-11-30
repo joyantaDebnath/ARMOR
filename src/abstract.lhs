@@ -8,7 +8,7 @@
     code in the world,}'' as noncompliance with the \xfon standard or other vulnerabilities can
   lead to interoperability issues or even impersonation attacks.
   Almost all existing efforts in evaluating the correctness of implementations of \xfon
-  rely on software testing approaches. 
+  rely on software testing. 
   In the words of the famous computer scientist Edsger Dijkstra, \emph{``Program
     testing can be used to show the presence of bugs, but never to show their
     absence!''}
@@ -16,16 +16,15 @@
   and vulnerabilities in widely used and tested open-source \xfon
   implementations.
   \emph{Therefore, we set out to substantially improve this
-    unsatisfactory status quo by developing a high-assurance implementation of
+    unsatisfactory status quo by developing a high-assurance implementation for
     the \xfon certificate chain validation, called \armor, with formal correctness
     guarantees}.
-  \armor is developed using \agda, a dependently typed
-  functional programming language and interactive theorem prover, and features a
-  modular architecture to cover each stage of certificate chain validation.
-  Finally, \armor is evaluated for its specificational accuracy and runtime
-  overhead compared to $11$ open-source \xfon implementations, showcasing its
+  \armor features a
+  modular architecture to cover each stage of certificate chain validation, and the formal correctness of each module is realized using the \agda interactive theorem prover. To demonstrate its
   practical effectiveness and reasonable performance in real-world
-  applications. 
+  applications, \armor is evaluated for its specificational accuracy and runtime
+  overhead comparing with $11$ open-source \xfon implementations. Finally, we show an end-to-end application of \armor 
+  by integrating it with the TLS 1.3 implementation of \mbedtls and testing with the widely-used data transfer tool \curl.
 \end{abstract}
 
 
