@@ -6,13 +6,27 @@ finally emphasizing the motivation for our work.
 \subsection{Preliminaries on \xfon Certificate Chain}
 Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions, which is the main focus of this work.
 
-\textbf{Internal Structure of a Certificate.} A version 3 certificate comprises three top-level fields: \texttt{TBSCertificate}, \texttt{SignatureAlgorithm}, and  \texttt{SignatureValue}. The \texttt{TBSCertificate} field contains information such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \texttt{TBSCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
+\textbf{Internal Structure of a Certificate.} A version 3 certificate comprises three top-level fields: \texttt{TBSCertificate}, \texttt{SignatureAlgorithm}, and \texttt{SignatureValue}. The \texttt{TBSCertificate} field contains information such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields like unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \texttt{TBSCertificate} content, generating a signature, denoted as \texttt{SignatureValue}, which is appended to the certificate's end, creating a digitally secure and tamper-proof document. The \texttt{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
 
 \textbf{Certificate Chain Validation.} A certificate chain is
 represented as a sequence of certificates, $C_1 \rightarrow C_2 \rightarrow
 \ldots \rightarrow C_{n-1} \rightarrow C_n$, where $C_1$ to $C_{n-1}$ are the CA certificates, $C_n$ is
-the end-user certificate, and each certificate $C_i$ is issued by its predecessor $C_{i-1}$ (see Figure~\ref{cert_chain}). For validating such a chain, each certificate $C_i$ undergoes parsing (denoted by $P(C_i)$) and semantic validation (denoted by $\mathit{SCP}(C_i)$). While parsing enforces syntactic requirements on the structure of different certificate fields, semantic validation involves decoding and checking the values in a single certificate (\eg, the certificate is not expired with respect to current system time). In addition, semantic validation on subsequent certificates in a chain (\eg, matching subject and issuer names, signature verification) is represented by a function $\mathit{CCP}(C_i, C_{i-1})$, which must return \emph{true} for all $i \ge 2$. Finally, the chain must be checked to ensure it starts from a trust anchor of the validator, that means, $C_1$ must be a trusted CA certificate (denoted by $T(C_1) =
-\text{true}$). This allows to extend the absolute trust through the intermediate CA certificate ($C_2$ to $C_{n-1}$), all the way down to the end-user certificate ($C_n$). Hence, the legitimacy of a certificate chain can be denoted by the following boolean expression.
+the end-user certificate, and each certificate $C_i$ is issued by its
+predecessor $C_{i-1}$ (see Figure~\ref{cert_chain}). For validating such a
+chain, each certificate $C_i$ undergoes parsing (denoted by $P(C_i)$) and
+semantic validation (denoted by $\mathit{SCP}(C_i)$). While parsing enforces
+syntactic requirements on the structure of different certificate fields,
+semantic validation involves decoding and checking the values in a single
+certificate (\eg, the certificate is not expired with respect to current system
+time). In addition, semantic validation on subsequent certificates in a chain
+(\eg, matching subject and issuer names, signature verification) is represented
+by a function $\mathit{CCP}(C_i, C_{i-1})$, which must return \emph{true} for
+all $i \ge 2$. Finally, the chain must be checked to ensure it starts from a
+trust anchor of the validator, meaning that $C_1$ must be a trusted CA
+certificate (denoted by $T(C_1) = \text{true}$).
+This allows to extend the absolute trust through the intermediate CA certificate
+($C_2$ to $C_{n-1}$), all the way down to the end-user certificate ($C_n$).
+Hence, the legitimacy of a certificate chain can be denoted by the following Boolean expression.
 
 \[
 \bigwedge_{i=1}^{n} P(C_i) \land \bigwedge_{i=1}^{n} \mathit{SCP}(C_i) \land \bigwedge_{i=2}^{n} \mathit{CCP}(C_i, C_{i-1}) \land T(C_1)
@@ -29,20 +43,31 @@ the end-user certificate, and each certificate $C_i$ is issued by its predecesso
   \end{figure}
 
 
-\emph{Note that}, the entire process of certificate chain validation is more complicated than what we have described so far. For example, the implementation may not receive the certificates in the proper hierarchical order, may miss some CA certificates, or may contain duplicate CA certificates. In that case, the implementation needs to build a proper certificate chain from the received certificates and its trust anchor. This chain building process may also generate multiple candidate certificate chains since some certificates can be cross-signed by multiple CAs~\cite{path}. However, if at least one such candidate chain passes the semantic validation, the algorithm successfully completes. More details on certificate chain validation is discussed in Section 3.
+Note that the entire process of certificate chain validation is more complicated
+than what we have described so far. For example, the implementation may not
+receive the certificates in the proper hierarchical order, may miss some CA
+certificates, or may contain duplicate CA certificates. In that case, the
+implementation needs to build a proper certificate chain from the received
+certificates and its trust anchor. This chain building process may also generate
+multiple candidate certificate chains since some certificates can be
+cross-signed by multiple CAs~\cite{path}.
+However, if at least one such candidate chain passes the semantic validation,
+the algorithm successfully completes.
+We discuss certificate chain validation in more detail in Section 3.
 
 \subsection{Testing \xfon Implementations for Correctness}
 \fuzzing~\cite{frank,
-  mucert, nezha, quan2020sadt, chen2023sbdt} and \symex~\cite{rfcguided, symcert} had been shown previously as powerful
-tools for uncovering \emph{logical
-  flaws} in the certificate chain validation code of many open-source TLS
-libraries. While \fuzzing operates by mutating valid seed certificates to
+  mucert, nezha, quan2020sadt, chen2023sbdt} and \symex~\cite{rfcguided,
+  symcert} have previously been shown to be powerful tools for uncovering
+\emph{logical flaws} in the certificate chain validation code of many
+open-source TLS libraries.
+While \fuzzing operates by mutating valid seed certificates to
 generate irregular inputs, which can reveal unexpected, potentially
 problematic behaviors in the implementation under scrutiny, \symex
 systematically explores all possible paths a program could take during its
 execution, helping to reveal more deeply embedded logical
-bugs. While these techniques coupled with differential testing\footnote{Differential testing is a method of testing software by comparing the output of two or more implementations for the same input. It is used to find bugs where one implementation behaves differently from others.} have successfully identified numerous
-noncompliance issues (\ie, being not compliant with respect to the standard
+bugs. While these techniques coupled with differential testing have successfully identified numerous
+noncompliance issues (\ie, not being compliant with respect to the standard
 specification), they naturally bear the risk of false negatives since some logical flaws remain undetected in differential testing, especially when those are common across all the tested implementations. In addition, \fuzzing and \symex often fall short of providing any \emph{formal guarantees regarding correctness} of an \xfon implementation. This is corroborated through many high impact bugs and vulnerabilities found in some widely used applications and open-source libraries over the last decade~\cite{CVE-2020-5523, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527, CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}. In contrast, a formally-verified implementation for \xfon certificate validation can provide mathematical assurances that the implementation behaves
 correctly, setting a benchmark for developing other such implementations.
 Such a formally-verified implementation, however, is currently
@@ -56,8 +81,26 @@ our implementation $I$ satisfies the formal specification $\phi$ (\ie, $I
 
 \textbf{Difference with prior work.} Although the current paper presents the first high-assurance implementation of \xfon certificate chain validation with correctness guarantees, it draws inspirations from prior work in the area.
 As an example, we rely on the 
-prior re-engineering effort of the \xfon specification and implementation (nqsb-TLS~\cite{nqsb-tls}, CERES~\cite{debnath2021re}, Hammurabi~\cite{ni2023asn1}) to distinguish between the syntactic and semantic requirements of \xfon and design \armor in a modular way. However, in comparison to \armor, these works lack any formal correctness guarantees. Although Ramananandro \etal proposed EverParse~\cite{ramananandro2019everparse}, a framework for generating verified parsers and serializers from Type-Length-Value ($<T, L, V>$) binary message format descriptions, with memory safety, functional correctness (parsing is the inverse of serialization), and non-malleable guarantees, it only focuses on parsing, does not provide explicit proof of \emph{soundness} and \emph{completeness} of certificate 
-parsing, and lacks formal correctness guarantees of other stages of the certificate chain validation. Barenghi \etal proposed an approach to automatically generate a parser for \xfon with the \antlr parser generator~\cite{barenghi2018systematic}, however they do major simplifications of the \xfon grammar to avoid complexities in parsing. Tao \etal developed a memory-safe and formally correct encoder for \xfon certificates~\cite{tao2021dice}, while our work does the reverse task, \emph{certificate decoding}.
+prior re-engineering effort of the \xfon specification and implementation
+(nqsb-TLS~\cite{nqsb-tls}, CERES~\cite{debnath2021re},
+Hammurabi~\cite{ni2023asn1}) to distinguish between the syntactic and semantic
+requirements of \xfon and design \armor in a modular way. However, in comparison
+to \armor, these works lack any formal correctness guarantees. Although
+Ramananandro \etal proposed EverParse~\cite{ramananandro2019everparse}, a
+framework for generating verified parsers and serializers from Type-Length-Value
+($<T, L, V>$) binary message format descriptions, with memory safety, functional
+correctness (\ie, proving parsing is the inverse of serialization), and
+non-malleable guarantees, it only focuses on parsing, does not provide explicit
+proof of \emph{soundness} and \emph{completeness} of certificate 
+parsing, and lacks formal correctness guarantees of other stages of the
+certificate chain validation.\todo{\tiny Be careful here; isn't is sound,
+  complete wrt serializers?}
+Barenghi \etal proposed an approach to automatically generate a parser for \xfon
+with the \antlr parser generator~\cite{barenghi2018systematic}, however they  do
+major simplifications of the \xfon grammar to avoid complexities in parsing.
+Tao \etal developed a memory-safe and formally correct encoder for \xfon
+certificates~\cite{tao2021dice}, while our work does the reverse task,
+\emph{certificate decoding}.
 
 
 
