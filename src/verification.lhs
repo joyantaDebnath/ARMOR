@@ -1,12 +1,21 @@
 \section{Verification Goals and Correctness Proofs}
 
-As shown in Figure~\ref{armor}, we provide formal correctness guarantee for the following modules: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and X.509 parsers)}, \emph{Semantic validator}, \emph{Chain builder}, and \emph{String canonicalizer}. For these verification, we use the \agda interactive theorem prover~\cite{bove2009brief, No07_agda}. In this section, we present a brief introduction to Agda and then describe the design and verified guarantees in detail.
+As shown in Figure~\ref{armor}, we provide formal correctness guarantee for the
+following modules: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
+  X.509 parsers)}, \emph{Semantic validator}, \emph{Chain builder}, and
+\emph{String canonicalizer}.
+For these verification tasks, we use the \agda interactive theorem
+prover~\cite{bove2009brief, No07_agda}.
+In this section, we briefly introduce Agda and then detail the
+design and verified guarantees of \armor's \agda modules.
 
 \subsection{Preliminaries on Agda}
 \agda is a \textit{dependently-typed} functional programming
-language, meaning that types may involve term expressions\todo{\tiny explain}.
-This capability helps express rich properties in types, and enforcing that
-programs satisfy those properties is reduced to typechecking.
+language, meaning that types may involve terms (that is, program-level
+expressions).
+This capability helps express rich properties of programs \emph{in the types of
+  those programs}, and checking that programs satisfy those properties is
+reduced to typechecking.
 In other words, if a program compiles, it is also proven to meet the
 specifications described by its type.
 Under the \emph{Curry-Howard}
@@ -16,58 +25,75 @@ propositions expressed by their types.
 This makes \agda a powerful tool for both expressing programs and their
 correctness, as it unifies the language of programs and proofs. 
 
-Consider the example shown in
-Figure~\ref{fig:agda-ex} of length-indexed lists, provided as part of the \agda
-standard library as |Vec|. 
+Consider the example shown in Figure~\ref{fig:agda-ex} of nonnegative integers
+strictly less than some upper bound, provided as part of the \agda standard
+library as |Fin|.
 \begin{figure}[h]
-  \centering
   \begin{code}
-data Vec (A : Set) : Nat -> Set where
-  vnil : Vec A 0
-  vcons : forall {n} -> A -> Vec A n -> Vec A (1 + n)
+data Fin : Nat -> Set where
+  fzero : {n : Nat} -> Fin (1 + n)
+  fsuc  : {n : Nat} -> (i : Fin n) -> Fin (1 + n)
 
-head : forall {A n} -> Vec A (1 + n) -> A
-head (vcons hd tl) = hd
+toNat : forall {n} -> Fin n -> Nat
+toNat fzero = 0
+toNat (fsuc i) = 1 + (toNat i)  
   \end{code}
   \caption{Length-indexed lists in \agda}
   \label{fig:agda-ex}
 \end{figure}
-By length-indexed, we mean that the length of the list is itself part of the
-type.
-We now briefly explain the code listing in the figure.
+By ``indexed,'' we mean that |Fin| is a \emph{family of types:} for every
+nonnegative integer |n : Nat|, |Fin n| is the type of nonnegative integers
+strictly less than |n|.
+
+We now explain the code listing in the figure, starting with the declaration of |Fin|.
 \begin{itemize}
-\item |Set| is the type of (small) types. Note that, we skip the details of \agda's
-  universe hierarchy since it is beyond the scope of this paper.
+\item The |data| keyword allows us to introduce a new inductive type or
+  inductive type family, in this case the type family |Fin|.
+  ``Inductive'' here means that \agda allows us to define functions over |Fin n|
+  by \emph{pattern matching} and \emph{structural recursion}, which we shall see shortly.
   
-\item The |data| keyword indicates that we are declaring |Vec| as an \emph{inductive
-    family} indexed by a type |A| and a natural number. By \emph{inductive
-    family}, we mean that for each type |A| and natural number |n|, |Vec A n| is
-  a unique type --- the type for lists with exactly |n| elements of type |A|).
+\item |Set| is the type of (small) types (we will omit the details of \agda's
+  universe hierarchy).
   
-\item |Vec| has two \emph{constructors}, |vnil| for the empty list and |vcons|
-  for a list with at least one element.
-  The constructors encode the connection between the number of elements and the
-  natural number index: |vnil| has type |Vec A 0| and |vcons| produces a list
-  with one more element than the tail of the list.
+\item |Fin| has two constructors, both of which have dual readings as ``mere
+  data'' and as axiomatizations of the \emph{``is strictly less than''}
+  predicate.
+  As mere data, |fzero| corresponds to the integer 0; as an axiom, it states
+  that 0 is strictly less than the successor |1 + n| of any nonnegative integer
+  |n|.
+  Similarly, as mere data |fsuc| corresponds to a primitive successor operation
+  (like the Peano numbers), and as an axiom it corresponds to the following
+  inference rule: if a number |i| is strictly less than |n|, then its successor
+  is strictly less than |1 + n|.
  
 \item Curly braces indicate function arguments that need not be passed
   explicitly, leaving \agda to infer their values from the types of other
   arguments to the function.
-  For example, we can write |vcons 5 vnil|, and \agda will know this has type
-  |Vec Nat 1|, as the only correct instantiation of parameter |n| of |vcons| 
-  is |0|.
+  For example, if |i| has type |Fin 5|, then we can write |fsuc i| and Agda can
+  determine this has type |Fin 6|; if we wanted to make explicit the argument that
+  instantiates parameter |n|, we would write |fsuc {5} i|.
 \end{itemize}
 
-Tracking the length of lists statically allows us to express correctness
-properties in the types of functions producing or consuming them.
-As a simple example, the second definition of Figure~\ref{fig:agda-ex}, |head|,
-expresses in its type that the list it consumes must have at least one element
-(denoted by |Vec A (1 + n)|).
-Because of this, in the definition of |head| we do not need to consider the case
-that the argument is an empty list. Through a process called \emph{dependent
-  pattern matching}~\cite{Co92_Pattern-Dependent-Types}, \agda determines that
-the equation \(0 = 1 + n\) is impossible to solve for the natural numbers, and
-thus the empty list can never be a well-typed argument to |head|. \\
+The next definition of the figure is the function |toNat|, which is defined by
+\emph{pattern matching} and \emph{recursion} over |Fin|.
+We can think of |toNat| as extracting the ``mere data'' contained in an
+expression of type |Fin n|.
+\begin{itemize}
+\item In the type signature of |toNat|, we use the syntactic sugar |forall| to
+  omit the type of the parameter |n|, as Agda can infer this from the occurrence
+  of |n| in the rest of the type, |Fin n -> Nat|.
+  
+\item The definition of |toNat| is given with two equations, one each for the
+  two constructors of |Fin|.
+  \begin{itemize}
+  \item In the first equation, we send |fzero| to 0.
+    
+  \item In the second equation, our |Fin| argument is of the form |fsuc i|.
+    We make a recursive call |toNat i| and increment the result by |1|.
+    Here, \agda can determine that the recursion is terminating, as |i| is
+    structurally smaller than |fsuc i|.
+  \end{itemize}
+\end{itemize}
 
 \says{joy}{needs to introduce the table somewhere} \\
 \says{joy}{Maximality} \\
