@@ -637,7 +637,7 @@ verification process to well-known external libraries.
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.57]{img/armor.drawio.pdf} \\
+  \includegraphics[scale=0.55]{img/armor.drawio.pdf} \\
   \vspace{0.2cm}
   \caption{Conceptual design and workflow of \armor}
   \label{armor}
