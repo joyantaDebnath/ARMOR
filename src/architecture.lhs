@@ -437,11 +437,12 @@ Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie, 
 \subsubsection{Complexities in DER parsing} The internal data structure of an \xfon certificate, while described in the
 \emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
 the \xsno Distinguished Encoding Rules (DER)~\cite{rec2002x}.
-This DER representation of the certificate byte stream internally follows a $<T, L, V>$ structure to represent each certificate field, where $T$ denotes the
+This DER representation of the certificate byte stream internally follows a \tlv
+structure to represent each certificate field, where $T$ denotes the
 type, $V$ indicates the actual content, and $L$ signifies the length in bytes of
-the $V$ field. Additionally, the $V$ field can include nested $<T, L, V>$ structures,
-adding additional layers of complexity to the binary data. Parsing such a binary
-data is challenging and error-prone since it always requires passing the value of the $L$ field
+the $V$ field. Additionally, the $V$ field can include multiple and nested \tlv
+structures, adding additional layers of complexity to the binary data.
+Parsing such a binary data is challenging and error-prone since it always requires passing the value of the $L$ field
 (length) to accurately parse the subsequent $V$ field. Since the internal
 grammar of a DER-encoded certificate is \emph{context-sensitive}, developing a
 \emph{correct} parser for such a grammar is not trivial~\cite{kaminsky2010pki, debnath2021re}. 

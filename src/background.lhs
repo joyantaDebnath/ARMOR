@@ -88,7 +88,7 @@ requirements of \xfon and design \armor in a modular way. However, in comparison
 to \armor, these works lack any formal correctness guarantees. Although
 Ramananandro \etal proposed EverParse~\cite{ramananandro2019everparse}, a
 framework for generating verified parsers and serializers from Type-Length-Value
-($<T, L, V>$) binary message format descriptions, with memory safety, functional
+(\tlv) binary message format descriptions, with memory safety, functional
 correctness (\ie, proving parsing is the inverse of serialization), and
 non-malleable guarantees, it only focuses on parsing, does not provide explicit
 proof of \emph{soundness} and \emph{completeness} of certificate 
