@@ -415,24 +415,51 @@
 
 
 
-\section{Design of \armor} This section presents the technical challenges of our work, our insights on addressing the challenges, and finally an overview of \armor's architecture.
+\section{Design of \armor}
+This section presents the technical challenges of our work, our insights on
+addressing the challenges, and finally an overview of \armor's architecture.
 
 \subsection{Technical Challenges}
 There are several challenges for to our work.
 
-\subsubsection{Complexities in specifications} \label{tc1} The \xfon specification is distributed 
+\subsubsection{Complexities in specifications}
+\label{sec:s3-tc1}
+The \xfon specification is distributed 
 across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
 5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
 4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC
-4518~\cite{zeilenga2006lightweight}), and its natural language specification has been shown to suffer from inconsistencies, ambiguities, and under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}. For example, regarding the requirements on certificate \emph{serial number}, the specification for version 3 \xfon certificates, RFC 5280~\cite{cooper2008internet} states the following quote. Here, the first sentence is inconsistent with the last sentence since one excludes zero as serial number but the other one allows it.
+4518~\cite{zeilenga2006lightweight}), and its natural language specification has
+been shown to suffer from inconsistencies, ambiguities, and
+under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}.
+For example, consider the following quote regarding the requirements on a
+certificate's \emph{serial number} from the specification for version 3 \xfon
+certificates, RFC 5280~\cite{cooper2008internet}.
 
-\quoteRFC{The serial number MUST be a positive integer assigned by the CA to 
-each certificate...CAs MUST force the serial Number to be a non-negative 
-integer...Non-conforming CAs may issue certificates with serial numbers that 
-are negative or zero. Certificate users SHOULD be prepared to gracefully handle 
-such certificates.}
+\quoteRFC{%
+  The serial number MUST be a positive integer assigned by the CA to
+  each certificate.  It MUST be unique for each certificate issued by a
+  given CA (i.e., the issuer name and serial number identify a unique
+  certificate).  CAs MUST force the serialNumber to be a non-negative
+  integer.%
+}%
 
-Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie, \emph{producer} rules) but also for the implementations that validate certificate chains (\eg, \emph{consumer} rules). In another way, RFC 5280 can be categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic rules are concerned with the parsing of an \xfon certificate serialized as a byte stream, the semantic rules impose constraints on the values of individual fields within a certificate and on the relationships between field values across different certificates in a chain. Unfortunately, these intertwined sets of rules further complicate the specification, making it challenging to determine how an \xfon implementation should respond in certain cases (\ie, whether to accept or reject an input).
+\noindent Here, the first sentence is inconsistent  with the last sentence since one
+excludes zero as serial number but the other one allows it. This discrepancy is
+noted in Errata ID 3200, the current status of which is ``Held for Document
+Update,'' meaning it has been acknowledged as a valid erratum but its
+correction is not considered sufficient motivation to update the RFC.
+
+Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie,
+\emph{producer} rules) but also for the implementations that validate
+certificate chains (\eg, \emph{consumer} rules). In another way, RFC 5280 can be
+categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic
+rules are concerned with the parsing of an \xfon certificate serialized as a
+byte stream, the semantic rules impose constraints on the values of individual
+fields within a certificate and on the relationships between field values across
+different certificates in a chain. Unfortunately, these intertwined sets of
+rules further complicate the specification, making it challenging to determine
+how an \xfon consumer implementation should respond in certain cases (\ie,
+whether to accept or reject an input).
 
 \subsubsection{Complexities in DER parsing} The internal data structure of an \xfon certificate, while described in the
 \emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
