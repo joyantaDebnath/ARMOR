@@ -477,7 +477,7 @@ grammar of a DER-encoded certificate is \emph{context-sensitive}, developing a
 To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
 is insufficient because the relevant certificate field value may need to be further 
 decoded from the parsed \asnone value.
-Take the \emph{example} of \xfon specification for using \texttt{UTCTime} format in certificate validity
+Take the example of \xfon specification for using \texttt{UTCTime} format in certificate validity
 field.
 It uses a two-digit year representation, $YY$, and here lies the potential for
 misinterpretation.
@@ -501,14 +501,21 @@ a mistake previously found by Chau \etal~\cite{symcert} in some TLS libraries (\
 
 
 \subsubsection{Complexities in individual stages} The \xfon certificate chain validation
-algorithm can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain building, semantic checking, signature verification), each of which has its own challenges. For example, (1) building a valid \emph{certification path} can be difficult due to the lack of concrete
-directions as well as the possibility of having multiple valid certificate
-chains~\cite{path}.
-(2) string canonicalization~\cite{zeilenga2006lightweight}, where strings are converted to their \emph{normalized} forms, is also a complex
-process, since the number of character sets is humongous considering all the
-languages worldwide. (3) During signature verification, the implementation needs to carefully
-parse the actual contents of the \texttt{SignatureValue} field with relevant cryptographic operations to prevent attacks (\eg, \emph{RSA signature forgery}~\cite{finney2006bleichenbacher,
-  bleichenbacher1998chosen}). While these intermediate stages are conceptually straightforward, implementing
+algorithm can be conceptually decomposed into different stages (\ie, PEM
+parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain
+building, semantic checking, signature verification), each of which has its own
+challenges.
+To give a few examples: (1) building a valid \emph{certification path} can be
+difficult due to the lack of concrete directions as well as the possibility of
+having multiple valid certificate chains~\cite{path};
+(2) string canonicalization~\cite{zeilenga2006lightweight}, where strings are
+converted to their \emph{normalized} forms, is also a complex process, since the
+number of character sets is humongous considering all the languages worldwide;
+and (3) during signature verification, the implementation needs to carefully parse
+the actual contents of the \texttt{SignatureValue} field with relevant
+cryptographic operations to prevent attacks (\eg, \emph{RSA signature
+  forgery}~\cite{finney2006bleichenbacher,bleichenbacher1998chosen}).
+While these intermediate stages are conceptually straightforward, implementing
 them securely is not trivial.
 
 
@@ -544,15 +551,44 @@ them securely is not trivial.
 \subsection{Our Insights} 
 We now discuss some design choices of our approach.
 \label{sec:s3-insights-on-tech-challenges}
-\subsubsection{Modular decomposition} Inspired by previous re-engineering efforts~\cite{nqsb-tls, debnath2021re, ni2023asn1}, we design and develop \armor with modularity. The entire process is broken down into smaller, manageable modules and each module is designed to perform a specific function, such as parsing, chain building, string canonicalization, and semantic validation. Such modularization allows us to precisely specify the requirements for each module and independently establish their correctness with machine-checked proofs. In addition, instead of trying to accomplish everything in a single step, this modularization allows us to undertake the chain validation task in multiple passes, increasing the simplicity and manageability of the overall process.
+\subsubsection{Modular decomposition}
+Inspired by previous re-engineering efforts~\cite{nqsb-tls, debnath2021re,
+  ni2023asn1}, we design and develop \armor modularly.
+The entire process is broken down into smaller, manageable modules and each
+module is designed to perform a specific function, such as parsing, chain
+building, string canonicalization, and semantic validation. Such modularization
+allows us to precisely specify the requirements for each module and
+independently establish their correctness with machine-checked proofs.
+In addition, instead of trying to accomplish everything in a single step, this
+modularization allows us to undertake the chain validation task in multiple
+passes, simplifying the overall process. 
 
-\subsubsection{Specificity} As discussed in Section~\ref{tc1}, RFC 5280 comprises two main rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization specifically concentrates on the \emph{consumer rules}, which are intended for
-certificate chain validation implementations. Additionally, a clear separation between the syntactic and semantic rules is pivotal in formally specifying the chain validation requirements. However, having a balance is essential --- too many semantic checks incorporated into the parsing process can lead to an overly complex parser, while excluding all semantic checks during parsing can result in an overly lenient parser. Our strategy lies somewhere in the middle, taking inspiration from the prior work\cite{nqsb-tls, debnath2021re, ni2023asn1}. We categorize DER restrictions as part of the parsing rules, and the rest are left for semantic validation. We enforce the semantic check on DER's $<T, L, V>$ length bound into the parsing side, contributing to a manageable parser that maintains necessary rigor without becoming overly complex. Finally, we focus primarily on the most commonly used subset of the standard specifications. While the \xsno DER and RFC 5280 are comprehensive and detail numerous restrictions and possibilities, in reality, not all aspects of the specifications are uniformly or widely used. For example, not all the extensions specified in the standard are used in real-world certificates. Thus, we did measurement studies on real-world certificate dataset to figure out which features to support or not (see Section 5 for details). 
+\subsubsection{Specificity} As discussed in Section~\ref{sec:s3-tc1}, RFC 5280 comprises two main rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization specifically concentrates on the \emph{consumer rules}, which are intended for
+certificate chain validation implementations. Additionally, a clear separation
+between the syntactic and semantic rules is pivotal in formally specifying the
+chain validation requirements. However, having a balance is essential --- too
+many semantic checks incorporated into the parsing process can lead to an overly
+complex parser, while excluding all semantic checks during parsing can result in
+an overly lenient parser. Our strategy lies somewhere in the middle, taking
+inspiration from the prior work\cite{nqsb-tls, debnath2021re, ni2023asn1}. We
+categorize DER restrictions as part of the parsing rules, and the rest are left
+for semantic validation. We enforce the semantic check on DER's \tlv length
+bound into the parsing side, contributing to a manageable parser that maintains
+necessary rigor without becoming overly complex. Finally, we focus primarily on
+the most commonly used subset of the standard specifications. While the \xsno
+DER and RFC 5280 are comprehensive and detail numerous restrictions and
+possibilities, in reality, not all aspects of the specifications are uniformly
+or widely used. For example, not all the extensions specified in the standard
+are used in real-world certificates.
+Thus, we performed measurement studies on real-world certificate dataset to
+determine which features to support (see Section 5 for details).
 
 \subsubsection{No verification of cryptographic operations} Verification of cryptographic
-operations is out-of-scope for this work. Therefore, we do not provide any formal specification and correctness guarantee for the signature verification stage. This design choice allows us to focus on the formal verification of rest of the modules while outsourcing the computationally-intensive signature verification process to external well-known libraries.
- 
-
+operations is out-of-scope for this work. Therefore, we do not provide any
+formal specification and correctness guarantee for the signature verification
+stage. This design choice allows us to focus on the formal verification of rest
+of the modules while outsourcing the computationally-intensive signature
+verification process to well-known external libraries.
 
 % For example, in our current configuration of \armor, we support $10$ certificate extensions. These extensions are selected based on their high frequency of occurrence in practice, providing a comprehensive coverage for the most common scenarios encountered in certificate parsing and semantic checking. When any other extension is present, we only consume the corresponding bytes of the extension to continue parsing rest of the certificate fields. Table~\ref{extfreq} shows our analysis on the frequency of different extensions based on $1.5$ billion real certificates collected from the \censys~\cite{censys} certificate repository in January $2022$. Based on this measurement study, we support the following extensions: Basic Constraints, Key Usage, Extended Key Usage, Authority Key Identifier, Subject Key Identifier, Subject Alternative Name, Issuer Alternative Name, Certificate Policy, CRL Distribution Points, and Authority Information Access.
 
@@ -599,17 +635,31 @@ operations is out-of-scope for this work. Therefore, we do not provide any forma
 \subsection{High-level Architecture} 
 
 \begin{figure}[h]
-    \centering
-    \scriptsize
-    \includegraphics[scale=0.57]{img/armor.drawio.pdf} \\
-    \vspace{0.2cm}
-    \caption{Conceptual design and workflow of \armor}
-    \label{armor}
-  \end{figure}
+  \centering
+  \scriptsize
+  \includegraphics[scale=0.57]{img/armor.drawio.pdf} \\
+  \vspace{0.2cm}
+  \caption{Conceptual design and workflow of \armor}
+  \label{armor}
+\end{figure}
   
-  
-  Figure~\ref{armor} shows a high-level overview of the architecture and the workflow of \armor. \armor \circled{A} takes a list of input certificates (\ie, end-user certificate and relevant CA certificates), a list of trusted CA certificates, the current system time, and optionally the expected certificate purpose as input and \circled{L} returns the
-  certificate validation result (\ie, verdict) as well as the public-key of the end-user certificate as output. \armor's architecture is modular, comprising several distinct components. Concretely, \circled{B} The PEM Parser reads a PEM certificate file and converts each certificate in the PEM file into its Base64 encoded format. \circled{C} The Base64 Decoder decodes each certificate into DER byte streams. \circled{D} -- \circled{E} The \xsno DER parser and \xfon parser collaboratively parse the DER byte stream and convert each certificate into an intermediate representation (\xfon IR). \circled{F} The chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the driver whether any chain passes all the semantic checks. In this design, the driver is the central component that orchestrates the entire process. The driver's role is multifaceted: (1) it activates the parser modules with the correct input; (2) it initiates the chain builder to form candidate chains; (3) it directs the semantic validator with the required input; (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
+
+Figure~\ref{armor}\todo{\tiny Map key} shows a high-level overview of the architecture
+and the workflow of \armor.
+\armor \circled{A} takes a list of input certificates (\ie, end-user certificate
+and relevant CA certificates), a list of trusted CA certificates, the current
+system time, and optionally the expected certificate purpose as input and
+\circled{L} returns the certificate validation result (\ie, verdict) as well as
+the public-key of the end-user certificate as output. \armor's architecture is modular, comprising
+several distinct components. Concretely, \circled{B} The PEM Parser reads a
+PEM certificate file and converts each certificate in the PEM file into its
+Base64 encoded format (sextets, \ie, unsigned 6 bit integers).
+\circled{C} The Base64 Decoder converts the the sextet strings into octet
+strings.
+\circled{D} -- \circled{E} The \xsno DER parser and \xfon parser collaboratively
+parse the DER byte stream and convert each certificate into an intermediate
+representation (\xfon IR).\todo{\tiny Not sure what E is.}
+\circled{F} The chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the driver whether any chain passes all the semantic checks. In this design, the driver is the central component that orchestrates the entire process. The driver's role is multifaceted: (1) it activates the parser modules with the correct input; (2) it initiates the chain builder to form candidate chains; (3) it directs the semantic validator with the required input; (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
   
 % \subsection{Verified Modules and Correctness Guarantees} 
 
