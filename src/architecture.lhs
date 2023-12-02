@@ -642,7 +642,7 @@ verification process to well-known external libraries.
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.57]{img/armor.drawio.pdf} \\
+  \includegraphics[scale=0.55]{img/armor.drawio.pdf} \\
   \vspace{0.2cm}
   \caption{Conceptual design and workflow of \armor}
   \label{armor}
@@ -660,11 +660,11 @@ several distinct components. Concretely, \circled{B} The PEM Parser reads a
 PEM certificate file and converts each certificate in the PEM file into its
 Base64 encoded format (sextets, \ie, unsigned 6 bit integers).
 \circled{C} The Base64 Decoder converts the the sextet strings into octet
-strings.
-\circled{D} -- \circled{E} The \xsno DER parser and \xfon parser collaboratively
+strings (\ie, unsigned 8 bit integers, or DER byte stream).
+\circled{D} The \xsno DER parser and \xfon parser collaboratively
 parse the DER byte stream and convert each certificate into an intermediate
-representation (\xfon IR).\todo{\tiny Not sure what E is.}
-\circled{F} The chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the driver whether any chain passes all the semantic checks. In this design, the driver is the central component that orchestrates the entire process. The driver's role is multifaceted: (1) it activates the parser modules with the correct input; (2) it initiates the chain builder to form candidate chains; (3) it directs the semantic validator with the required input; (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
+representation (\xfon IR). Note that if a certificate is already given in DER format as input, \circled{E} we can directly call the DER parser. 
+Next, \circled{F} The chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the driver whether any chain passes all the semantic checks. In this design, the driver is the central component that orchestrates the entire process. The driver's role is multifaceted: (1) it activates the parser modules with the correct input; (2) it initiates the chain builder to form candidate chains; (3) it directs the semantic validator with the required input; (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
   
 % \subsection{Verified Modules and Correctness Guarantees} 
 

@@ -4,9 +4,9 @@
 
 % \subsection{Unsupported Features}
 
-% \subsection{Threats to Validity}
+\subsection{Threats to Validity}
 
-% \subsection{Limitations} only UTF8
+\subsection{Limitations}
 
 
 
