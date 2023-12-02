@@ -9,7 +9,25 @@ prover~\cite{bove2009brief, No07_agda}.
 In this section, we briefly introduce Agda and then detail the
 design and verified guarantees of \armor's \agda modules.
 
+\subsubsection*{Trusted Computing Base (TCB)}
+Our TCB comprises the \agda toolchain, which includes its native type-checker,
+compiler, and standard library.
+In particular, our use \agda's standard library includes the module
+\texttt{Data.Trie} (for the \emph{String canonicalizer}), which requires the
+\texttt{--sized-types} language feature, and the module \texttt{IO}, which
+requires the \texttt{--guardedness} language feature.
+The use of these two features together \emph{in the declaration of a coinductive
+  type} causes logical inconsistency~\cite{AgdaIssue-1209}.
+In our code base, the only module which enables both features is the
+\emph{Driver}, which does not define any coinductive types.
+
+In addition, we trust the correctness of the \ghc \haskell compiler to generate
+the executable binary, we assume that the verifier's trust anchor (\ie, the
+trusted root CA store) is up-to-date and does not contain any malicious
+certificates, and that the current system time is accurate.
+
 \subsection{Preliminaries on Agda}
+\label{sec:s4-preliminaries-agda}
 \agda is a \textit{dependently-typed} functional programming
 language, meaning that types may involve terms (that is, program-level
 expressions).
@@ -95,9 +113,11 @@ expression of type |Fin n|.
   \end{itemize}
 \end{itemize}
 
+
+\subsubsection*{Termination}
+
 \says{joy}{needs to introduce the table somewhere} \\
 \says{joy}{Maximality} \\
-\says{joy}{Termination} \\
 
 \begin{table*}[h]
   % \captionsetup{font=footnotesize}
@@ -117,22 +137,24 @@ expression of type |Fin n|.
 \end{tabular}
 \end{table*}
 
+\subsection{Input Strings and Base64 Decoding}
+We used |Fin| as our example throughout Section~\ref{sec:s4-preliminaries-agda}
+because it plays a central role as the type of the language alphabet for our
+\xsno DER and \xfon parsers, as well as the input and output types for Base64
+decoding.
+In general, parser inputs have types of the form |List A|, where |A| is the type
+of language alphabet; for our PEM parser this is |Char|, Agda's primitive type
+for character literals, and for our \xsno DER and \xfon parsers, this is
+|UInt8|, an alias for |Fin 256|.
+The ultimate result of our PEM parser is a string of sextets, \ie, a value of
+type |List UInt6|, where |UInt6| is an alias for |Fin 64|.
 
-\subsection{Input Strings} \says{joy}{needs a proper place to put this section}
-Inputs to our parser have types of the form |List A|, where |A| is the type of
-the language alphabet.
-For our PEM parser, this is |Char|, Agda's primitive type for character
-literals.
-For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
-the Agda standard library type |Fin 256| (the type for nonnegative integers
-strictly less than 256).
-
-\subsection{Summary of Base64 Decoding} \says{joy}{needs a proper place to put this section}
-We hand off the result of the PEM parser, which extracts the Base64 encoding of the
-certificates, to the X.509 parser, which expects an octet string, through a
-Base64 decoder that is verified with respect to an encoder.
+The hand-off between the result of PEM parsing and the input to \xsno DER /
+\xfon parsing (Figure~\ref{armor}, \circled{C} -- \circled{D}) is managed by the
+Base64 decoder, whose formal correctness properties are established with respect
+to a Base64 encoder (used only for specificational purposes).
 Specifically, we prove: 1) that the encoder always produces a valid sextet
-string (Base64 binary string); and 2) the encoder and decoder pair forms an
+string; and 2) the encoder and decoder pair forms an
 isomorphism between octet strings and valid sextet strings for encoding them.
 This is summarized below in Figure~\ref{fig:s4-base64} (for space
 considerations, all definitions have been omitted).
