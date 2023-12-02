@@ -411,7 +411,12 @@
 
 % \noindent\textbf{Verified \agda Code to Executable Binary:} \agda is primarily a proof assistant, not commonly used to produce executable binaries directly. However, we can indirectly produce executable binaries by compiling the \agda code to \haskell and then using the \haskell compiler \ghc~\cite{ghc} to generate an executable. This process begins with enabling IO operations through \agda's builtin features. Then, \agda's \textsf{compile} command transforms the \agda code to \haskell. The generated \haskell code is then compiled into an executable binary using the \ghc. However, in terms of runtime performance, the generated executable may not be as efficient as the code written directly in \haskell.
 
-% \noindent\textbf{Trusted Computing Base (TCB):} Our TCB comprises the \agda toolchain, which includes its native type-checker, compiler, and standard library. In addition, we trust the correctness of the \ghc \haskell compiler to generate the executable binary. Lastly, we assume that the verifier's trust anchor (\ie, the trusted root CA store) is up-to-date and does not contain any malicious certificates.
+% \noindent\textbf{Trusted Computing Base (TCB):} Our TCB comprises the \agda
+% toolchain, which includes its native type-checker, compiler, and standard
+% library. In addition, we trust the correctness of the \ghc \haskell compiler
+% to generate the executable binary. Lastly, we assume that the verifier's trust
+% anchor (\ie, the trusted root CA store) is up-to-date and does not contain any
+% malicious certificates. 
 
 
 
