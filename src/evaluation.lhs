@@ -24,49 +24,49 @@ by the Frankencert tool~\cite{frank} to mimic bad inputs.
 
 
 \subsection{Findings}
-% Now, we present our results based on the experiments.
+Now, we present our results based on the experiments.
 
-% \subsubsection{Effectiveness and Accurancy of \armor} 
-% Table~\ref{t0} illustrates the rigorous approach \armor takes toward certificate validation compared to most libraries. This is particularly evident in the `Rej-Acc' column, highlighting instances where \armor rejected a certificate chain that other libraries accepted. Except for \ceres, all libraries accepted $10,222$ certificate chains that \armor rejected, indicating \armor's adherence to stricter validation rules. A closer investigation of these rejections by \armor reveals that they stem from violations of guidelines specified in RFC-5280. \armor rejected $4,992$ certificates because their serial numbers were $0$, contrary to the RFC-5280 requirement for a positive integer. Additionally, \armor rejected $5,230$ certificate chains for having an \textit{email} address included as an \texttt{IA5String} in the \texttt{Subject} or \texttt{Issuer} names - another deviation from RFC-5280, which recommends placing such information in the \texttt{Issuer} or \texttt{Subject Alternative Name} extensions.
+\subsubsection{Effectiveness and Accurancy of \armor} 
+Table~\ref{t0} illustrates the rigorous approach \armor takes toward certificate validation compared to most libraries. This is particularly evident in the `Rej-Acc' column, highlighting instances where \armor rejected a certificate chain that other libraries accepted. Except for \ceres, all libraries accepted $10,222$ certificate chains that \armor rejected, indicating \armor's adherence to stricter validation rules. A closer investigation of these rejections by \armor reveals that they stem from violations of guidelines specified in RFC-5280. \armor rejected $4,992$ certificates because their serial numbers were $0$, contrary to the RFC-5280 requirement for a positive integer. Additionally, \armor rejected $5,230$ certificate chains for having an \textit{email} address included as an \texttt{IA5String} in the \texttt{Subject} or \texttt{Issuer} names - another deviation from RFC-5280, which recommends placing such information in the \texttt{Issuer} or \texttt{Subject Alternative Name} extensions.
 
-% Interestingly, the \certvalidator library appears to enforce an even stricter validation process, rejecting $89$ certificate chains that \armor accepted. Upon examination, it was found that this discrepancy arises because the \certvalidator does not support the \texttt{Subject Alternative Name} certificate extension, reporting parsing errors for these chains. However, \armor correctly supports this extension and therefore does not reject these certificate chains, highlighting its comprehensive capabilities.
+Interestingly, the \certvalidator library appears to enforce an even stricter validation process, rejecting $89$ certificate chains that \armor accepted. Upon examination, it was found that this discrepancy arises because the \certvalidator does not support the \texttt{Subject Alternative Name} certificate extension, reporting parsing errors for these chains. However, \armor correctly supports this extension and therefore does not reject these certificate chains, highlighting its comprehensive capabilities.
 
-% \armor's interpretation of the specification appears accurate. It agrees with most certificate chain validations conducted by the test libraries. In the `Acc-Acc' category, \armor matches the results of almost all test libraries in $1,424,757$ cases. This demonstrates high consistency and a correct understanding of the specification. Furthermore, there are no discrepancies in certificate chain validation results compared to high-assurance implementation like \ceres. This underlines \armor's accurate interpretation of the specification, aligning with the RFC-5280 guidelines. 
+\armor's interpretation of the specification appears accurate. It agrees with most certificate chain validations conducted by the test libraries. In the `Acc-Acc' category, \armor matches the results of almost all test libraries in $1,424,757$ cases. This demonstrates high consistency and a correct understanding of the specification. Furthermore, there are no discrepancies in certificate chain validation results compared to high-assurance implementation like \ceres. This underlines \armor's accurate interpretation of the specification, aligning with the RFC-5280 guidelines. 
 
-% % As an oracle, \armor performs exceptionally well. It identified 10,222 certificate chains that it rejected but were accepted by almost all other libraries (`Rej-Acc' category). This demonstrates \armor's role as an effective oracle by enforcing specification adherence more strictly than other libraries.
-
-
+% As an oracle, \armor performs exceptionally well. It identified 10,222 certificate chains that it rejected but were accepted by almost all other libraries (`Rej-Acc' category). This demonstrates \armor's role as an effective oracle by enforcing specification adherence more strictly than other libraries.
 
 
-% \begin{table}[h]
-%     \captionsetup{font=footnotesize}
-%    \centering
-%         \setlength\extrarowheight{1.5pt}
-%         \setlength{\tabcolsep}{1.5pt}
-%         \sffamily\scriptsize
-%         \caption{Analysis on validation outcomes of 2,000,000 \censys chains}
-%         \sffamily\scriptsize
-%         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
-%         \vspace{0.5em}
-%         \label{t0}
-%         \sffamily\scriptsize
-%     \centering
-% \begin{tabular}{||c||c||c||c||c||c||c||}
-% \hline
-% \textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} & \textbf{Sim} & \textbf{Diff}\\ \hline
-% \boringssl       & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \gnutls          & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \matrixssl       & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \mbedtls        & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \openssl         & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \wolfssl         & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \crypto          & 1,424,757                & 0                      & 10,222                  & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \bouncycastle   & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \sun             & 1,424,757                & 0                      & 10,222                   & 5,65,021 & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \certvalidator   & 1,424,668                & 89                    & 10,222                  & 5,65,021 & 99.48$\%$ & 0.52$\%$ \\ \hline
-% \ceres           & 1,424,757                & 0                    & 0                      & 5,75,243  & 100$\%$    & 0$\%$           \\ \hline
-% \end{tabular}
-% \end{table}
+
+
+\begin{table}[h]
+    \captionsetup{font=footnotesize}
+   \centering
+        \setlength\extrarowheight{1.5pt}
+        \setlength{\tabcolsep}{1.5pt}
+        \sffamily\scriptsize
+        \caption{Analysis on validation outcomes of 2,000,000 \censys chains}
+        \sffamily\scriptsize
+        Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+        \vspace{0.5em}
+        \label{t0}
+        \sffamily\scriptsize
+    \centering
+\begin{tabular}{||c||c||c||c||c||c||c||}
+\hline
+\textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} & \textbf{Sim} & \textbf{Diff}\\ \hline
+\mbedtls        & 1,435,914                & 0                      & 10,315                  & 5,53,771 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\boringssl        & 1,435,914                & 0                      & 10,315                  & 5,53,771 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\matrixssl       & 1,435,914                & 0                      & 5,066                   & 5,59,020 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\wolfssl         & 1,435,914                & 0                      & 10,320                   & 5,53,766 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\openssl         & 1,435,900                & 14                      & 10,310                  & 5,53,776 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\gnutls        & 1,435,914                & 0                      & 10,315                  & 5,53,771 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\crypto          & 1,435,914                & 0                      & 10,315                  & 5,53,771 & 99.49$\%$ & 0.51$\%$ \\ \hline
+\bouncycastle   & xx                & 0                      & xx                   & xx & 99.49$\%$ & 0.51$\%$ \\ \hline
+\sun             & xx                & 0                      & xx                   & xx & 99.49$\%$ & 0.51$\%$ \\ \hline
+\certvalidator   & 1,435,823                & 91                    & 10,315                  & 5,53,771 & 99.48$\%$ & 0.52$\%$ \\ \hline
+\ceres           & xx                & 0                    & 0                      & xx  & 100$\%$    & 0$\%$           \\ \hline
+\end{tabular}
+\end{table}
 
 
 
@@ -103,7 +103,7 @@ In the case of \armor, it strikes a reasonable balance between execution time an
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \sun}}              & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,956}}           & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.129}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.140}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.285}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.271}}                                                         & {\color[HTML]{000000} 0.085}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,044}}           & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.147}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1.882}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.215}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.194}}                                                         & {\color[HTML]{000000} 0.075}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \certvalidator}}    & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,951}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.221}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.855}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.269}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.263}}                                                         & {\color[HTML]{000000} 0.060}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,049}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.143}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1.779}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.254}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.254}}                                                         & {\color[HTML]{000000} 0.061}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \ceres}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.033}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 5.735}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.755}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.821}}                                                         & {\color[HTML]{000000} 0.338}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.151}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 5.621}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.541}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.594}}                                                         & {\color[HTML]{000000} 0.263}                                                       \\ \cline{1-7} \cline{9-14} 
-    \multicolumn{1}{||c||}{{\color[HTML]{000000} \armor}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.034}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 5.156}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.364}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.351}}                                                         & {\color[HTML]{000000} 0.093}                                                       & \multirow{-14}{*}{{\color[HTML]{000000} }} & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.038}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1.977}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.192}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.180}}                                                         & {\color[HTML]{000000} 0.093}                                                       \\ \hline
+    \multicolumn{1}{||c||}{{\color[HTML]{000000} \armor}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.207}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 4.553}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.641}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.618}}                                                         & {\color[HTML]{000000} 0.118}                                                       & \multirow{-14}{*}{{\color[HTML]{000000} }} & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 0.053}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 4.665}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.518}}                                                       & \multicolumn{1}{c||}{{\color[HTML]{000000} 2.544}}                                                         & {\color[HTML]{000000} 0.300}                                                       \\ \hline
     \end{tabular}
     \end{table}
 
@@ -136,141 +136,141 @@ In the case of \armor, it strikes a reasonable balance between execution time an
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \sun}}              & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,956}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 47.50}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 62.83}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 53.60}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 53.19}}                                                        & {\color[HTML]{000000} 1.19}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,044}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 44.42}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 61.52}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 50.30}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 49.88}}                                                        & {\color[HTML]{000000} 1.86}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \certvalidator}}    & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,951}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 26.67}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 28.42}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.06}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.04}}                                                        & {\color[HTML]{000000} 0.14}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,049}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 23.90}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.30}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 26.62}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 26.79}}                                                        & {\color[HTML]{000000} 0.71}                                                       \\ \cline{1-7} \cline{9-14} 
     \multicolumn{1}{||c||}{{\color[HTML]{000000} \ceres}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 21.03}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 40.70}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 39.08}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 39.45}}                                                        & {\color[HTML]{000000} 2.24}                                                       & {\color[HTML]{000000} }                    & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 21.02}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 31.79}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 27.03}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 28.04}}                                                        & {\color[HTML]{000000} 3.23}                                                       \\ \cline{1-7} \cline{9-14} 
-    \multicolumn{1}{||c||}{{\color[HTML]{000000} \armor}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 30.98}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 88.49}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 46.77}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 45.99}}                                                        & {\color[HTML]{000000} 3.77}                                                       & \multirow{-14}{*}{{\color[HTML]{000000} }} & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 17.95}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 63.00}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 32.81}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 24.35}}                                                        & {\color[HTML]{000000} 12.95}                                                      \\ \hline
+    \multicolumn{1}{||c||}{{\color[HTML]{000000} \armor}}            & \multicolumn{1}{c||}{{\color[HTML]{000000} 74,801}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 998}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 1187}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 1049}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1032}}                                                        & {\color[HTML]{000000} 61}                                                       & \multirow{-14}{*}{{\color[HTML]{000000} }} & \multicolumn{1}{c||}{{\color[HTML]{000000} 25,199}}          & \multicolumn{1}{c||}{{\color[HTML]{000000} 994}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 1185}}                                                     & \multicolumn{1}{c||}{{\color[HTML]{000000} 1069}}                                                      & \multicolumn{1}{c||}{{\color[HTML]{000000} 1075}}                                                        & {\color[HTML]{000000} 135}                                                      \\ \hline
     \end{tabular}
     \end{table}
 
 
-% \subsection{Results on Frankencerts based on 5,00,000 chains}
+\subsection{Results on Frankencerts based on 5,00,000 chains}
 
-% \begin{table}[h]
-%     \captionsetup{font=footnotesize}
-%    \centering
-%         \setlength\extrarowheight{1.5pt}
-%         \setlength{\tabcolsep}{1.5pt}
-%         \sffamily\scriptsize
-%         \caption{Analysis on validation outcomes of 5,00,000 \frankencert chains}
-%         \sffamily\scriptsize
-%         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
-%         \vspace{0.5em}
-%         \label{t0}
-%         \sffamily\scriptsize
-%     \centering
-% \begin{tabular}{||c||c||c||c||c||c||c||}
-% \hline
-% \textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} & \textbf{Sim} & \textbf{Diff}\\ \hline
-% \boringssl       & 0                & 0                      & 83                  & 4,99,917 & 99.98$\%$ & 0.02$\%$ \\ \hline
-% \gnutls          & 0                & 0                      & 139                 & 4,99,861 & 99.97$\%$ & 0.03$\%$ \\ \hline
-% \matrixssl       & 0                & 0                      & xx                   & xx & 99.49$\%$ & 0.51$\%$ \\ \hline
-% \mbedtls        & 0                & 0                      & 0                  & 5,00,000 & 100$\%$ & 0$\%$ \\ \hline
-% \openssl         & 0                & 0                      & 191                  & 4,99,809 & 99.96$\%$ & 0.04$\%$ \\ \hline
-% \wolfssl         & 0                & 0                      & 111                   & 4,99,889 & 99.97$\%$ & 0.03$\%$ \\ \hline
-% \crypto          & 0                & 0                      & 842                  & 4,99,158 & 99.83$\%$ & 0.17$\%$ \\ \hline
-% \bouncycastle   & 0                & 0                      & 1                   & 4,99,999 & 99.99$\%$ & 0.01$\%$ \\ \hline
-% \sun             & 0                & 0                      & 1                   & 4,99,999 & 99.99$\%$ & 0.01$\%$ \\ \hline
-% \certvalidator   & 0                & 0                    & 6,204                  & 4,93,796 & 98.75$\%$ & 1.25$\%$ \\ \hline
-% \ceres           & 0                & 0                    & 0                      & 5,00,000  & 100$\%$    & 0$\%$           \\ \hline
-% \end{tabular}
-% \end{table}
-
-
-
-% \begin{table*}[h]
-%     \captionsetup{font=footnotesize}
-%     \centering
-%          \setlength\extrarowheight{1.5pt}
-%          \setlength{\tabcolsep}{1.5pt}
-%          \sffamily\scriptsize
-%          \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
-%          \sffamily\scriptsize
-%          Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
-%          \vspace{0.5em}
-%          \label{t0}
-%          \sffamily\scriptsize
-%      \centering
-%     \begin{tabular}{||c||c||c||c||c||c||c||c||c||c||}
-%     \hline
-%     \textbf{Supported Features}           & \textbf{\openssl} & \textbf{\gnutls} & \textbf{\boringssl} & \textbf{\wolfssl} & \textbf{\matrixssl} & \textbf{\sun} & \textbf{\bouncycastle} & \textbf{\certvalidator} & \textbf{\crypto} \\ \hline
-%     \textit{R}                            & 166                              & 107                             & 80                                 & 105                              & 110                                & 1                            & 1                                     & 5855                                  & 205                             \\ \hline
-%     \textit{Subject / Issuer Name}        & 8                                & 4                               & 2                                  & 3                                & 3                                  & 0                            & 0                                     & 345                                   & 24                              \\ \hline
-%     \textit{Certificate Policy}           & 8                                & 5                               & 0                                  & 2                                & 2                                  & 0                            & 0                                     & 0                                     & 61                              \\ \hline
-%     \textit{CRL Distribution Points}      & 0                                & 3                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 33                              \\ \hline
-%     \textit{Authority Information Access} & 4                                & 2                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 88                              \\ \hline
-%     \textit{Basic Constraints}            & 0                                & 2                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 94                              \\ \hline
-%     \textit{Key Usage}                    & 0                                & 9                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 93                              \\ \hline
-%     \textit{Extended Key Usage}           & 0                                & 7                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 98                              \\ \hline
-%     \textit{Subject Key Identifier}       & 0                                & 0                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 40                              \\ \hline
-%     \textit{Subject Alternative Names}    & 0                                & 0                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 33                              \\ \hline
-%     \textit{Issuer Alternative Names}     & 5                                & 0                               & 1                                  & 1                                & 3                                  & 0                            & 0                                     & 4                                     & 106                             \\ \hline
-%     \textbf{Total}                        & \textbf{191}                     & \textbf{139}                    & \textbf{83}                        & \textbf{111}                     & \textbf{118}                       & \textbf{1}                   & \textbf{1}                            & \textbf{6204}                         & \textbf{875}                    \\ \hline
-%     \end{tabular}
-%     \end{table*}
+\begin{table}[h]
+    \captionsetup{font=footnotesize}
+   \centering
+        \setlength\extrarowheight{1.5pt}
+        \setlength{\tabcolsep}{1.5pt}
+        \sffamily\scriptsize
+        \caption{Analysis on validation outcomes of 5,00,000 \frankencert chains}
+        \sffamily\scriptsize
+        Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+        \vspace{0.5em}
+        \label{t0}
+        \sffamily\scriptsize
+    \centering
+\begin{tabular}{||c||c||c||c||c||c||c||}
+\hline
+\textbf{\armor vs Others} & \textbf{Acc-Acc} & \textbf{Acc-Rej} & \textbf{Rej-Acc} & \textbf{Rej-Rej} & \textbf{Sim} & \textbf{Diff}\\ \hline
+\boringssl       & 0                & 0                      & 83                  & 4,99,917 & 99.98$\%$ & 0.02$\%$ \\ \hline
+\gnutls          & 0                & 0                      & 139                 & 4,99,861 & 99.97$\%$ & 0.03$\%$ \\ \hline
+\matrixssl       & 0                & 0                      & xx                   & xx & 99.49$\%$ & 0.51$\%$ \\ \hline
+\mbedtls        & 0                & 0                      & 0                  & 5,00,000 & 100$\%$ & 0$\%$ \\ \hline
+\openssl         & 0                & 0                      & 191                  & 4,99,809 & 99.96$\%$ & 0.04$\%$ \\ \hline
+\wolfssl         & 0                & 0                      & 111                   & 4,99,889 & 99.97$\%$ & 0.03$\%$ \\ \hline
+\crypto          & 0                & 0                      & 842                  & 4,99,158 & 99.83$\%$ & 0.17$\%$ \\ \hline
+\bouncycastle   & 0                & 0                      & 1                   & 4,99,999 & 99.99$\%$ & 0.01$\%$ \\ \hline
+\sun             & 0                & 0                      & 1                   & 4,99,999 & 99.99$\%$ & 0.01$\%$ \\ \hline
+\certvalidator   & 0                & 0                    & 6,204                  & 4,93,796 & 98.75$\%$ & 1.25$\%$ \\ \hline
+\ceres           & 0                & 0                    & 0                      & 5,00,000  & 100$\%$    & 0$\%$           \\ \hline
+\end{tabular}
+\end{table}
 
 
 
-
-%  \begin{table*}[h]
-%     \captionsetup{font=footnotesize}
-%     \centering
-%          \setlength\extrarowheight{1.5pt}
-%          \setlength{\tabcolsep}{1.5pt}
-%          \sffamily\scriptsize
-%          \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
-%          \sffamily\scriptsize
-%          Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
-%          \vspace{0.5em}
-%          \label{t0}
-%          \sffamily\scriptsize
-%      \centering
-% \begin{tabular}{cc||ccccc||ccccc||}
-% \cline{3-12}
-% \textit{}                                    &                   & \multicolumn{5}{c||}{\textbf{Success (Megabytes)}}                                                                                                                 & \multicolumn{5}{c||}{\textbf{Failure (Megabytes)}}                                                                                                                 \\ \hline
-% \multicolumn{1}{||c||}{\textbf{Library}}       & \textbf{Language} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} \\ \hline
-% \multicolumn{1}{||c||}{\textit{Mbed TLS}}      & C/C++             & \multicolumn{1}{c||}{4.039}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{4.125}           & 0.149         & \multicolumn{1}{c||}{4.052}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{4.125}           & 0.157         \\ \hline
-% \multicolumn{1}{||c||}{\textit{BoringSSL}}     & C/C++             & \multicolumn{1}{c||}{4.011}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.938}           & 0.126         & \multicolumn{1}{c||}{3.922}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.938}           & 0.159         \\ \hline
-% \multicolumn{1}{||c||}{\textit{MatrixSSL}}     & C/C++             & \multicolumn{1}{c||}{3.260}         & \multicolumn{1}{c||}{3.375}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.375}           & 0.131         & \multicolumn{1}{c||}{3.127}         & \multicolumn{1}{c||}{3.375}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.188}           & 0.342         \\ \hline
-% \multicolumn{1}{||c||}{\textit{WolfSSL}}       & C/C++             & \multicolumn{1}{c||}{8.393}         & \multicolumn{1}{c||}{8.625}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{8.438}           & 0.137         & \multicolumn{1}{c||}{8.165}         & \multicolumn{1}{c||}{8.625}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{8.063}           & 0.274         \\ \hline
-% \multicolumn{1}{||c||}{\textit{OpenSSL}}       & C/C++             & \multicolumn{1}{c||}{5.795}         & \multicolumn{1}{c||}{6.188}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{5.813}           & 0.150         & \multicolumn{1}{c||}{5.798}         & \multicolumn{1}{c||}{6.188}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{5.813}           & 0.166         \\ \hline
-% \multicolumn{1}{||c||}{\textit{GnuTLS}}        & C/C++             & \multicolumn{1}{c||}{7.787}         & \multicolumn{1}{c||}{8.063}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{7.875}           & 0.164         & \multicolumn{1}{c||}{7.165}         & \multicolumn{1}{c||}{8.063}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{7.313}           & 0.818         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Crypto}}        & Go                & \multicolumn{1}{c||}{62.707}        & \multicolumn{1}{c||}{67.688}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{61.500}          & 2.670         & \multicolumn{1}{c||}{62.741}        & \multicolumn{1}{c||}{67.500}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{61.500}          & 2.706         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Bouncy Castle}} & Java              & \multicolumn{1}{c||}{125.203}       & \multicolumn{1}{c||}{137.105}      & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{125.531}         & 3.375         & \multicolumn{1}{c||}{99.565}        & \multicolumn{1}{c||}{134.621}      & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{96.277}          & 9.000         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Sun}}           & Java              & \multicolumn{1}{c||}{56.040}        & \multicolumn{1}{c||}{65.781}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{55.441}          & 2.169         & \multicolumn{1}{c||}{51.705}        & \multicolumn{1}{c||}{63.742}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{51.098}          & 2.576         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Certvalidator}} & Python            & \multicolumn{1}{c||}{27.391}        & \multicolumn{1}{c||}{28.313}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{27.375}          & 0.471         & \multicolumn{1}{c||}{26.646}        & \multicolumn{1}{c||}{28.313}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{26.813}          & 0.866         \\ \hline
-% \multicolumn{1}{||c||}{\textit{CERES}}         & Python            & \multicolumn{1}{c||}{39.983}        & \multicolumn{1}{c||}{40.852}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{40.043}          & 0.644         & \multicolumn{1}{c||}{27.344}        & \multicolumn{1}{c||}{35.852}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{27.867}          & 3.500         \\ \hline
-% \multicolumn{1}{||c||}{\textit{ARMOR}}         & Agda              & \multicolumn{1}{c||}{1049.710}      & \multicolumn{1}{c||}{1187.270}     & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{1032.795}        & 60.699        & \multicolumn{1}{c||}{1069.531}      & \multicolumn{1}{c||}{1185.940}     & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{1075.090}        & 135.514       \\ \hline
-% \end{tabular}
-% \end{table*}
+\begin{table*}[h]
+    \captionsetup{font=footnotesize}
+    \centering
+         \setlength\extrarowheight{1.5pt}
+         \setlength{\tabcolsep}{1.5pt}
+         \sffamily\scriptsize
+         \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
+         \sffamily\scriptsize
+         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+         \vspace{0.5em}
+         \label{t0}
+         \sffamily\scriptsize
+     \centering
+    \begin{tabular}{||c||c||c||c||c||c||c||c||c||c||}
+    \hline
+    \textbf{Supported Features}           & \textbf{\openssl} & \textbf{\gnutls} & \textbf{\boringssl} & \textbf{\wolfssl} & \textbf{\matrixssl} & \textbf{\sun} & \textbf{\bouncycastle} & \textbf{\certvalidator} & \textbf{\crypto} \\ \hline
+    \textit{R}                            & 166                              & 107                             & 80                                 & 105                              & 110                                & 1                            & 1                                     & 5855                                  & 205                             \\ \hline
+    \textit{Subject / Issuer Name}        & 8                                & 4                               & 2                                  & 3                                & 3                                  & 0                            & 0                                     & 345                                   & 24                              \\ \hline
+    \textit{Certificate Policy}           & 8                                & 5                               & 0                                  & 2                                & 2                                  & 0                            & 0                                     & 0                                     & 61                              \\ \hline
+    \textit{CRL Distribution Points}      & 0                                & 3                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 33                              \\ \hline
+    \textit{Authority Information Access} & 4                                & 2                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 88                              \\ \hline
+    \textit{Basic Constraints}            & 0                                & 2                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 94                              \\ \hline
+    \textit{Key Usage}                    & 0                                & 9                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 93                              \\ \hline
+    \textit{Extended Key Usage}           & 0                                & 7                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 98                              \\ \hline
+    \textit{Subject Key Identifier}       & 0                                & 0                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 40                              \\ \hline
+    \textit{Subject Alternative Names}    & 0                                & 0                               & 0                                  & 0                                & 0                                  & 0                            & 0                                     & 0                                     & 33                              \\ \hline
+    \textit{Issuer Alternative Names}     & 5                                & 0                               & 1                                  & 1                                & 3                                  & 0                            & 0                                     & 4                                     & 106                             \\ \hline
+    \textbf{Total}                        & \textbf{191}                     & \textbf{139}                    & \textbf{83}                        & \textbf{111}                     & \textbf{118}                       & \textbf{1}                   & \textbf{1}                            & \textbf{6204}                         & \textbf{875}                    \\ \hline
+    \end{tabular}
+    \end{table*}
 
 
 
-% \begin{table*}[h]
-%     \captionsetup{font=footnotesize}
-%     \centering
-%          \setlength\extrarowheight{1.5pt}
-%          \setlength{\tabcolsep}{1.5pt}
-%          \sffamily\scriptsize
-%          \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
-%          \sffamily\scriptsize
-%          Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
-%          \vspace{0.5em}
-%          \label{t0}
-%          \sffamily\scriptsize
-%      \centering
-% \begin{tabular}{cc||ccccc||ccccc||}
-% \cline{3-12}
-%                                              &                   & \multicolumn{5}{c||}{\textbf{Success (Seconds)}}                                                                                                                   & \multicolumn{5}{c||}{\textbf{Failure (Seconds)}}                                                                                                                   \\ \hline
-% \multicolumn{1}{||c||}{\textbf{Library}}       & \textbf{Language} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} \\ \hline
-% \multicolumn{1}{||c||}{\textit{Mbed TLS}}      & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.021}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.000         & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.014}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.001         \\ \hline
-% \multicolumn{1}{||c||}{\textit{BoringSSL}}     & C/C++             & \multicolumn{1}{c||}{0.017}         & \multicolumn{1}{c||}{0.031}        & \multicolumn{1}{c||}{0.014}        & \multicolumn{1}{c||}{0.016}           & 0.001         & \multicolumn{1}{c||}{0.016}         & \multicolumn{1}{c||}{0.040}        & \multicolumn{1}{c||}{0.015}        & \multicolumn{1}{c||}{0.016}           & 0.002         \\ \hline
-% \multicolumn{1}{||c||}{\textit{OpenSSL}}       & C/C++             & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.019}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.007}           & 0.001         & \multicolumn{1}{c||}{0.006}         & \multicolumn{1}{c||}{0.017}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.006}           & 0.001         \\ \hline
-% \multicolumn{1}{||c||}{\textit{MatrixSSL}}     & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.018}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.001         & \multicolumn{1}{c||}{0.004}         & \multicolumn{1}{c||}{0.018}        & \multicolumn{1}{c||}{0.001}        & \multicolumn{1}{c||}{0.004}           & 0.002         \\ \hline
-% \multicolumn{1}{||c||}{\textit{WolfSSL}}       & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.013}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.000         & \multicolumn{1}{c||}{0.004}         & \multicolumn{1}{c||}{0.010}        & \multicolumn{1}{c||}{0.003}        & \multicolumn{1}{c||}{0.004}           & 0.001         \\ \hline
-% \multicolumn{1}{||c||}{\textit{GnuTLS}}        & C/C++             & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.016}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.007}           & 0.001         & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.013}        & \multicolumn{1}{c||}{0.002}        & \multicolumn{1}{c||}{0.007}           & 0.001         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Crypto}}        & Go                & \multicolumn{1}{c||}{0.150}         & \multicolumn{1}{c||}{0.322}        & \multicolumn{1}{c||}{0.126}        & \multicolumn{1}{c||}{0.147}           & 0.011         & \multicolumn{1}{c||}{0.150}         & \multicolumn{1}{c||}{0.289}        & \multicolumn{1}{c||}{0.134}        & \multicolumn{1}{c||}{0.147}           & 0.011         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Bouncy Castle}} & Java              & \multicolumn{1}{c||}{0.540}         & \multicolumn{1}{c||}{1.878}        & \multicolumn{1}{c||}{0.408}        & \multicolumn{1}{c||}{0.532}           & 0.058         & \multicolumn{1}{c||}{0.383}         & \multicolumn{1}{c||}{1.324}        & \multicolumn{1}{c||}{0.304}        & \multicolumn{1}{c||}{0.365}           & 0.063         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Sun}}           & Java              & \multicolumn{1}{c||}{0.144}         & \multicolumn{1}{c||}{0.616}        & \multicolumn{1}{c||}{0.118}        & \multicolumn{1}{c||}{0.136}           & 0.019         & \multicolumn{1}{c||}{0.126}         & \multicolumn{1}{c||}{0.879}        & \multicolumn{1}{c||}{0.093}        & \multicolumn{1}{c||}{0.121}           & 0.017         \\ \hline
-% \multicolumn{1}{||c||}{\textit{Certvalidator}} & Python            & \multicolumn{1}{c||}{0.162}         & \multicolumn{1}{c||}{0.340}        & \multicolumn{1}{c||}{0.147}        & \multicolumn{1}{c||}{0.159}           & 0.010         & \multicolumn{1}{c||}{0.154}         & \multicolumn{1}{c||}{0.288}        & \multicolumn{1}{c||}{0.096}        & \multicolumn{1}{c||}{0.154}           & 0.017         \\ \hline
-% \multicolumn{1}{||c||}{\textit{CERES}}         & Python            & \multicolumn{1}{c||}{0.534}         & \multicolumn{1}{c||}{0.980}        & \multicolumn{1}{c||}{0.220}        & \multicolumn{1}{c||}{0.524}           & 0.035         & \multicolumn{1}{c||}{0.363}         & \multicolumn{1}{c||}{0.784}        & \multicolumn{1}{c||}{0.140}        & \multicolumn{1}{c||}{0.396}           & 0.130         \\ \hline
-% \multicolumn{1}{||c||}{\textit{ARMOR}}         & Agda              & \multicolumn{1}{c||}{2.641}         & \multicolumn{1}{c||}{4.553}        & \multicolumn{1}{c||}{2.207}        & \multicolumn{1}{c||}{2.618}           & 0.118         & \multicolumn{1}{c||}{2.518}         & \multicolumn{1}{c||}{4.665}        & \multicolumn{1}{c||}{0.053}        & \multicolumn{1}{c||}{2.544}           & 0.300         \\ \hline
-% \end{tabular}
-% \end{table*}
+
+ \begin{table*}[h]
+    \captionsetup{font=footnotesize}
+    \centering
+         \setlength\extrarowheight{1.5pt}
+         \setlength{\tabcolsep}{1.5pt}
+         \sffamily\scriptsize
+         \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
+         \sffamily\scriptsize
+         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+         \vspace{0.5em}
+         \label{t0}
+         \sffamily\scriptsize
+     \centering
+\begin{tabular}{cc||ccccc||ccccc||}
+\cline{3-12}
+\textit{}                                    &                   & \multicolumn{5}{c||}{\textbf{Success (Megabytes)}}                                                                                                                 & \multicolumn{5}{c||}{\textbf{Failure (Megabytes)}}                                                                                                                 \\ \hline
+\multicolumn{1}{||c||}{\textbf{Library}}       & \textbf{Language} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} \\ \hline
+\multicolumn{1}{||c||}{\textit{Mbed TLS}}      & C/C++             & \multicolumn{1}{c||}{4.039}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{4.125}           & 0.149         & \multicolumn{1}{c||}{4.052}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{4.125}           & 0.157         \\ \hline
+\multicolumn{1}{||c||}{\textit{BoringSSL}}     & C/C++             & \multicolumn{1}{c||}{4.011}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.938}           & 0.126         & \multicolumn{1}{c||}{3.922}         & \multicolumn{1}{c||}{4.313}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.938}           & 0.159         \\ \hline
+\multicolumn{1}{||c||}{\textit{MatrixSSL}}     & C/C++             & \multicolumn{1}{c||}{3.260}         & \multicolumn{1}{c||}{3.375}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.375}           & 0.131         & \multicolumn{1}{c||}{3.127}         & \multicolumn{1}{c||}{3.375}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{3.188}           & 0.342         \\ \hline
+\multicolumn{1}{||c||}{\textit{WolfSSL}}       & C/C++             & \multicolumn{1}{c||}{8.393}         & \multicolumn{1}{c||}{8.625}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{8.438}           & 0.137         & \multicolumn{1}{c||}{8.165}         & \multicolumn{1}{c||}{8.625}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{8.063}           & 0.274         \\ \hline
+\multicolumn{1}{||c||}{\textit{OpenSSL}}       & C/C++             & \multicolumn{1}{c||}{5.795}         & \multicolumn{1}{c||}{6.188}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{5.813}           & 0.150         & \multicolumn{1}{c||}{5.798}         & \multicolumn{1}{c||}{6.188}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{5.813}           & 0.166         \\ \hline
+\multicolumn{1}{||c||}{\textit{GnuTLS}}        & C/C++             & \multicolumn{1}{c||}{7.787}         & \multicolumn{1}{c||}{8.063}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{7.875}           & 0.164         & \multicolumn{1}{c||}{7.165}         & \multicolumn{1}{c||}{8.063}        & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{7.313}           & 0.818         \\ \hline
+\multicolumn{1}{||c||}{\textit{Crypto}}        & Go                & \multicolumn{1}{c||}{62.707}        & \multicolumn{1}{c||}{67.688}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{61.500}          & 2.670         & \multicolumn{1}{c||}{62.741}        & \multicolumn{1}{c||}{67.500}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{61.500}          & 2.706         \\ \hline
+\multicolumn{1}{||c||}{\textit{Bouncy Castle}} & Java              & \multicolumn{1}{c||}{125.203}       & \multicolumn{1}{c||}{137.105}      & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{125.531}         & 3.375         & \multicolumn{1}{c||}{99.565}        & \multicolumn{1}{c||}{134.621}      & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{96.277}          & 9.000         \\ \hline
+\multicolumn{1}{||c||}{\textit{Sun}}           & Java              & \multicolumn{1}{c||}{56.040}        & \multicolumn{1}{c||}{65.781}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{55.441}          & 2.169         & \multicolumn{1}{c||}{51.705}        & \multicolumn{1}{c||}{63.742}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{51.098}          & 2.576         \\ \hline
+\multicolumn{1}{||c||}{\textit{Certvalidator}} & Python            & \multicolumn{1}{c||}{27.391}        & \multicolumn{1}{c||}{28.313}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{27.375}          & 0.471         & \multicolumn{1}{c||}{26.646}        & \multicolumn{1}{c||}{28.313}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{26.813}          & 0.866         \\ \hline
+\multicolumn{1}{||c||}{\textit{CERES}}         & Python            & \multicolumn{1}{c||}{39.983}        & \multicolumn{1}{c||}{40.852}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{40.043}          & 0.644         & \multicolumn{1}{c||}{27.344}        & \multicolumn{1}{c||}{35.852}       & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{27.867}          & 3.500         \\ \hline
+\multicolumn{1}{||c||}{\textit{ARMOR}}         & Agda              & \multicolumn{1}{c||}{1049.710}      & \multicolumn{1}{c||}{1187.270}     & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{1032.795}        & 60.699        & \multicolumn{1}{c||}{1069.531}      & \multicolumn{1}{c||}{1185.940}     & \multicolumn{1}{c||}{1.500}        & \multicolumn{1}{c||}{1075.090}        & 135.514       \\ \hline
+\end{tabular}
+\end{table*}
+
+
+
+\begin{table*}[h]
+    \captionsetup{font=footnotesize}
+    \centering
+         \setlength\extrarowheight{1.5pt}
+         \setlength{\tabcolsep}{1.5pt}
+         \sffamily\scriptsize
+         \caption{Breakdown of \frankencert analysis when \armor rejected but others accepted}
+         \sffamily\scriptsize
+         Acc = Accept \quad  Rej = Reject \quad Sim = Similarity \quad Diff = Difference \enskip
+         \vspace{0.5em}
+         \label{t0}
+         \sffamily\scriptsize
+     \centering
+\begin{tabular}{cc||ccccc||ccccc||}
+\cline{3-12}
+                                             &                   & \multicolumn{5}{c||}{\textbf{Success (Seconds)}}                                                                                                                   & \multicolumn{5}{c||}{\textbf{Failure (Seconds)}}                                                                                                                   \\ \hline
+\multicolumn{1}{||c||}{\textbf{Library}}       & \textbf{Language} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} & \multicolumn{1}{c||}{\textbf{Mean}} & \multicolumn{1}{c||}{\textbf{Max}} & \multicolumn{1}{c||}{\textbf{Min}} & \multicolumn{1}{c||}{\textbf{Median}} & \textbf{S.D.} \\ \hline
+\multicolumn{1}{||c||}{\textit{Mbed TLS}}      & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.021}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.000         & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.014}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{BoringSSL}}     & C/C++             & \multicolumn{1}{c||}{0.017}         & \multicolumn{1}{c||}{0.031}        & \multicolumn{1}{c||}{0.014}        & \multicolumn{1}{c||}{0.016}           & 0.001         & \multicolumn{1}{c||}{0.016}         & \multicolumn{1}{c||}{0.040}        & \multicolumn{1}{c||}{0.015}        & \multicolumn{1}{c||}{0.016}           & 0.002         \\ \hline
+\multicolumn{1}{||c||}{\textit{OpenSSL}}       & C/C++             & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.019}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.007}           & 0.001         & \multicolumn{1}{c||}{0.006}         & \multicolumn{1}{c||}{0.017}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.006}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{MatrixSSL}}     & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.018}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.001         & \multicolumn{1}{c||}{0.004}         & \multicolumn{1}{c||}{0.018}        & \multicolumn{1}{c||}{0.001}        & \multicolumn{1}{c||}{0.004}           & 0.002         \\ \hline
+\multicolumn{1}{||c||}{\textit{WolfSSL}}       & C/C++             & \multicolumn{1}{c||}{0.005}         & \multicolumn{1}{c||}{0.013}        & \multicolumn{1}{c||}{0.004}        & \multicolumn{1}{c||}{0.005}           & 0.000         & \multicolumn{1}{c||}{0.004}         & \multicolumn{1}{c||}{0.010}        & \multicolumn{1}{c||}{0.003}        & \multicolumn{1}{c||}{0.004}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{GnuTLS}}        & C/C++             & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.016}        & \multicolumn{1}{c||}{0.006}        & \multicolumn{1}{c||}{0.007}           & 0.001         & \multicolumn{1}{c||}{0.007}         & \multicolumn{1}{c||}{0.013}        & \multicolumn{1}{c||}{0.002}        & \multicolumn{1}{c||}{0.007}           & 0.001         \\ \hline
+\multicolumn{1}{||c||}{\textit{Crypto}}        & Go                & \multicolumn{1}{c||}{0.150}         & \multicolumn{1}{c||}{0.322}        & \multicolumn{1}{c||}{0.126}        & \multicolumn{1}{c||}{0.147}           & 0.011         & \multicolumn{1}{c||}{0.150}         & \multicolumn{1}{c||}{0.289}        & \multicolumn{1}{c||}{0.134}        & \multicolumn{1}{c||}{0.147}           & 0.011         \\ \hline
+\multicolumn{1}{||c||}{\textit{Bouncy Castle}} & Java              & \multicolumn{1}{c||}{0.540}         & \multicolumn{1}{c||}{1.878}        & \multicolumn{1}{c||}{0.408}        & \multicolumn{1}{c||}{0.532}           & 0.058         & \multicolumn{1}{c||}{0.383}         & \multicolumn{1}{c||}{1.324}        & \multicolumn{1}{c||}{0.304}        & \multicolumn{1}{c||}{0.365}           & 0.063         \\ \hline
+\multicolumn{1}{||c||}{\textit{Sun}}           & Java              & \multicolumn{1}{c||}{0.144}         & \multicolumn{1}{c||}{0.616}        & \multicolumn{1}{c||}{0.118}        & \multicolumn{1}{c||}{0.136}           & 0.019         & \multicolumn{1}{c||}{0.126}         & \multicolumn{1}{c||}{0.879}        & \multicolumn{1}{c||}{0.093}        & \multicolumn{1}{c||}{0.121}           & 0.017         \\ \hline
+\multicolumn{1}{||c||}{\textit{Certvalidator}} & Python            & \multicolumn{1}{c||}{0.162}         & \multicolumn{1}{c||}{0.340}        & \multicolumn{1}{c||}{0.147}        & \multicolumn{1}{c||}{0.159}           & 0.010         & \multicolumn{1}{c||}{0.154}         & \multicolumn{1}{c||}{0.288}        & \multicolumn{1}{c||}{0.096}        & \multicolumn{1}{c||}{0.154}           & 0.017         \\ \hline
+\multicolumn{1}{||c||}{\textit{CERES}}         & Python            & \multicolumn{1}{c||}{0.534}         & \multicolumn{1}{c||}{0.980}        & \multicolumn{1}{c||}{0.220}        & \multicolumn{1}{c||}{0.524}           & 0.035         & \multicolumn{1}{c||}{0.363}         & \multicolumn{1}{c||}{0.784}        & \multicolumn{1}{c||}{0.140}        & \multicolumn{1}{c||}{0.396}           & 0.130         \\ \hline
+\multicolumn{1}{||c||}{\textit{ARMOR}}         & Agda              & \multicolumn{1}{c||}{2.641}         & \multicolumn{1}{c||}{4.553}        & \multicolumn{1}{c||}{2.207}        & \multicolumn{1}{c||}{2.618}           & 0.118         & \multicolumn{1}{c||}{2.518}         & \multicolumn{1}{c||}{4.665}        & \multicolumn{1}{c||}{0.053}        & \multicolumn{1}{c||}{2.544}           & 0.300         \\ \hline
+\end{tabular}
+\end{table*}
