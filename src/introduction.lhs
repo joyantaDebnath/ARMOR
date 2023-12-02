@@ -1,5 +1,6 @@
 % -*- eval: (flyspell-mode); -*-
 \section{Introduction}
+\label{sec:introduction}
 
 The \xfon PKI standard~\cite{cooper2008internet} provides a scalable way to verify the binding of an entity's identity with its public-key. 
 This identity-public-key binding is represented as an \xfon certificate, which is digitally signed by an issuer\footnote{The issuer of an \xfon certificate can also be the entity itself, 

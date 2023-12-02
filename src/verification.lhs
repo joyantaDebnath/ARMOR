@@ -19,7 +19,8 @@ requires the \texttt{--guardedness} language feature.
 The use of these two features together \emph{in the declaration of a coinductive
   type} causes logical inconsistency~\cite{AgdaIssue-1209}.
 In our code base, the only module which enables both features is the
-\emph{Driver}, which does not define any coinductive types.
+\emph{Driver} (because it needs to invoke the \emph{String canonicalizer} and
+perform IO), which does not define any coinductive types.
 
 In addition, we trust the correctness of the \ghc \haskell compiler to generate
 the executable binary, we assume that the verifier's trust anchor (\ie, the
@@ -388,7 +389,7 @@ NoSubstrings G =
   forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
   -> G xs1 -> G xs2 -> xs1 == xs2
 \end{code}
-Given that \xfon uses \(<T,L,V>\) encoding, it is
+Given that \xfon uses \tlv encoding, it is
 unsurprising that that we are able to prove |NoSubstrings| holds for our
 specification.
 This property is also an essential lemma to prove \emph{strong

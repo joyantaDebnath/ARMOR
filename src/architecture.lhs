@@ -421,8 +421,65 @@
 
 
 \section{Design of \armor}
-This section presents the technical challenges of our work, our insights on
-addressing the challenges, and finally an overview of \armor's architecture.
+This section presents the philosophy behind our approach, the technical
+challenges of our work and insights into addressing them, and finally an
+overview of \armor's architecture.
+
+\subsection{Philosophy}
+\subsubsection*{Relational Specifications}
+The central tenant of our approach to formally verifying \armor is to do so with
+respect to high-level, relational, and implementation-independent
+specifications, and we have remained faithful to this tenant except in the case
+of the \emph{Base64 decoder} module.\todo{\tiny String prep?}
+Our motivation for adhering to this discipline is two-fold.
+\begin{enumerate}
+\item \textbf{A specification is always part of the trusted computing base (TCB).}
+  Formally verified software is only as trustworthy as the specification with respect
+  to which it is verified.
+  \emph{Relational} specifications that describe how the input and output are
+  related without referencing implementation details are, in general, simpler
+  and thus easier for humans evaluate the trustworthiness of than specifications
+  that do reference such details.
+  
+\item \textbf{A specification can be valuable in its own right.}
+  Specifications are useful as documentation, and they are made all the more
+  valuable by being applicable to a wide range of implementations for a
+  particular software task.
+  Due to the inherent complexity \xfon CCVL, there is a vast space for
+  non-trivial variations in implementation (\eg, combining parsing with
+  semantic validation, differences in approach to parsing, etc.), something that
+  RFCs specifying \xfon CCVL explicitly acknowledge and aim to accommodate
+  Rather than providing correctness proofs that are limited to our particular
+  implementation, we seek to provide a formal, machine-checked alternative to
+  the RFCs by giving \emph{implementation-agnostic} correctness specifications.
+\end{enumerate}
+
+As a concrete example for our motivation, consider the task of formally
+verifying a particular sorting algorithm.
+We could either prove it correct by showing it is extensionally equal to some
+other sorting algorithm (\eg, \emph{mergesort}), \emph{or} state the correctness
+property relationally: the output is a permutation of the input with the
+property that for every adjacent pair of elements, the first is no greater than
+the second.
+Not only is it clear that it is the second, relational property that we
+ultimately care about for a sorting algorithm, if we did not already have this
+as our intuition for \emph{what a sorting should achieve}, then the usefulness
+of the first property \emph{as a form of communication} is limited.
+
+\subsubsection*{Modularity}
+We decompose \armor into independent modules, which (as we discussed in
+Section~\ref{sec:introduction}) has the practical advantage of facilitating both
+our implementation and verification efforts.
+Also lying behind this design choice is a philosophical concern, namely
+\emph{what should the formal end-to-end guarantees of \xfon CCVL even be?}
+The input to \armor is a character string and the result is a
+verdict and a list of public keys and signatures.
+While we could present a relational join of each of the correctness properties
+of each module as an end-to-end guarantee, in our view this ``leaks''
+implementation details, specifically our modular decomposition of \xfon CCVL (an
+approach that is not shared by many other implementations).
+We therefore refrain from positioning our results as an end-to-end guarantee,
+leaving such a task for future research.
 
 \subsection{Technical Challenges}
 There are several challenges for to our work.
