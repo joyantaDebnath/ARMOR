@@ -130,7 +130,7 @@ expression of type |Fin n|.
 \end{itemize}
 
 
-\says{joy}{Maximality} \\
+
 
 \begin{table*}[h]
   % \captionsetup{font=footnotesize}
