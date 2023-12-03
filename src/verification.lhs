@@ -653,7 +653,7 @@ strongCompleteness ua ns p xs inG = (w , strong xs inG s)
   where
   w = completeness p inG
   s = toWitness w
-  strong : forall xs inG s -> (_ , inG) == (_ , Success.value s)
+  strong : forall xs inG s -> (dashcomma inG) == (dashcomma Success.value s)
   strong xs inG s with ns _ inG (Success.prefix s)
   ... | refl with ua inG (Success.value s)
   ... | refl = refl
@@ -679,6 +679,10 @@ In the definition, we exhibit witness |w| using the previous proof
 |completeness|, and in the helper proof |strong| we use the assumptions |ns :
 NoSubstrings G| and |ua : Unambiguous G| to prove that |xs| and |inG| are equal
 to the |prefix| consumed and |value| returned by |p xs|.
+Note that in the type signature of |strong|, |dashcomma| is a \emph{function}
+(with precedence lower than ordinary function application) that builds a tuple,
+used when the type of the second component of the tuple uniquely determines the
+value of the first component.
 
 \emph{Strong completeness from maximality.}
 For PEM, even though the format lacks the \emph{no-substrings} property we can
@@ -699,6 +703,109 @@ strongCompletenessMax : forall {G} -> Unambiguous G
 \end{figure}
 
 \subsection{Verification of Chain Builder}
+The section presents the \emph{Chain builder}, for which we have proven
+soundness.
+Adhering to our discipline of providing high-level, relational specifications,
+we dedicate the bulk of this section to explaining how soundness is formalized,
+presenting at the end the type of our correct-by-construction chain builder.
+
+\subsubsection{Relating a Certificate to a Certificate of its Issuer}
+
+\begin{figure}
+  \begin{code}
+_IsIssuerFor_ : forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2 -> Set
+issuer IsIssuerFor issuee =
+  NameMatch (Cert.getIssuer issuee) (Cert.getSubject issuer)    
+
+_IsIssuerFor_In_ :  forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2
+                    -> (certs : List (exists Cert)) -> Set
+issuer IsIssuerFor issuee In certs =
+  issuer IsIssuerFor issue Land (dashcomma issuer) `elem` certs
+  \end{code}
+  \caption{|_IsIssuerFor_In_| relation}
+  \label{fig:isissuer}
+\end{figure}
+
+In Figure~\ref{fig:isissuer}, |c1 IsIssuerFor c2| expresses the property that |c1|
+is a certificate for the issuer of certificate |c2|.
+\agda provides great flexibility in defining infix and mixfix operations through
+the use of underscores in identifiers, so by writing |_IsIssuerFor_|, we can use
+|IsIssuerFor| as a infix binary relation.
+|IsIssuerFor| is defined using |NameMatch| (definition not shown), which
+expresses that two distinguished names are equal after string canonicalization.
+
+Of course, for chain building we are not just interested in \emph{whether} one
+certificate represents an issuer for another, but \emph{where} that issuer came
+from, \ie, whether it came from the trusted CA certificates or as part of the
+message sent by the entity we are trying to authenticate.
+It is therefore useful to define the 3-place (mixfix) relation |c1 IsIssuerFor
+c2 In certs|, which expresses the additional property that |issuer| is an
+element of |certs|.
+We briefly explain the unfamiliar parts of this definition.
+First, the type |exists
+Cert| is a convenience notation for the type of pairs whose first component is a
+bytestring |xs| and whose second component is a proof of type |Cert xs|;
+therefore, the type of the argument |certs : List (exists Cert)| tells us
+|certs| is a list of such tuples.
+Second, the binary relation |_`elem`_| (appearing in the definition as
+|(dashcomma issuer) `elem` certs|) is defined in \agda's standard library and
+expresses that the left expression is an element of the list on the right.
+
+\subsubsection{Definition of |Chain| and the Sound-By-Construction Chain Builder}
+
+\begin{figure}
+  \begin{code}
+data Chain (trust certs : List (exists Cert))
+  : forall {@0 xs} -> Cert xs -> Set where
+  root :  forall {@0 xs1 xs2} {c : Cert xs1} {r : Cert xs2}
+          -> r IsIssuerFor c In trust -> Chain trust certs c
+  link :  forall {@0 xs1 xs2} {c1 : Cert xs1} {c2 : Cert xs2}
+          -> (isIn : c1 IsIssuerFor c2 In certs)
+          -> Chain trust (certs emdash (proj2 isIn)) c2
+          -> Chain trust certs c1
+  \end{code}
+  \caption{|Chain|}
+  \label{fig:s4-chain}
+\end{figure}
+
+We now have everything need to specify a correct chain, shown in
+Figure~\ref{fig:s4-chain}.
+|Chain trust certs c| is the type of proofs that there exists a path beginning
+with the entity whose certificate is |c|, ending with a certificate in |trust|,
+and whose intermediate steps are pulled uniquely from |certs|.
+The base case for |Chain| is given by constructor |root|, which says the chain
+is complete if we find a certificate for the issuer of |c| in |trust|.
+In the inductive case, we have that if |c1| is the certificate for an issuer of
+|c2| in the input certificate list |certs|, then to build a valid chain of trust
+to |c1| we need a valid chain of trust to |c2|.
+
+Moreover, to prohibit |c2| from appearing than once, the list of valid
+intermediate certs between |c2| and the trust anchor must be reduced.
+This is captured by the expression |certs emdash (proj2 isIn)|, where |emdash|
+takes a list and a proof some element is a member of it and returns a list where
+that member has been remove.
+Not only does this capture a crucial correctness guarantee, but it is essential
+for convincing \agda's termination checker that chain building is terminating:
+since the element we are trying to remove has been proven to be in the list, the
+length of the resulting list is strictly smaller than the list we started with.
+
+\begin{figure}
+  \begin{code}
+buildChains
+  :  forall (trust certs : List (exists Cert))
+     -> forall {@0 bs} (c : Cert bs) -> List (Chain trust certs c)
+buildChains = ...
+  \end{code}
+  \caption{Chain building function (type only)}
+  \label{fig:s4-chain-builder}
+\end{figure}
+We can at last present the type of our sound-by-construction chain builder,
+shown in Figure~\ref{fig:s4-chain-builder}.
+We read it as follows: for all certificate lists |trust| and |certs|, and for
+every certificate |c|, we can produce a list of chains which authenticates |c|
+using intermediate certificates for |certs| and ending with an issuing
+certificate from |trust|.
+
 
 \subsection{Verification of String Canonicalizer}
 

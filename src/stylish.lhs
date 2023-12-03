@@ -175,6 +175,8 @@
 %format  *>        = "\mathbin{\HSSym{*\!\!>}}"
 %format <*         = "\mathbin{\HSSym{<\!\!*}}"
 %format ?          = "\HSVar{?}\,"
+%format dashcomma  = "\HSVar{\mhyphen ,}"
+%format emdash     = "\mathbin{\HSSym{\leftrightline}}"
 
 %% Formatting single letters and subscripts by
 %% default.

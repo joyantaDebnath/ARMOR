@@ -122,6 +122,7 @@
 \usepackage{todonotes}
 
 \usepackage[normalem]{ulem}
+\usepackage{MnSymbol}
 
 %%%%%%% General stuff
 \newcommand{\etal}{\textit{et al.}\xspace}
