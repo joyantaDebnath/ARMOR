@@ -2,15 +2,16 @@
 \section{Introduction}
 \label{sec:introduction}
 
-The \xfon PKI standard~\cite{cooper2008internet} provides a scalable way to verify the binding of an entity's identity with its public-key. 
-This identity-public-key binding is represented as an \xfon certificate, which is digitally signed by an issuer\footnote{The issuer of an \xfon certificate can also be the entity itself, 
-whose identity and public-key binding is vouched for in the certificate. Such
-certificates are commonly known as self-signed certificates.} 
+The \xfon PKI standard~\cite{cooper2008internet} provides a scalable way to verify the authenticity of the binding of an entity's identity with its public-key. 
+This identity-public-key binding is represented as an \xfon certificate, which is digitally signed by an issuer 
+%\footnote{The issuer of an \xfon certificate can also be the entity itself, 
+%whose identity and public-key binding is vouched for in the certificate. Such
+%certificates are commonly known as self-signed certificates.} 
 (\eg, certificate authority or CA), 
 signifying the issuer's trust in the authenticity and integrity of this binding. For scalably establishing the authenticity and integrity of a certificate, the \xfon standard takes advantage of the \emph{transitivity} of this ``\emph{trust}'' relationship. 
 This intuition is realized in the \xfon standard~\cite{cooper2008internet} through a \emph{certificate chain validation} algorithm. Concretely, when an 
-entity $e_1$ wants to check whether the certificate of another entity $e_2$ is authentic, this algorithm starts with the certificate of a  
-trust anchor (\ie, an issuer who is unconditionally trusted by $e_1$) and then attempts to extend this absolute trust through a chain of input certificates, 
+entity $e_1$ wants to check whether the certificate (given, as part of an input chain of certificates) of another entity $e_2$ is authentic, this algorithm starts with the certificate of a  
+trust anchor (\ie, an issuer who is unconditionally trusted by $e_1$) and then attempts to extend this absolute trust through a chain of the input certificates, 
 all the way down to $e_2$.
 
 Implementations of \xfon certificate chain validation, hailed
@@ -22,7 +23,9 @@ flexible mechanism for public-key distribution.
 These desirable guarantees of \xfon PKI are often used as fundamental building
 blocks for achieving other security assurances such as \emph{confidentiality},
 \emph{integrity}, and  \emph{non-repudiation} in many applications, including
-but not limited to SSL/TLS, IPSec, HTTPS, Email, DNS over HTTPS/TLS, WiFi, code
+but not limited to SSL/TLS, IPSec, HTTPS, Email, 
+%DNS over HTTPS/TLS, 
+WiFi, code
 signing,  secure boot, firmware/software verification, and secure software
 update.
 % 
@@ -65,7 +68,7 @@ syntactic requirements of an \xfon certificate~\cite{kaminsky2010pki, debnath202
 Thus, proving total correctness of the parser is quite complicated.
 To make matters worse, parsing just the \asnone structure from the certificate byte stream 
 is insufficient because the relevant certificate field value may need to be further 
-decoded from the parsed \asnone value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \xsno DER parsing, string canonicalization, chain building, semantic validation, signature verification), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
+decoded from the parsed \asnone DER value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \xsno DER parsing, string canonicalization, chain building, semantic validation, signature verification), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
 
 \textbf{Approach}. \armor is designed and developed with modularity in mind. Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
 we modularly decompose the whole \xfon certificate chain validation 
