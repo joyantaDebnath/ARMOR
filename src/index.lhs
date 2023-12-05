@@ -80,6 +80,17 @@
 \usepackage{caption}
 \captionsetup[figure]{skip=0pt} % Adjust for your preferred distance
 
+% \usepackage[subtle]{savetrees} % Less white-space waste
+\linepenalty=1000 % Don't create orphans
+
+% \usepackage{enumitem} % List manipulation
+% \setlist{nosep} % to remove all spaces
+% %\setlist{noitemsep} % to leave space around whole list
+% \setlist[itemize]{leftmargin=*} % Globally remove bullet indent
+% % put [leftmargin=*] after \begin{itemize} to remove individual indent
+
+
+
 \usepackage{tikz}
 \newcommand*\circled[1]{\tikz[baseline=(C.base)]\node[draw,circle,inner sep=1.2pt,line width=0.2mm,](C) {\footnotesize #1};\!}
 
@@ -560,6 +571,7 @@
 
 % \title{ARMOR: A Verified Implementation of X.509 Certificate Chain Validation}
 \title{ARMOR: A Formally Verified Implementation of \xfon Certificate Chain Validation}
+\author{} 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
