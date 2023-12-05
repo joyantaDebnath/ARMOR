@@ -56,7 +56,7 @@ of semantic aspects; (3) lacks explicit proof of \emph{soundness} and \emph{comp
 parsing; (4) focuses only on verified encoding of certificates, not parsing.
 
 
-\textbf{Challenges}. Developing \armor required addressing the following technical challenges. 
+\noindent\textbf{Challenges}. Developing \armor required addressing the following technical challenges. 
  \emph{First}, the \xfon specification is distributed 
 across many documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
 5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
@@ -71,7 +71,7 @@ To make matters worse, parsing just the \asnone structure from the certificate b
 is insufficient because the relevant certificate field value may need to be further 
 decoded from the parsed \asnone DER value. \emph{Finally}, the \xfon chain validation can be conceptually decomposed into different stages (\ie, PEM parsing, Base64 decoding, \xsno DER parsing, string canonicalization, chain building, semantic validation, signature verification), each of which can be complex by itself (see~\cite{path, yahyazadeh2021morpheus, pkcsndss}).
 
-\textbf{Approach}. \armor is designed and developed with modularity in mind. 
+\noindent\textbf{Approach}. \armor is designed and developed with modularity in mind. 
 Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
 we modularly decompose the whole \xfon certificate chain validation 
 process into several modules. Such modularity facilitates both ease of implementation, 
@@ -138,7 +138,7 @@ mechanism to obtain \haskell code, which is then invoked by the driver.
 % These formal guarantees signify that it is possible to develop efficient parsers
 % for \xfon, although the grammar itself is context-sensitive. 
 
-\textbf{Evaluation}. As \armor, or any formally verified software, is only as
+\noindent\textbf{Evaluation}. As \armor, or any formally verified software, is only as
 good as its specification, it is crucial that we compare \armor{}'s specification 
 to other implementations to gain assurance that our interpretation of the natural language
 specification is indeed correct.
@@ -173,7 +173,7 @@ is more important than runtime overhead}.
 % \textbf{Evaluation and Notable Findings:} We aim to evaluate \armor's correctness in interpreting the specification, its performance as a benchmark, and its runtime and memory overhead. Therefore, we conduct differential testing against $11$ open-source \xfon implementations. Our evaluation uses a dataset of $2$ million certificates randomly selected from a snapshot of $1.5$ billion real certificates gathered from the \censys~\cite{censys} certificate repository. Our analysis shows that \armor enforces stricter validation rules compared to most libraries, rejecting $10,222$ certificate chains accepted by other libraries due to their violations of RFC-5280 requirements. \armor also showed no discrepancies compared to high-assurance implementation like \ceres~\cite{debnath2021re}. In terms of runtime and memory overhead, \armor consumes a considerable amount of memory compared to other libraries, yet its execution time is competitive, especially when compared to \ceres. These results suggest that despite not outperforming the \cpp libraries (\eg, \openssl~\cite{openssl}, \gnutls~\cite{gnutls}, \boringssl~\cite{boringssl}, \mbedtls~\cite{mbedtls}, \wolfssl~\cite{wolfssl}, \matrixssl~\cite{matrixssl}) regarding memory and runtime, \armor's correctness guarantees and reasonable runtime make it a viable choice for real-world scenarios.
 
 
-\textbf{Impact.} \armor can substantially improve the security 
+\noindent\textbf{Impact.} \armor can substantially improve the security 
 %and privacy 
 of critical applications that rely on 
 \xfon PKI (e.g., SSL/TLS). 
@@ -211,7 +211,7 @@ formal reference for programmers to consult.
 % \says{JD}{need to be more specific on which modules are formally proved. soundess and completeness are part of parser, not semantic validation. also, the properties are defined in terms of chain. are we sure?}
 
 % \textbf{Our Contributions:} 
-\textbf{Contributions.} We make five technical contributions.
+\noindent\textbf{Contributions.} We make five technical contributions.
 
 % \says{CJ}{Add parser-independent spec of grammar.}
 \begin{enumerate}\setlength{\itemsep}{0em}
