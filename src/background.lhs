@@ -1,6 +1,6 @@
 \newcommand{\field}[1]{\ensuremath{\mathsf{\small #1}}\xspace}
 \renewcommand{\chain}{\ensuremath{\mathcal{C}}\xspace}
-\section{Background and Motivation}
+\section{Background and Motivation of \armor}
 This section presents a primer on \xfon certificates and  
 certificate chain validation, the motivation of \armor, and 
 the underlying problem \armor aims to address. 
