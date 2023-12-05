@@ -10,7 +10,8 @@ This identity-public-key binding is represented as an \xfon certificate, which i
 (\eg, certificate authority or CA), 
 signifying the issuer's trust in the authenticity and integrity of this binding. For scalably establishing the authenticity and integrity of a certificate, the \xfon standard takes advantage of the \emph{transitivity} of this ``\emph{trust}'' relationship. 
 This intuition is realized in the \xfon standard~\cite{cooper2008internet} through a \emph{certificate chain validation} algorithm. Concretely, when an 
-entity $e_1$ wants to check whether the certificate (given, as part of an input chain of certificates) of another entity $e_2$ is authentic, this algorithm starts with the certificate of a  
+entity $e_1$ wants to check whether the certificate (given, as part of an input chain of certificates) of another entity $e_2$ is authentic, this algorithm \emph{conceptually} 
+starts with the certificate of a  
 trust anchor (\ie, an issuer who is unconditionally trusted by $e_1$) and then attempts to extend this absolute trust through a chain of the input certificates, 
 all the way down to $e_2$.
 
