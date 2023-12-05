@@ -1,18 +1,14 @@
 \section{Discussion}
 
-% \subsection{Supported Features}
 
-% \subsection{Unsupported Features}
+\noindent\textbf{Use Case.} ARMOR is intended to be used for the following three tasks-- (1) checking the compliance of other X.509 certificate chain validation implementations, (2) validating certificate chains for TLS-enabled web servers, and (3) integrating ARMOR in applications to handle the validation of X.509 certificate chains. However, applications developers also need to consider the higher runtime overhead of \armor when it is used for certificate chain validation in real-time.
 
-\subsection{Threats to Validity}
+\noindent\textbf{Threat to validity.}
 
-make
-\subsection{Limitations}
+\noindent\textbf{Limitations.} ARMOR has certain limitations: Firstly, it does not include verification of cryptographic operations, instead outsourcing signature verification to external libraries like \haclstar and \morpheus. Notably, an attempt to use the formally verified WhyMP library for modular exponentiation proved unsuccessful for some inputs, leading to reliance on Python's cryptography library. Furthermore, ARMOR offers no guarantees of memory-safety correctness and does not feature a formally-verified string canonicalizer. The existing string canonicalizer is limited, as it does not block bidirectional characters and only handles UTF-8 encoded Unicode characters. Lastly, ARMOR does not support hostname verification and revocation checking, leaving unclear whether these tasks should be incorporated in X.509 implementations or left to application developers. This exclusion simplifies the verification process but limits the ARMOR's scope.
 
-\noindent\textbf{Cryptographic operations.} Verification of cryptographic
-operations is out-of-scope for this work.
-We outsource the signature
-verification process to a high-assurance external cryptography library.
+
+
 
 
 % \begin{table*}[h]
