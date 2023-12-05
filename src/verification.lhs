@@ -17,7 +17,7 @@ and relegate the discussion of the other components in the full version of the p
 % In this section, we briefly introduce Agda and then detail the
 % design and verified guarantees of \armor's \agda modules.
 
-\begin{table*}[t]
+\begin{table}[t]
   % \captionsetup{font=footnotesize}
 \centering
 \sffamily\scriptsize
@@ -27,13 +27,13 @@ and relegate the discussion of the other components in the full version of the p
   \sffamily\scriptsize
   \label{table:summary-of-guarantees}
 \centering
-\begin{tabular}{c||c||c||c||c||c||c||}
-\cline{2-7}
-\textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}X.690 DER and\\ X.509 Parsers\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}String \\ Canonicalizer\end{tabular}} & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
-\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Implementation\\ Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Maximality\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & .....                                                                    & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} \\ \hline
-\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguousness                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguousness\\ Non-malleability\\ No-substrings\end{tabular} & N/A                                                                            & ......                                                                   & N/A                                                                            \\ \hline
+\begin{tabular}{c||c||c||c||c||c||}
+\cline{2-6}
+\textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}DER\\ Parser\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Maximality\\ Terminate\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular}                                                                    & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular} \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguous                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguous\\ Nonmalleable\\ No substrings\end{tabular} & N/A                                                                                                                                              & N/A                                                                            \\ \hline
 \end{tabular}
-\end{table*}
+\end{table}
 
 
 \noindent\textbf{Trusted Computing Base (TCB).}
