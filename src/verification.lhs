@@ -9,7 +9,7 @@ following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.6
 %   , and
 % \emph{String canonicalizer}.
 For these verification tasks, 
-which took 2.5 person years to complete, we use the \agda interactive theorem
+which took 12 person months to complete, we use the \agda interactive theorem
 prover~\cite{bove2009brief, No07_agda}. 
 Due to space constraints, we only discuss the correctness guarantees of the X.690 DER and X.509 parsers, 
 and relegate the discussion of the other components in the full version of the paper \cite{armor-full-version}. 
