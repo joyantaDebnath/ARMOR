@@ -201,6 +201,7 @@
 
 
 \newcommand{\censys}{\ensuremath{\mathsf{Censys}}\xspace}
+\newcommand{\eff}{\ensuremath{\mathsf{EFF}}\xspace}
 \newcommand{\frankencert}{\ensuremath{\mathsf{Frankencert}}\xspace}
 \newcommand{\morpheus}{\ensuremath{\mathsf{Morpheus}}\xspace}
 \newcommand{\haclstar}{\ensuremath{\mathsf{HACL^*}}\xspace}

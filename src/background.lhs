@@ -105,7 +105,7 @@ have the same logical error. Having a formally verified \emph{test oracle} like 
 decrease the change of undetected bugs. In addition, these approaches cannot 
 provide any mathematical assurance of correctness for the tested implementations. 
 This is corroborated through many high impact bugs and  vulnerabilities found in 
-some widely used applications and open-source libraries over the last decade~\cite{CVE-2020-5523, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527,  CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}. In contrast, a formally verified implementation of \xfon certificate validation like \armor 
+some widely used applications and open-source libraries over the last decade~\cite{CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2023-33201, CVE-2023-40012}. In contrast, a formally verified implementation of \xfon certificate validation like \armor 
 can give mathematical assurance that it does not suffer from such logical bugs. 
 
 %\fuzzing~\cite{frank,

@@ -40,7 +40,7 @@ The majority of prior work focuses on developing software testing mechanisms spe
 different \xfon libraries~\cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt, rfcguided, symcert}. While these methods 
 have been beneficial in identifying numerous vulnerabilities, they often fall short of providing any formal guarantees regarding correctness. 
 This is corroborated through many high impact bugs and vulnerabilities in some widely used applications and open-source libraries 
-\cite{CVE-2020-5523, CVE-2020-13615, CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2021-34558, CVE-2020-36477, CVE-2021-43527, CVE-2022-3602, CVE-2022-3786, CVE-2022-3996, CVE-2022-47630, CVE-2022-4203, CVE-2023-0464, CVE-2023-2650, CVE-2023-33201, CVE-2023-40012, CVE-2023-39441}.   
+\cite{CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2023-33201, CVE-2023-40012}.   
 In contrast, a formally-verified implementation of \xfon certificate chain
 validation can provide mathematical assurances that the implementation behaves
 correctly, setting a benchmark for developing other such implementations.
