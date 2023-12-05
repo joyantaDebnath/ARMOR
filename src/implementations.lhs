@@ -11,7 +11,7 @@ After receiving these inputs, the \python driver invokes the \agda component.
 On the \agda side, the current time is read directly from the system. 
 This component then invokes the necessary parsers, builds the candidate certificate chains, 
 and conducts semantic validation as required. Finally, it returns the feedback along with some parsed information 
-(\ie, \texttt{Key Usage} purposes, \texttt{TBSCertificate} bytes, \texttt{SignatureValue} bytes, \texttt{SignatueAlgorithm}) 
+(\ie, \field{Key Usage} purposes, \field{TBSCertificate} bytes, \field{SignatureValue} bytes, \field{SignatueAlgorithm}) 
 to the \python side. Subsequently, the \python side takes over to perform signature verification and check the consistency 
 of the specified purpose in the end-user certificate. The final result of the chain validation process is determined and 
 provided by the \python implementation. 
