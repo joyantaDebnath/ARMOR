@@ -96,7 +96,7 @@ all of these approaches have to address is a lack of \emph{test oracle}. Most
 of the prior approaches rely on differential testing whether different implementations 
 are used as \emph{cross-checking test oracles}. These approaches, however, can potentially 
 suffer from undetected bugs, especially in the case that the implementations under test 
-have the same logical error. Having a formally verified \emph{test oracle} can substantially 
+have the same logical error. Having a formally verified \emph{test oracle} like \armor can substantially 
 decrease the change of undetected bugs. In addition, these approaches cannot 
 provide any mathematical assurance of correctness for the tested implementations. 
 This is corroborated through many high impact bugs and  vulnerabilities found in 
