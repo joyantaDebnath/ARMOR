@@ -17,8 +17,8 @@ Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x
 \textbf{Certificate Chain Validation.} A certificate chain \chain can be \emph{conceptually} 
 viewed as an ordered sequence of certificates, $\chain = [C_1, C_2, \ldots, C_{n-1}, C_n]$, in which $C_1$ to $C_{n-1}$ are the (intermediate) CA certificates whereas $C_n$ is
 the end-user certificate. Each certificate $C_i$ is issued by its
-predecessor $C_{i-1}$ (see Figure~\ref{cert_chain}). Roughly speaking, 
-the certificate chain validation can be \emph{conceptually} decomposed into the 
+predecessor $C_{i-1}$ (see Figure~\ref{cert_chain}). Roughly, 
+the certificate chain validation (CCVL) can be \emph{conceptually} decomposed into the 
 following stages: \emph{parsing}, \emph{semantic condition checking},  
 \emph{signature verification}, and \emph{trust anchor verification}.
 
@@ -68,7 +68,7 @@ the unconditional trust of $C_1$ through the intermediate CA certificates
   \end{figure}
 
 For ease of exposition, the certificate chain validation described here is intentionally 
-left to be abstract. An implementation additionally has to take into account different corner cases. 
+left to be simple and abstract. An implementation additionally has to take into account different corner cases. 
 As an example, the presented certificate chain \chain may not be in the 
 correct hierarchical order, also may not contain some CA certificates, or may 
 contain duplicates. It is the implementation's responsibility to construct potential chains 
