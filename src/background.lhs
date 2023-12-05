@@ -2,8 +2,9 @@
 \renewcommand{\chain}{\ensuremath{\mathcal{C}}\xspace}
 \section{Background and Motivation of \armor}
 This section presents a primer on \xfon certificates and  
-certificate chain validation, the motivation of \armor, and 
-the underlying problem \armor aims to address. 
+certificate chain validation, and the motivation of \armor.
+% , and 
+% the underlying problem \armor aims to address. 
 
 %a brief discussion on \xfon certificate chain validation,
 %highlighting prior works on testing open-source \xfon implementations and
