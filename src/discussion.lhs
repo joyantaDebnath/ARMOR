@@ -6,8 +6,13 @@
 
 \subsection{Threats to Validity}
 
-make\subsection{Limitations}
+make
+\subsection{Limitations}
 
+\noindent\textbf{Cryptographic operations.} Verification of cryptographic
+operations is out-of-scope for this work.
+We outsource the signature
+verification process to a high-assurance external cryptography library.
 
 
 % \begin{table*}[h]

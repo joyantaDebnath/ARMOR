@@ -5,6 +5,125 @@ technical challenges.
 %challenges of our work and insights into addressing them, and finally an
 %overview of \armor's architecture.
 
+\subsection{Technical Challenges}
+Realizing \armor{}'s vision of a formally verified \xfon library 
+requires addressing the following technical challenges. 
+%There are several challenges for to our work.
+
+\noindent\textbf{Complexities in specifications.}
+%\label{sec:s3-tc1}
+The \xfon specification is distributed 
+across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
+5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
+4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC
+4518~\cite{zeilenga2006lightweight}). The natural language specification has
+been shown to suffer from inconsistencies, ambiguities, and
+under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}.
+As an example, consider the following requirements of a
+certificate's \emph{serial number} extracted from 
+%the specification for version 3 \xfon
+%certificates, 
+RFC 5280~\cite{cooper2008internet}.
+\quoteRFC{%
+  The serial number MUST be a positive integer assigned by the CA to
+  each certificate. [...]  
+  %It MUST be unique for each certificate issued by a
+  %given CA (i.e., the issuer name and serial number identify a unique
+  %certificate).  
+  CAs MUST force the serialNumber to be a non-negative
+  integer.%
+}%
+\noindent The two requirements here are inconsistent as one part 
+excludes zero as serial number while the other allows it. 
+%This discrepancy is
+%noted in Errata ID 3200, the current status of which is ``Held for Document
+%Update,'' meaning it has been acknowledged as a valid erratum but its
+%correction is not considered sufficient motivation to update the RFC.
+
+Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie,
+\emph{producer} rules) but also for the implementations that validate
+certificate chains (\eg, \emph{consumer} rules). In another way, RFC 5280 can be
+categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic
+rules are concerned with the parsing of an \xfon certificate serialized as a
+byte stream, the semantic rules impose constraints on the values of individual
+fields within a certificate and on the relationships between field values across
+different certificates in a chain. Unfortunately, these intertwined sets of
+rules further complicate the specification, making it challenging to determine
+how an \xfon consumer implementation should respond in certain cases (\ie,
+whether to accept a chain).
+
+
+\noindent\textbf{Complexities in DER parsing.} 
+The internal representation of an \xfon certificate, while described in the
+\emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
+the \xsno Distinguished Encoding Rules (DER)~\cite{rec2002x}.
+This DER representation of the certificate byte stream internally 
+has the form \tlv, 
+%follows a \tlv
+%structure to represent each certificate field, 
+where $t$ denotes the
+type, $v$ indicates the actual content, and $\ell$ signifies the length in bytes of
+the $v$ field. Additionally, the $v$ field can include multiple and nested \tlv
+structures, adding additional layers of complexity to the binary data.
+Parsing such a binary data is challenging and error-prone since it 
+always requires passing the value of the $\ell$ field
+(length) to accurately parse the subsequent $v$ field. Since the internal
+grammar of a DER-encoded certificate is \emph{context-sensitive}, 
+developing a \emph{correct} parser for such a grammar is 
+non-trivial~\cite{kaminsky2010pki, debnath2021re}. 
+
+To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
+is insufficient because the relevant certificate field value may need to be further 
+decoded from the parsed \asnone value.
+Take the example of \xfon specification for using \field{UTCTime} format in certificate validity
+field. 
+It uses a two-digit year representation, $YY$, and here lies the potential for
+misinterpretation.
+In this format, values from $00$ to $49$ are deemed to belong to the $21st$
+century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the $20th$ century and
+are consequently translated into $19YY$.
+These restrictions on the \field{UTCTime} format allow the representation of
+years only from $1950$ to $2049$.
+Therefore, library developers need to be very careful to decode the actual value of \field{UTCTime}
+to avoid potential certificate chain validation errors, 
+a mistake previously found by Chau \etal~\cite{symcert} in some TLS libraries (\eg, MatrixSSL, axTLS).
+
+
+% \begin{figure}[h]
+%   \centering
+%   \scriptsize
+%   \includegraphics[scale=0.73]{img/stages.drawio.pdf} \\
+%   \caption{Conceptual workflow of certificate chain validation}
+%   \label{cert_validation}
+% \end{figure}
+
+\noindent\textbf{Supporting different certificate representations.}
+An \xfon library has to expose different interfaces for
+supporting different representations of an \xfon certificate.
+As an example, the certificates in a root store are saved in
+the PEM format whereas the certificates obtained during a TLS
+connection are represented as a DER encoded bytestream.
+
+
+\noindent\textbf{Complexities in individual stages.} 
+The \xfon certificate chain validation
+algorithm can be conceptually decomposed into different stages (\ie, PEM
+parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain
+building, semantic checking, signature verification), each of which has its own
+challenges. To give a few examples: (1) building a valid \emph{certification path} can be
+difficult due to the lack of concrete directions as well as the possibility of
+having multiple valid certificate chains~\cite{path};
+(2) string canonicalization~\cite{zeilenga2006lightweight}, where strings are
+converted to their \emph{normalized} forms, is also a complex process, since the
+number of character sets is humongous considering all the languages worldwide;
+and (3) during signature verification, the implementation needs to carefully parse
+the actual contents of the \field{SignatureValue} field with relevant
+cryptographic operations to prevent attacks (\eg, \emph{RSA signature
+  forgery}~\cite{finney2006bleichenbacher,bleichenbacher1998chosen}).
+While these intermediate stages are conceptually straightforward, implementing
+them securely and proving their correctness are non-trivial.
+
+
 \subsection{\armor{}'s Verification Philosophy}
 \noindent\textbf{Relational Specifications.}
 The central tenant of our approach to formally verifying \armor is to do so with
@@ -64,148 +183,54 @@ approach that is not shared by many other implementations).
 We therefore refrain from positioning our results as an end-to-end guarantee,
 leaving such a task for future research.
 
-\subsection{Technical Challenges}
-There are several challenges for to our work.
-
-\subsubsection{Complexities in specifications}
-\label{sec:s3-tc1}
-The \xfon specification is distributed 
-across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
-5280~\cite{cooper2008internet}, RFC 6125~\cite{saint2011rfc}, RFC
-4158~\cite{cooper2005rfc}, RFC 2527~\cite{rfc2527}, RFC
-4518~\cite{zeilenga2006lightweight}), and its natural language specification has
-been shown to suffer from inconsistencies, ambiguities, and
-under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}.
-For example, consider the following quote regarding the requirements on a
-certificate's \emph{serial number} from the specification for version 3 \xfon
-certificates, RFC 5280~\cite{cooper2008internet}.
-
-\quoteRFC{%
-  The serial number MUST be a positive integer assigned by the CA to
-  each certificate.  It MUST be unique for each certificate issued by a
-  given CA (i.e., the issuer name and serial number identify a unique
-  certificate).  CAs MUST force the serialNumber to be a non-negative
-  integer.%
-}%
-
-\noindent Here, the first sentence is inconsistent  with the last sentence since one
-excludes zero as serial number but the other one allows it. This discrepancy is
-noted in Errata ID 3200, the current status of which is ``Held for Document
-Update,'' meaning it has been acknowledged as a valid erratum but its
-correction is not considered sufficient motivation to update the RFC.
-
-Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie,
-\emph{producer} rules) but also for the implementations that validate
-certificate chains (\eg, \emph{consumer} rules). In another way, RFC 5280 can be
-categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic
-rules are concerned with the parsing of an \xfon certificate serialized as a
-byte stream, the semantic rules impose constraints on the values of individual
-fields within a certificate and on the relationships between field values across
-different certificates in a chain. Unfortunately, these intertwined sets of
-rules further complicate the specification, making it challenging to determine
-how an \xfon consumer implementation should respond in certain cases (\ie,
-whether to accept or reject an input).
-
-\subsubsection{Complexities in DER parsing} The internal data structure of an \xfon certificate, while described in the
-\emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
-the \xsno Distinguished Encoding Rules (DER)~\cite{rec2002x}.
-This DER representation of the certificate byte stream internally follows a \tlv
-structure to represent each certificate field, where $T$ denotes the
-type, $V$ indicates the actual content, and $L$ signifies the length in bytes of
-the $V$ field. Additionally, the $V$ field can include multiple and nested \tlv
-structures, adding additional layers of complexity to the binary data.
-Parsing such a binary data is challenging and error-prone since it always requires passing the value of the $L$ field
-(length) to accurately parse the subsequent $V$ field. Since the internal
-grammar of a DER-encoded certificate is \emph{context-sensitive}, developing a
-\emph{correct} parser for such a grammar is not trivial~\cite{kaminsky2010pki, debnath2021re}. 
-
-To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
-is insufficient because the relevant certificate field value may need to be further 
-decoded from the parsed \asnone value.
-Take the example of \xfon specification for using \texttt{UTCTime} format in certificate validity
-field.
-It uses a two-digit year representation, $YY$, and here lies the potential for
-misinterpretation.
-In this format, values from $00$ to $49$ are deemed to belong to the $21st$
-century and are thus interpreted as $20YY$. In contrast, values from $50$ to $99$ are associated with the $20th$ century and
-are consequently translated into $19YY$.
-These restrictions on the \texttt{UTCTime} format allow the representation of
-years only from $1950$ to $2049$.
-Therefore, library developers need to be very careful to decode the actual value of \texttt{UTCTime}
-to avoid potential certificate chain validation errors, 
-a mistake previously found by Chau \etal~\cite{symcert} in some TLS libraries (\eg, MatrixSSL, axTLS).
-
-
-% \begin{figure}[h]
-%   \centering
-%   \scriptsize
-%   \includegraphics[scale=0.73]{img/stages.drawio.pdf} \\
-%   \caption{Conceptual workflow of certificate chain validation}
-%   \label{cert_validation}
-% \end{figure}
-
-
-\subsubsection{Complexities in individual stages} The \xfon certificate chain validation
-algorithm can be conceptually decomposed into different stages (\ie, PEM
-parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain
-building, semantic checking, signature verification), each of which has its own
-challenges.
-To give a few examples: (1) building a valid \emph{certification path} can be
-difficult due to the lack of concrete directions as well as the possibility of
-having multiple valid certificate chains~\cite{path};
-(2) string canonicalization~\cite{zeilenga2006lightweight}, where strings are
-converted to their \emph{normalized} forms, is also a complex process, since the
-number of character sets is humongous considering all the languages worldwide;
-and (3) during signature verification, the implementation needs to carefully parse
-the actual contents of the \texttt{SignatureValue} field with relevant
-cryptographic operations to prevent attacks (\eg, \emph{RSA signature
-  forgery}~\cite{finney2006bleichenbacher,bleichenbacher1998chosen}).
-While these intermediate stages are conceptually straightforward, implementing
-them securely is not trivial.
 
 
 
-\subsection{Our Insights} 
-We now discuss some design choices of our approach.
-\label{sec:s3-insights-on-tech-challenges}
-\subsubsection{Modular decomposition}
-Inspired by previous re-engineering efforts~\cite{nqsb-tls, debnath2021re,
-  ni2023asn1}, we design and develop \armor modularly.
-The entire process is broken down into smaller, manageable modules and each
-module is designed to perform a specific function, such as parsing, chain
-building, string canonicalization, and semantic validation. Such modularization
-allows us to precisely specify the requirements for each module and
-independently establish their correctness with machine-checked proofs.
-In addition, instead of trying to accomplish everything in a single step, this
-modularization allows us to undertake the chain validation task in multiple
-passes, simplifying the overall process. 
+% \subsection{Our Insights} 
+% We now discuss some design choices of our approach.
+% \label{sec:s3-insights-on-tech-challenges}
 
-\subsubsection{Specificity} As discussed in Section~\ref{sec:s3-tc1}, RFC 5280 comprises two main rule sets: \emph{producer rules} and \emph{consumer rules}. Our formalization specifically concentrates on the \emph{consumer rules}, which are intended for
-certificate chain validation implementations. Additionally, a clear separation
-between the syntactic and semantic rules is pivotal in formally specifying the
-chain validation requirements. However, having a balance is essential --- too
-many semantic checks incorporated into the parsing process can lead to an overly
-complex parser, while excluding all semantic checks during parsing can result in
-an overly lenient parser. Our strategy lies somewhere in the middle, taking
-inspiration from the prior work\cite{nqsb-tls, debnath2021re, ni2023asn1}. We
-categorize DER restrictions as part of the parsing rules, and the rest are left
-for semantic validation. We enforce the semantic check on DER's \tlv length
-bound into the parsing side, contributing to a manageable parser that maintains
-necessary rigor without becoming overly complex. Finally, we focus primarily on
-the most commonly used subset of the standard specifications. While the \xsno
-DER and RFC 5280 are comprehensive and detail numerous restrictions and
-possibilities, in reality, not all aspects of the specifications are uniformly
-or widely used. For example, not all the extensions specified in the standard
-are used in real-world certificates.
-Thus, we performed measurement studies on real-world certificate dataset to
-determine which features to support (see Section 5 for details).
+% \noindent\textbf{Modular decomposition.}
+% Inspired by previous work~\cite{nqsb-tls, debnath2021re,
+%   ni2023asn1}, we design and develop \armor modularly.
+% The entire process is broken down into smaller, manageable modules. Each
+% module is designed to perform a specific function, such as parsing, chain
+% building, string canonicalization, and semantic validation. Such modularization
+% allows us to precisely specify the requirements for each module and
+% independently establish their correctness with machine-checked proofs.
+% In addition, instead of trying to accomplish everything in a single step, this
+% modularization allows us to undertake the chain validation task in multiple
+% passes, simplifying the overall formal verification task. 
 
-\subsubsection{No verification of cryptographic operations} Verification of cryptographic
-operations is out-of-scope for this work. Therefore, we do not provide any
-formal specification and correctness guarantee for the signature verification
-stage. This design choice allows us to focus on the formal verification of rest
-of the modules while outsourcing the computationally-intensive signature
-verification process to well-known external libraries.
+% \noindent\textbf{Specificity.} As discussed before, 
+% RFC 5280 comprises of two main rule sets: \emph{producer rules} and \emph{consumer rules}. 
+% Our formalization specifically concentrates on the \emph{consumer rules}, which are intended for
+% certificate chain validation implementations. Additionally, a clear separation
+% between the syntactic and semantic rules is pivotal in formally specifying the
+% chain validation requirements. However, having a balance is essential --- too
+% many semantic checks incorporated into the parsing process can lead to an overly
+% complex parser, while excluding all semantic checks during parsing can result in
+% an overly lenient parser. Our strategy lies somewhere in the middle, taking
+% inspiration from the prior work~\cite{nqsb-tls, debnath2021re, ni2023asn1}. 
+% %We
+% %categorize DER restrictions as part of the parsing rules, and the rest are left
+% %for semantic validation. We enforce the semantic check on DER's \tlv length
+% %bound into the parsing side, contributing to a manageable parser that maintains
+% %necessary rigor without becoming overly complex. 
+% Finally, we focus primarily on
+% the most commonly used subset of the standard specifications. While the \xsno
+% DER and RFC 5280 are comprehensive and detail numerous restrictions and
+% possibilities, in reality, not all aspects of the specifications are uniformly
+% or widely used. For example, not all the extensions specified in the standard
+% are used in real-world certificates.
+% Thus, we performed measurement studies on real-world certificate dataset to
+% determine which features to support (see Section 5).
+
+% %We do not provide any
+% %formal specification and correctness guarantees for the signature verification
+% %stage. This design choice allows us to focus on the formal verification of rest
+% %of the modules while outsourcing the computationally-intensive signature
+% %verification process to well-known external libraries.
 
 \begin{figure}[h]
   \centering
@@ -216,8 +241,8 @@ verification process to well-known external libraries.
   \label{armor}
 \end{figure}
   
-
-Figure~\ref{armor}\todo{\tiny Map key} shows a high-level overview of the architecture
+\subsection{\armor{}'s Architecture}
+Figure~\ref{armor} shows a high-level overview of the architecture
 and the workflow of \armor.
 \armor \circled{A} takes a list of input certificates (\ie, end-user certificate
 and relevant CA certificates), a list of trusted CA certificates, the current

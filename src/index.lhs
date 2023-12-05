@@ -154,7 +154,7 @@
 \newcommand{\ber}{BER\xspace}
 \newcommand{\asnone}{ASN.1\xspace}
 \newcommand{\basesf}{Base64\xspace}
-\newcommand{\tlv}{\ensuremath{\langle T,L,V \rangle}\xspace}
+\newcommand{\tlv}{\ensuremath{\langle t,\ell,v\rangle}\xspace}
 
 \newcommand{\sdsi}{SDSI\textbackslash SPKI\xspace}
 \newcommand{\pgp}{PGP\xspace}
