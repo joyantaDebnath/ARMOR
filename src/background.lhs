@@ -68,13 +68,12 @@ the unconditional trust of $C_1$ through the intermediate CA certificates
   \end{figure}
 
 For ease of exposition, the certificate chain validation described here is intentionally 
-left to be simple. An implementation has to address different corner cases. 
+left to be abstract. An implementation additionally has to take into account different corner cases. 
 As an example, the presented certificate chain \chain may not be in the 
-correct hierarchical order, and also may not contain some CA certificates or may 
-contain duplicates. It is the implementation's responsibility to address these cases. 
-For a faithful description of the whole certificate chain validation, interested readers 
-can consult the  RFC 5280 
-\cite{cooper2008internet}. 
+correct hierarchical order, also may not contain some CA certificates, or may 
+contain duplicates. It is the implementation's responsibility to construct potential chains 
+and try to verify them. For a faithful and detailed description of the whole certificate chain validation, 
+interested readers can consult the  RFC 5280~\cite{cooper2008internet}. 
 %Note that the entire process of certificate chain validation is more complicated
 %than what we have described so far. For example, the implementation may not
 %receive the certificates in the proper hierarchical order, may miss some CA
