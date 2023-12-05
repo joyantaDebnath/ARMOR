@@ -19,18 +19,23 @@ viewed as an ordered sequence of certificates, $\chain = [C_1, C_2, \ldots, C_{n
 the end-user certificate. Each certificate $C_i$ is issued by its
 predecessor $C_{i-1}$ (see Figure~\ref{cert_chain}). Roughly, 
 the certificate chain validation (CCVL) can be \emph{conceptually} decomposed into the 
-following stages: \emph{parsing}, \emph{semantic condition checking},  
-\emph{signature verification}, and \emph{trust anchor verification}.
+following stages: \emph{parsing}, \emph{transformation and pre-processing}, 
+and \emph{semantic condition checking} (See Figure~\ref{armor}).  
+%\emph{signature verification}, and \emph{trust anchor verification}.
 
 The parsing stage checks to see whether each certificate $C_i$ in \chain  
-is syntactically well-formed. After parsing, the semantic condition checking 
+is syntactically well-formed and then parses it in an intermediate representation. 
+After parsing, the intermediate representation of \chain 
+goes through a series of transformations and pre-processing. 
+The semantic condition checking 
 stage checks to see whether the standard-prescribed 
 semantic conditions are fulfilled. These conditions 
-can be on a single certificate (e.g.,the certificate is not expired) or across certificates (e.g., 
+can be on a single certificate (e.g.,the certificate is not expired, the signature is verified) 
+or across certificates (e.g., 
 the subject name of the certificate $C_{i-1}$ is the same as the issuer name of the 
 certificate $C_i$). 
-The next stage is to check whether the digital signature 
-present in each certificate $C_i$ can be verified. 
+%The next stage is to check whether the digital signature 
+%present in each certificate $C_i$ can be verified. 
 Finally, one checks to see 
 whether $C_1$ is present in the trusted root store. All of these checks 
 together allows one to extend 
