@@ -207,13 +207,13 @@
 \newcommand{\crlite}{\ensuremath{\mathsf{CRLite}}\xspace}
 \newcommand{\ocspstapling}{\ensuremath{\mathsf{OCSP\mhyphen Stapling}}\xspace}
 
-\newcommand{\python}{\texttt{Python}\xspace}
-\newcommand{\fstar}{\texttt{F^*}\xspace}
-\newcommand{\cpp}{\texttt{C/C++}\xspace}
-\newcommand{\haskell}{\texttt{Haskell}\xspace}
-\newcommand{\agda}{\texttt{Agda}\xspace}
-\newcommand{\go}{\texttt{Go}\xspace}
-\newcommand{\java}{\texttt{Java}\xspace}
+\newcommand{\python}{\texttt{\small Python}\xspace}
+\newcommand{\fstar}{\texttt{\small F^*}\xspace}
+\newcommand{\cpp}{\texttt{\small C/C++}\xspace}
+\newcommand{\haskell}{\texttt{\small Haskell}\xspace}
+\newcommand{\agda}{\texttt{\small Agda}\xspace}
+\newcommand{\go}{\texttt{\small Go}\xspace}
+\newcommand{\java}{\texttt{\small Java}\xspace}
 
 \newcommand{\parser}{\ensuremath{\mathsf{Parser}}\xspace}
 \newcommand{\semantic}{\ensuremath{\mathsf{Semantic\mhyphen checker}}\xspace}

@@ -42,14 +42,16 @@ type-checker, compiler, and standard library (v1.7.1).
 % In particular, 
 Particularly, 
 our use of \agda's standard library includes the module
-\texttt{Data.Trie} (for the \emph{String canonicalizer}), which requires the
-\texttt{--sized-types} language feature, and the module \texttt{IO}, which
-requires the \texttt{--guardedness} language feature.
+\texttt{\small Data.Trie} (for the \emph{String canonicalizer}), which requires the
+\texttt{\small --sized-types} language feature, and the module \texttt{\small IO}, which
+requires the \texttt{\small --guardedness} language feature.
 The use of these two features together \emph{in the declaration of a coinductive
   type} causes logical inconsistency~\cite{AgdaIssue-1209}.
 In our code base,  the only module which enables both features is the
-\emph{Driver Interface} (because it needs to invoke the \emph{String canonicalizer} and
-perform IO), which however does not define any coinductive types.
+\emph{Driver Interface}. It, 
+%(because it needs to invoke the \emph{String canonicalizer} and perform IO), 
+% which, 
+however, does not define any coinductive types.
 
 \textbf{Termination.}
 By default, \agda employs a syntactic termination checking that ensures that

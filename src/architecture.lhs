@@ -7,7 +7,7 @@ technical challenges.
 
 \subsection{Technical Challenges}
 Realizing \armor{}'s vision of a formally verified \xfon library 
-requires addressing the following technical challenges. 
+requires addressing the following  challenges. 
 %There are several challenges for to our work.
 
 \noindent\textbf{Complexities in specifications.}
@@ -188,7 +188,7 @@ verdict and a public key.
 While we could present a relational join of each of the correctness properties
 of each module as an end-to-end guarantee, in our view this ``leaks''
 implementation details, specifically our modular decomposition of \xfon CCVL (an
-approach not necessarily shared by other implementations).
+approach not  shared by most implementations).
 We therefore refrain from positioning our results as an end-to-end guarantee,
 leaving such a task for future research.
 
