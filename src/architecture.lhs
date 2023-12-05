@@ -107,9 +107,11 @@ connection are represented as a DER encoded bytestream.
 
 \noindent\textbf{Complexities in individual stages.} 
 The \xfon certificate chain validation
-algorithm can be conceptually decomposed into different stages (\ie, PEM
-parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain
-building, semantic checking, signature verification), each of which has its own
+algorithm can be conceptually decomposed into different stages, 
+% (\ie, PEM
+% parsing, Base64 decoding, \asnone DER parsing, string canonicalization, chain
+% building, semantic checking, signature verification), 
+each of which has its own
 challenges. To give a few examples: (1) building a valid \emph{certification path} can be
 difficult due to the lack of concrete directions as well as the possibility of
 having multiple valid certificate chains~\cite{path};
@@ -169,17 +171,24 @@ of the first property \emph{as a form of communication} is limited.
 
 \noindent\textbf{Modularity.}
 We decompose \armor into independent modules (see Figure~\ref{armor}), 
-which (as we discussed in Section~\ref{sec:introduction}) has 
-the practical advantage of facilitating both
-our implementation and verification efforts.
+which %(as we discussed in Section~\ref{sec:introduction}) 
+facilitates 
+% has 
+% the 
+% %practical 
+% advantage of facilitating 
+both
+our 
+implementation and verification efforts.
 Also lying behind this design choice is a philosophical concern, namely
 \emph{what should the formal end-to-end guarantees of \xfon CCVL even be?}
 The input to \armor is a character string and the result is a
-verdict and a list of public keys and signatures.
+verdict and a public key. 
+% a list of public keys and signatures.
 While we could present a relational join of each of the correctness properties
 of each module as an end-to-end guarantee, in our view this ``leaks''
 implementation details, specifically our modular decomposition of \xfon CCVL (an
-approach that is not shared by many other implementations).
+approach not necessarily shared by other implementations).
 We therefore refrain from positioning our results as an end-to-end guarantee,
 leaving such a task for future research.
 

@@ -1,18 +1,18 @@
 \section{Verification Goals and Correctness Proofs}
-In this section, we briefly discuss \armor{}'s verification 
-goals and its correctness proofs. 
-Recall that, as shown in Figure~\ref{armor}, 
-we provide formal correctness guarantee for the
+We now briefly discuss \armor{}'s verification 
+goals and their correctness proofs. 
+% Recall that, as shown in Figure~\ref{armor}, 
+We provide formal correctness guarantee for the
 following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
-  X.509 parsers)}, \emph{Semantic validator}, and \emph{Chain builder}.
-A summary of the guarantees for each \armor component is in Table \ref{table:summary-of-guarantees}. 
+  X.509 parsers)}, \emph{Semantic validator}, and \emph{Chain builder} (see Table \ref{table:summary-of-guarantees} for a summary of guarantees).
+% A summary of these guarantees is in Table \ref{table:summary-of-guarantees}. 
 %   , and
 % \emph{String canonicalizer}.
 For these verification tasks, 
 which took 2.5 person years to complete, we use the \agda interactive theorem
 prover~\cite{bove2009brief, No07_agda}. 
-Due to space constraints, we mainly discuss the correctness guarantees of the parsers, 
-and relegate the discussion of the other components in the full version of the paper \cite{}. 
+Due to space constraints, we only discuss the correctness guarantees of the X.690 DER and X.509 parsers, 
+and relegate the discussion of the other components in the full version of the paper \cite{armor-full-version}. 
 
 % In this section, we briefly introduce Agda and then detail the
 % design and verified guarantees of \armor's \agda modules.
@@ -39,15 +39,17 @@ and relegate the discussion of the other components in the full version of the p
 \noindent\textbf{Trusted Computing Base (TCB).}
 Our TCB comprises of the \agda toolchain (v2.6.2.2), which includes its native
 type-checker, compiler, and standard library (v1.7.1).
-In particular, our use \agda's standard library includes the module
+% In particular, 
+Particularly, 
+our use of \agda's standard library includes the module
 \texttt{Data.Trie} (for the \emph{String canonicalizer}), which requires the
 \texttt{--sized-types} language feature, and the module \texttt{IO}, which
 requires the \texttt{--guardedness} language feature.
 The use of these two features together \emph{in the declaration of a coinductive
   type} causes logical inconsistency~\cite{AgdaIssue-1209}.
-In our code base, however, the only module which enables both features is the
+In our code base,  the only module which enables both features is the
 \emph{Driver Interface} (because it needs to invoke the \emph{String canonicalizer} and
-perform IO), which does not define any coinductive types.
+perform IO), which however does not define any coinductive types.
 
 \textbf{Termination.}
 By default, \agda employs a syntactic termination checking that ensures that
@@ -61,10 +63,10 @@ termination is guaranteed by \agda's syntactic checker everywhere except the
 additionally rests on the correctness of \agda's type-based checker.
 
 \textbf{Other Assumptions.}
-Finally, we trust the correctness of the \ghc \haskell compiler to generate
-the executable binary, we assume that the verifier's trust anchor (\ie, the
-trusted root CA store) is up-to-date and does not contain any malicious
-certificates, and that the current system time is accurate.
+We also make the following assumptions: (1) the \ghc \haskell compiler correctly generates
+the executable; (2) the verifier's %trust anchor (\ie, the
+trusted root CA store is up-to-date and does not contain any malicious
+certificates; (3) the current system time is accurate.
 
 \subsection{Preliminaries on Agda}
 \label{sec:s4-preliminaries-agda}
