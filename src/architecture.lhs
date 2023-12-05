@@ -242,14 +242,18 @@ leaving such a task for future research.
 \end{figure}
   
 \subsection{\armor{}'s Architecture}
-Figure~\ref{armor} shows a high-level overview of the architecture
+Figure~\ref{armor} shows the architecture
 and the workflow of \armor.
-\armor \circled{A} takes a list of input certificates (\ie, end-user certificate
-and relevant CA certificates), a list of trusted CA certificates, the current
+\armor \circled{A} takes a certificate chain, 
+% list of input certificates (\ie, end-user certificate
+% and relevant CA certificates), 
+a list of trusted CA certificates, the current
 system time, and optionally the expected certificate purpose as input and
 \circled{L} returns the certificate validation result (\ie, verdict) as well as
-the public-key of the end-user certificate as output. \armor's architecture is modular, comprising
-several distinct components. Concretely, \circled{B} The PEM Parser reads a
+the public-key of the end-user certificate as output. 
+% \armor's architecture is modular, comprising
+% several distinct components. 
+\circled{B} The PEM Parser reads a
 PEM certificate file and converts each certificate in the PEM file into its
 Base64 encoded format (sextets, \ie, unsigned 6 bit integers).
 \circled{C} The Base64 Decoder converts the the sextet strings into octet

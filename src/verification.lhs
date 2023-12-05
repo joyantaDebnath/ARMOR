@@ -1,13 +1,40 @@
 \section{Verification Goals and Correctness Proofs}
+In this section, we briefly discuss \armor{}'s verification 
+goals and its correctness proofs. 
+Recall that, as shown in Figure~\ref{armor}, 
+we provide formal correctness guarantee for the
+following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
+  X.509 parsers)}, \emph{Semantic validator}, and \emph{Chain builder}.
+A summary of the guarantees for each \armor component is in Table \ref{table:summary-of-guarantees}. 
+%   , and
+% \emph{String canonicalizer}.
+For these verification tasks, 
+which took 2.5 person years to complete, we use the \agda interactive theorem
+prover~\cite{bove2009brief, No07_agda}. 
+Due to space constraints, we mainly discuss the correctness guarantees of the parsers, 
+and relegate the discussion of the other components in the full version of the paper \cite{}. 
 
-As shown in Figure~\ref{armor}, we provide formal correctness guarantee for the
-following modules: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
-  X.509 parsers)}, \emph{Semantic validator}, \emph{Chain builder}, and
-\emph{String canonicalizer}.
-For these verification tasks, we use the \agda interactive theorem
-prover~\cite{bove2009brief, No07_agda}.
-In this section, we briefly introduce Agda and then detail the
-design and verified guarantees of \armor's \agda modules.
+% In this section, we briefly introduce Agda and then detail the
+% design and verified guarantees of \armor's \agda modules.
+
+\begin{table*}[t]
+  % \captionsetup{font=footnotesize}
+\centering
+\sffamily\scriptsize
+  \setlength\extrarowheight{1.5pt}
+  \setlength{\tabcolsep}{1.5pt}
+  \caption{A summary of correctness guarantees for each module in \armor}
+  \sffamily\scriptsize
+  \label{table:summary-of-guarantees}
+\centering
+\begin{tabular}{c||c||c||c||c||c||c||}
+\cline{2-7}
+\textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}X.690 DER and\\ X.509 Parsers\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}String \\ Canonicalizer\end{tabular}} & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Implementation\\ Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Maximality\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & .....                                                                    & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguousness                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguousness\\ Non-malleability\\ No-substrings\end{tabular} & N/A                                                                            & ......                                                                   & N/A                                                                            \\ \hline
+\end{tabular}
+\end{table*}
+
 
 \noindent\textbf{Trusted Computing Base (TCB).}
 Our TCB comprises of the \agda toolchain (v2.6.2.2), which includes its native
@@ -18,8 +45,8 @@ In particular, our use \agda's standard library includes the module
 requires the \texttt{--guardedness} language feature.
 The use of these two features together \emph{in the declaration of a coinductive
   type} causes logical inconsistency~\cite{AgdaIssue-1209}.
-In our code base, the only module which enables both features is the
-\emph{Driver} (because it needs to invoke the \emph{String canonicalizer} and
+In our code base, however, the only module which enables both features is the
+\emph{Driver Interface} (because it needs to invoke the \emph{String canonicalizer} and
 perform IO), which does not define any coinductive types.
 
 \textbf{Termination.}
@@ -29,12 +56,12 @@ This syntactic termination checker can be disabled through the explicit use of
 certain pragmas, or replaced with a \emph{type-based} termination checker
 through the use of sized types.
 \armor does not use any pragmas that disable termination checking, so its
-termination is guaratneed by \agda's syntactic checker everywhere except the
+termination is guaranteed by \agda's syntactic checker everywhere except the
 \emph{String canonicalizer} and its co-dependencies, whose termination guarantee
 additionally rests on the correctness of \agda's type-based checker.
 
 \textbf{Other Assumptions.}
-In addition, we trust the correctness of the \ghc \haskell compiler to generate
+Finally, we trust the correctness of the \ghc \haskell compiler to generate
 the executable binary, we assume that the verifier's trust anchor (\ie, the
 trusted root CA store) is up-to-date and does not contain any malicious
 certificates, and that the current system time is accurate.
@@ -132,23 +159,6 @@ expression of type |Fin n|.
 
 
 
-\begin{table*}[h]
-  % \captionsetup{font=footnotesize}
-\centering
-\sffamily\scriptsize
-  \setlength\extrarowheight{1.5pt}
-  \setlength{\tabcolsep}{1.5pt}
-  \caption{Summary of correctness guarantees for each module (incomplete)}
-  \sffamily\scriptsize
-  \label{sum-ver}
-\centering
-\begin{tabular}{c||c||c||c||c||c||c||}
-\cline{2-7}
-\textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}X.690 DER and\\ X.509 Parsers\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}String \\ Canonicalizer\end{tabular}} & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
-\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Implementation\\ Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Maximality\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} & .....                                                                    & \begin{tabular}[c]{@@{}c@@{}}Soundness\\ Completeness\\ Termination\end{tabular} \\ \hline
-\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguousness                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguousness\\ Non-malleability\\ No-substrings\end{tabular} & N/A                                                                            & ......                                                                   & N/A                                                                            \\ \hline
-\end{tabular}
-\end{table*}
 
 \subsection{Input Strings and Base64 Decoding}
 We used |Fin| as our example throughout Section~\ref{sec:s4-preliminaries-agda}
