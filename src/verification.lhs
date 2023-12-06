@@ -3,7 +3,9 @@ We now discuss \armor{}'s correctness proofs.
 % Recall that, as shown in Figure~\ref{armor}, 
 We provide formal correctness guarantee for the
 following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
-  X.509 parsers)}, \emph{Semantic validator}, and \emph{Chain builder} (see Table \ref{table:summary-of-guarantees} for a summary of guarantees).
+  X.509 parsers)}, \emph{Semantic validator}, and \emph{Chain builder} (see
+Table~\ref{table:summary-of-guarantees} for a summary of guarantees organized by
+module).
 % A summary of these guarantees is in Table \ref{table:summary-of-guarantees}. 
 %   , and
 % \emph{String canonicalizer}.
@@ -11,7 +13,9 @@ For these verification tasks,
 which took 12 person months to complete, we use the \agda interactive theorem
 prover~\cite{bove2009brief, No07_agda}. 
 Due to space constraints, we only discuss the correctness guarantees of the X.690 DER and X.509 parsers, 
-and relegate the discussion of the other components in the full version of the paper \cite{armor-full-version}. 
+and relegate the discussion of the other components in the full version of the
+paper \cite{armor-full-version}; see Table~\ref{tab:app-formal-guarantees} for a
+listing and brief description of all formal guarantees proven.
 
 % In this section, we briefly introduce Agda and then detail the
 % design and verified guarantees of \armor's \agda modules.
