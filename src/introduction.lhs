@@ -234,6 +234,10 @@ with respect to our formalized specification.
 \item We show an end-to-end application of \armor, integrating it with TLS 1.3 implementation of \boringssl and testing with the widely-used application \curl~\cite{curl}.
 \end{enumerate}
 
+\noindent\textbf{Full Version and The Artifacts.} The complete version of our paper and the details of our implementation are available at the following link: \url{https://anonymous.4open.science/r/armor-full-version/}.
+
+\noindent\textbf{Responsible Disclosure.} We are currently in the process of sharing our findings with the corresponding library developers.
+
 % Our work presents significant contributions to the field of \xfon PKI, as stated below.
 
 % \begin{enumerate}
