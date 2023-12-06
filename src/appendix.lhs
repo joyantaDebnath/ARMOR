@@ -118,39 +118,86 @@
   \begin{tabularx}{0.8\textwidth}{||c||c||X||}
     \hline
     \textbf{Property}
-    & \textbf{Domain}
+    & \textbf{Proven For}
     & \textbf{Description}
     \\ \hline
     |Unambiguous|
-    & Language
-    & One string cannot be the encoding of two distinc values.
+    & PEM, \xsno DER, \xfon
+    & One string cannot be the encoding of two distinct values.
     \\ \hline
     |NonMalleable|
-    & Language
+    & \xsno DER, \xfon
     & Two distinct strings cannot be the encoding of the same value.
     \\ \hline
     |UniquePrefixes|
-    & Language
-    & Parsers have no degrees of freedom of which prefix of an input they
-    accept.
-    \\ \hline
+    & \xsno DER, \xfon (\tlv)
+    & At most one prefix of a string is in the language.
+    \\ \hline \hline
+    Isomorphism
+    & Base64 decoder
+    & The Base64 decoder forms an isomorphism with a specificational encoder
+    between the set of octet strings and the subset of sextet strings that are
+    valid encodings.
+    \\ \hline \hline
     |MaximalParser|
-    & Parser
+    & PEM
     & If the parser consumes a prefix, that prefix is the longest one in the language.
     \\ \hline
-    |Sound|
-    & Parser
-    & If the parser accepts some prefix of an input, that prefix is in the
+    |Sound| (parser)
+    & PEM, \xsno DER, \xfon
+    & If the parser accepts some prefix, that prefix is in the
     language.
     \\ \hline
-    |Complete|
-    & Parser
-    & If the string is in the language, then the parser accepts some prefix of it.
+    |Complete| (parser)
+    & PEM, \xsno DER, \xfon
+    & If the string is in the language, the parser accepts some prefix of it.
     \\ \hline
     |StronglyComplete|
-    & Parser
+    & PEM, \xfon
     & If a string is in the language and encodes value |v|, the parser consumes
     \emph{exactly} that string and produces |v|.
+    \\ \hline \hline
+    Valid chain
+    & X.509
+    & Our specification |Chain| for chains consisting of a sequence of \(n\)
+    certificates satisfies the following properties by construction:
+    \begin{enumerate}
+    \item[(a)] for all \(x\in \{1 \ldots n-1\}\), the subject of certificate
+      \(x\) is the issuer of certificate \(x+1\);
+    \item[(b)] certificate \(1\) is issued by a trusted CA;
+    \item[(c)] certificate \(n\) is the certificate to be validated
+    \end{enumerate}
+
+    \\ \hline
+    Chain uniqueness
+    & \xfon
+    & Under the following assumptions, sequences of certificates satisfying our
+    |Chain| specification have no duplicates.
+    \begin{itemize}
+    \item The input certificate sequence has no duplicates.
+      
+    \item The certificate to be validated is not in the trusted root store.
+    \end{itemize}
+    \\ \hline
+    Sound chain builder
+    & \xfon
+    & By construction, the chain builder produces only chains satisfying the
+    specification |Chain|.
+    \\ \hline
+    Complete chain builder
+    & \xfon
+    & The chain builder generates all certificate lists satisfying the
+    specification |Chain|.
+    \\ \hline \hline
+    Sound semantic checker
+    & \xfon
+    & If a certificate or chain passes the semantic checker, it satisfies the
+    semantic properties.
+    \\ \hline
+    Complete semantic checker
+    & \xfon
+    & If a certificate or chain satisfies the semantic properties, it passes the
+    semantic checks.
     \\ \hline
   \end{tabularx}
   \label{tab:app-formal-guarantees}
