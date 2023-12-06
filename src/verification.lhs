@@ -1,5 +1,5 @@
 \section{Verification Goals and Correctness Proofs}
-We now briefly discuss \armor{}'s correctness proofs. 
+We now discuss \armor{}'s correctness proofs. 
 % Recall that, as shown in Figure~\ref{armor}, 
 We provide formal correctness guarantee for the
 following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
@@ -39,8 +39,7 @@ and relegate the discussion of the other components in the full version of the p
 Our TCB comprises the \agda toolchain (v2.6.2.2), which includes its native
 type-checker, compiler, and standard library (v1.7.1).
 % In particular, 
-Particularly, 
-our use of \agda's standard library includes the module
+Our use of \agda's standard library includes the module
 \texttt{\small Data.Trie} (for the \emph{String canonicalizer}), which requires the
 \texttt{\small --sized-types} language feature, and the module \texttt{\small IO}, which
 requires the \texttt{\small --guardedness} language feature.
@@ -83,8 +82,8 @@ This paradigm, known as the \emph{Curry-Howard}
 correspondence~\cite{SU06_Lectures-on-the-Curry-Howard-Isomorphism}, means we
 can view \agda's types as \emph{propositions} and its programs as \emph{proofs}
 of the propositions expressed by their types.
-This makes \agda a powerful tool for both expressing programs and their
-correctness, as it unifies the language of programs and proofs. 
+% This makes \agda a powerful tool for both expressing programs and their
+% correctness, as it unifies the language of programs and proofs. 
 
 Consider the example shown in Figure~\ref{fig:agda-ex} of nonnegative integers
 strictly less than some upper bound, provided as part of the \agda standard
@@ -107,9 +106,9 @@ by a non-negative integer.
 In other words, for every nonnegative integer |n : Nat|, |Fin n| is a unique
 type whose inhabitants correspond to the nonnegative integers strictly less than |n|.
 
-We now explain the code listing in the figure, starting with the declaration of |Fin|.
+We now explain the declaration of |Fin|.
 \begin{itemize}
-\item The |data| keyword allows us to introduce a new inductive type or
+\item The |data| keyword introduces a new inductive type or
   type family, in this case |Fin|.
 \item |Set| is the type of (small) types (we omit the details of \agda's
   universe hierarchy). 
@@ -119,20 +118,19 @@ We now explain the code listing in the figure, starting with the declaration of 
   predicate.
   As mere data, |fzero| corresponds to the integer 0; as an axiom, it states
   that 0 is strictly less than the successor |1 + n| of any nonnegative |n|.
-  Similarly, as mere data |fsuc| corresponds to a primitive successor operation
-  (like the Peano numbers), and as an axiom it corresponds to the following
-  inference rule: if |i| is strictly less than |n|, then its successor
-  is strictly less than |1 + n|.
+  Similarly, as mere data |fsuc| is a primitive successor operation
+  (like the Peano numbers), and as an inference rule, it states that if |i| is
+  strictly less than |n|, then its successor is strictly less than |1 + n|.
  
 \item Curly braces indicate function arguments that need not be passed
   explicitly.
-  For example, if |i| has type |Fin 5|, then we can write |fsuc i| and Agda can
-  determine this has type |Fin 6|.
+  For example, if |i| has type |Fin 5|, then  Agda can
+  determine |fsuc i| has type |Fin 6|.
 \end{itemize}
 
 Since |Fin| is inductive, we can define functions over it by \emph{pattern
   matching} and \emph{recursion}.
-This is shwon with function |toNat|, which we can think of as extracting the ``mere data''
+This is shown with function |toNat|, which we can think of as extracting the ``mere data''
 contained in an expression of type |Fin n|.
 \begin{itemize}
 \item In the type signature, we use the syntactic sugar |forall| to
@@ -156,18 +154,20 @@ contained in an expression of type |Fin n|.
 \xsno DER and \xfon parsers, as well as the input and output types for Base64
 decoding.
 In general, parser inputs have types of the form |List A|, where |A| is the type
-of language alphabet; for our PEM parser this is |Char|, Agda's character type,
-and for our \xsno DER and \xfon parsers, this is |UInt8|, an alias for |Fin 256|.
+of language alphabet; %
+%for our PEM parser this is |Char|, Agda's character type,
+%and
+for our \xsno DER and \xfon parsers, this is |UInt8|, an alias for |Fin 256|.
 The ultimate result of our PEM parser is a string of sextets, \ie, a value of
 type |List UInt6|, where |UInt6| is an alias for |Fin 64|.
 
 The hand-off between the result of PEM parsing and the input to \xfon parsing
 (Figure~\ref{armor}, \circled{C} -- \circled{D}) is managed by the 
 Base64 decoder, whose formal correctness properties are established with respect
-to a specificational encoder.%
+to a specificational encoder. %
 %(used only for specificational purposes).
-Specifically, we prove: 1) that the encoder always produces a valid sextet
-string; and 2) the encoder and decoder pair forms an
+Specifically, we prove: (1) that the encoder always produces a result accepted by
+the decoder; and (2) the encoder and decoder pair forms an
 isomorphism between octet strings and valid sextet strings for encoding them.
 For a more detailed summary, see the full version of the paper~\cite{armor-full-version}
 % This is summarized below in Figure~\ref{fig:s4-base64} (for space
@@ -202,17 +202,15 @@ Much current research~\cite{ni2023asn1, ramananandro2019everparse}
 for applying formal methods to parsing uses serializers to specify the
 correctnes properties of parsers.
 Formal proofs of correctness (in any context) are only ever as good as the
-specification of those correctness properties, and by using serializers
-as part of the specification, this earlier research swells the trusted computing
-base by introducing implementation details.
-To avoid this issue, for our approach we use \emph{relational} specifications of
+specification of those correctness properties, and this earlier research swells
+the trusted computing base by introducing implementation details for serialization.
+To avoid this issue, we use \emph{relational} specifications of
 languages. 
 This has two other advantages: (1) it allows for a clear distinction between correctness
 properties of the \emph{language} and \emph{parser}; and (2)
 it brings the formal language specification into closer correspondence with the
-natural language description, meaning we can be more confident the former
-captures the meaning of the later.
-This second point in particular als means the formal specification can serve as a
+natural language description.
+This second point also means the formal specification can serve as a
 machine-checked, rigorous alternative for the developers seeking to
 understand the relevant specifications. 
 
@@ -220,8 +218,8 @@ The relational specifications we give are of the following form.
 For a given language \(G\) with alphabet \(A\), we define a family of types
 |G : List A -> Set|, where the family |G| is indexed by strings |xs : List A|
 over the alphabet.
-Such a family of types serves the dual roles: a value of type |G xs| is not only a
-proof that \(\mathit{xs}\) is in the language \(G\), but also the internal
+Such a family serves dual roles: a value of type |G xs| is both
+proof that \(\mathit{xs}\) is in the language \(G\), and the internal
 representation of the value decoded from \(\mathit{xs}\).
 
 \begin{figure}[h]
@@ -248,15 +246,15 @@ record IntegerValue (@0 bs : List UInt8) : Set where
 
 We illustrate our approach with a concrete example: our specification of X.690
 DER integer values, shown in Figure~\ref{fig:s4-integervalue}.
-This specification takes the form of an Agda record (roughly analogous to a
-C-style \texttt{struct}) that is parameterized by a bytestring |bs|.
+This specification takes the form of an Agda record that is parameterized by a
+bytestring |bs|.
 \begin{itemize}
 \item \textbf{Erasure annotations.} The annotation |@0| marks the accompanying
   identifier as \emph{erased at runtime}.
-  In |IntegerValue|, only field |val|, which is the integer encoded by |bs|, is
+  In |IntegerValue|, only |val|, which is the integer encoded by |bs|, is
   present at runtime; the remaining fields and parameter |bs| are erased by
   Agda's GHC backend.
-  The annotations for runtime erasure not only improve \armor{}'s performance,
+  Runtime erasure annotations not only improve performance,
   but also document the components that serve only specificational purposes for
   programmers using \armor as a reference.
 
@@ -313,18 +311,10 @@ In the context of \xfon, format ambiguity could result in interoperability
 issues between standards-compliant producers and consumers (\eg, rejection
 because the decoded certificate does not match the encoded certificate).
 
-\textit{Challenges.} |Unambiguous| expresses a property much stronger
-than might be first apparent.
-To illustrate, showing |Unambiguous IntegerValue| requires showing that the
-corresponding fields are equal --- \emph{even the purely ones.}
-Once established, the additional strength afforded by |Unambiguous| significantly aids
-development of our verified parsers; however, this means that specifications
-(such as |MinRep|) mustbe carefuly crafted to admit unique proof terms.
-
-Another challenging aspect in proving unambiguousness for X.690 DER in
-particular is the format's support for sequences that have \emph{optional} and
-\emph{default} fields, that is, fields that might not be present in the
-sequence.
+\textit{Challenges.}
+One challenging aspect in proving unambiguousness for X.690 DER its support for
+sequences with \emph{optional} and \emph{default} fields, that is, fields that
+might not be present in the sequence.
 We are threatened with ambiguity if it is possible to mistake an optional field
 whose encoding is present for another optional field whose encoding is absent.
 To avoid this scenario, the \xsno format stipulates that every field of any
@@ -345,7 +335,7 @@ between internal representations |a1 : G xs1| and |a2 : G xs2| without
 Thus, to make non-malleability non-trivial, we must express what is the
 ``raw'' internal datatype corresponding to |G|, discarding the specificational
 components.
-We express generally in Agda by |Raw|, given below.
+We expresses this with |Raw|, given below.
 \begin{code}
 record Raw (G : List A -> Set) : Set where
   field
@@ -353,7 +343,7 @@ record Raw (G : List A -> Set) : Set where
     to : {@0 xs : List A} -> G xs -> D
 \end{code}
 
-An inhabitant of |Raw G| consists of a type |D| (be the ``mere data'' of |G|)
+An inhabitant of |Raw G| consists of a type |D| (the ``mere data'' of |G|)
 together with a function |to| that extracts this data from any inhabitant of |G xs|.
 Consider the case for |IntegerValue| below.
 \begin{code}
@@ -371,7 +361,7 @@ the mere data of |g1| and |g2| are equal, then not only are strings
 |xs1| and |xs2| equal, but also |g1| and |g2|.
 In Agda, we write:
 \begin{code}
-NonMalleable : {G : @0 List A -> Set} -> Raw G -> Set
+NonMalleable : {G : List A -> Set} -> Raw G -> Set
 NonMalleable{G} R =
   forall {@0 xs1 xs2} -> (g1 : G xs1) (g2 : G xs2)
   -> Raw.to R g1 == Raw.to R g2 -> (xs1 , g1) ==  (xs2 , g2)  
@@ -380,10 +370,10 @@ Proving |NonMalleable RawIntegerValue| requires proving |Base256.twoComp| is
 injective. 
 
 \textbf{Unique prefixes}
-The final language property we discuss, which we dub \emph{``unique prefixes,''}
+The final language property we discuss, dubbed \emph{``unique prefixes,''}
 expresses that a language permits parsers no degrees of freedom over which
-prefix of an input string it consumes.
-Striving for \emph{parser independence} in our specifications, we formulate
+prefix of the input it consumes.
+Striving for \emph{parser independence}, we formulate
 this property as follows: for any two prefixes of an input string, if both
 prefixes are in the language |G|, then they are equal.
 In Agda, we express this as |UniquePrefixes| below.
@@ -394,8 +384,8 @@ UniquePrefixes G = forall {xs1 ys1 xs2 ys2}
 Given that \xfon uses \tlv encoding, it is
 unsurprising that we are able to prove |UniquePrefixes| holds.
 However, we call explicit attention to this property for two
-reasons: 1) it is an essential lemma in our proof of \emph{strong completeness} of
-our \xfon parser (see Section~\ref{sec:s4-parser-sound-complete-strong}); and 2)
+reasons: (1) it is an essential lemma in our proof of \emph{strong completeness} of
+our \xfon parser (see Section~\ref{sec:s4-parser-sound-complete-strong}); and (2)
 this property \emph{does not hold} for the PEM format due to leniency in
 end-of-line encoding, so to show strong completeness for PEM parsers we need an
 additional property, \emph{maximality}.
