@@ -105,7 +105,7 @@ proven \emph{soundness} (any bytestring accepted by the parsers conforms to the
 format specification) and \emph{completeness} (any bytestring that conforms to
 the format specification is accepted by the parser). For our \xsno DER and
 \xfon \emph{language formalizations}, we have proven \emph{unambiguousness}
-(e.g., onebytestring cannot be the encoding of two distinct \xfon certificates)
+(e.g., one bytestring cannot be the encoding of two distinct \xfon certificates)
 and \emph{non-malleability} (e.g., two distinct bytestrings cannot be the
 encoding of the same \xfon certificate) required for the above guarantees.
 Once these different proof obligations are discharged, we use \agda's extraction
