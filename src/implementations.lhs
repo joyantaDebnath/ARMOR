@@ -2,7 +2,7 @@
 % We now discuss implementation details of \armor.
 
 \noindent\textbf{Driver and Input Interface.} 
-The \armor{}'s driver module is developed using both \python and \agda programming languages. 
+The \armor's driver module is developed using both \python and \agda programming languages. 
 The \python component is responsible for the user interface, handling inputs such as certificates 
 in DER or PEM formats, trusted CA certificates in PEM format, and optionally, the intended purpose 
 of the end-user certificate (e.g., Server Authentication, Client Authentication, Code Signing). 
