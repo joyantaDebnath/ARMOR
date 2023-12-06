@@ -205,6 +205,7 @@
 \newcommand{\frankencert}{\ensuremath{\mathsf{Frankencert}}\xspace}
 \newcommand{\morpheus}{\ensuremath{\mathsf{Morpheus}}\xspace}
 \newcommand{\haclstar}{\ensuremath{\mathsf{HACL^*}}\xspace}
+\newcommand{\whymp}{\ensuremath{\mathsf{WhyMP}}\xspace}
 \newcommand{\coq}{\ensuremath{\mathsf{Coq}}\xspace}
 \newcommand{\ghc}{\ensuremath{\mathsf{GHC}}\xspace}
 \newcommand{\libfaketime}{\ensuremath{\mathsf{Libfaketime}}\xspace}
