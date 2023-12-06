@@ -2,7 +2,7 @@
 \renewcommand{\chain}{\ensuremath{\mathcal{C}}\xspace}
 \section{Background and Motivation of \armor}
 This section presents a primer on \xfon certificates and  
-certificate chain validation, and the motivation of \armor.
+certificate chain validation, and the motivation for \armor.
 % , and 
 % the underlying problem \armor aims to address. 
 
@@ -11,9 +11,10 @@ certificate chain validation, and the motivation of \armor.
 %finally emphasizing the motivation for our work.
 
 \subsection{Preliminaries on \xfon Certificate Chain}
-Though the \xfon standard is primarily defined in the ITU-T \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions, which is the main focus of this work.
+Though the \xfon standard is primarily defined in \mbox{ITU-T} \xfon~\cite{rec2005x}, RFC 5280~\cite{cooper2008internet} provides additional restrictions and directions to use \xfon certificate for the Internet domain. Particularly, RFC 5280 concentrates on version 3 of the certificate standard and the usage of different extensions, which is the main focus of this work.
 
-\textbf{Internal Structure of a Certificate.} A version 3 certificate comprises of three top-level fields, namely, \field{TBSCertificate}, \field{SignatureAlgorithm}, and \field{SignatureValue}. The \field{TBSCertificate} field contains information such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public-key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields such as the unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \field{TBSCertificate} content, generating a signature, denoted as \field{SignatureValue}, which is appended to the end of the certificate, creating a digitally secure and tamper-proof container. The \field{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
+\textbf{Internal Structure of a Certificate.}
+A version 3 certificate comprises three top-level fields, namely, \field{TBSCertificate}, \field{SignatureAlgorithm}, and \field{SignatureValue}. The \field{TBSCertificate} field contains information such as the certificate version, a unique serial number, the validity period, the certificate issuer's name, and the certificate owner's name (\ie, subject). It also includes the public key, the algorithm employed by the issuer for signing the certificate, and a few \emph{optional} fields such as the unique identifiers and a sequence of extensions, specifically for version 3 of the \xfon standard. The issuer CA signs the entire \field{TBSCertificate} content, generating a signature, denoted as \field{SignatureValue}, which is appended to the end of the certificate, creating a digitally secure and tamper-proof container. The \field{SignatureAlgorithm} field specifies the algorithm used by the issuer CA for generating the signature.
 
 \textbf{Certificate Chain Validation.} A certificate chain \chain can be \emph{conceptually} 
 viewed as an ordered sequence of certificates, $\chain = [C_1, C_2, \ldots, C_{n-1}, C_n]$, in which $C_1$ to $C_{n-1}$ are the (intermediate) CA certificates whereas $C_n$ is
@@ -31,7 +32,7 @@ goes through a series of transformations and pre-processing.
 The semantic condition checking 
 stage checks to see whether the standard-prescribed 
 semantic conditions are fulfilled. These conditions 
-can be on a single certificate (e.g.,the certificate is not expired, the signature is verified) 
+can be on a single certificate (\eg, the certificate is not expired, the signature is verified) 
 or across certificates (e.g., 
 the subject name of the certificate $C_{i-1}$ is the same as the issuer name of the 
 certificate $C_i$). 
@@ -74,12 +75,12 @@ the unconditional trust of $C_1$ through the intermediate CA certificates
   \end{figure}
 
 For ease of exposition, the certificate chain validation described here is intentionally 
-left to be simple and abstract. An implementation additionally has to take into account different corner cases. 
-As an example, the presented certificate chain \chain may not be in the 
-correct hierarchical order, also may not contain some CA certificates, or may 
+left abstract. An implementation additionally has to take into account different
+corner cases, such as the presented certificate chain \chain not being in the 
+correct hierarchical order, may not contain some CA certificates, or may 
 contain duplicates. It is the implementation's responsibility to construct potential chains 
-and try to verify them. For a faithful and detailed description of the whole certificate chain validation, 
-interested readers can consult the  RFC 5280~\cite{cooper2008internet}. 
+and try to verify them. For a detailed description of the entirety of \textbf{CCVL}, 
+interested readers can consult RFC 5280~\cite{cooper2008internet}. 
 %Note that the entire process of certificate chain validation is more complicated
 %than what we have described so far. For example, the implementation may not
 %receive the certificates in the proper hierarchical order, may miss some CA
@@ -102,7 +103,7 @@ of the prior approaches rely on differential testing whether different implement
 are used as \emph{cross-checking test oracles}. These approaches, however, can potentially 
 suffer from undetected bugs, especially in the case that the implementations under test 
 have the same logical error. Having a formally verified \emph{test oracle} like \armor can substantially 
-decrease the change of undetected bugs. In addition, these approaches cannot 
+decrease the chance of undetected bugs. In addition, these approaches cannot 
 provide any mathematical assurance of correctness for the tested implementations. 
 This is corroborated through many high impact bugs and  vulnerabilities found in 
 some widely used applications and open-source libraries over the last decade~\cite{CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2023-33201, CVE-2023-40012}. In contrast, a formally verified implementation of \xfon certificate validation like \armor 
