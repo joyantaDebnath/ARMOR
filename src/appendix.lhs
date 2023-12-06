@@ -45,9 +45,55 @@
   R27              & Validate leaf certificate purpose against user's expected certificate purpose. \\ \hline                                                      
   \end{tabularx}
   \label{rules}
-  \end{table*}
+\end{table*}
 
-  
+\begin{table*}
+  \setlength\extrarowheight{1.2pt}
+  \setlength{\tabcolsep}{1.5pt}  
+  \centering
+  \sffamily\scriptsize
+  \caption{Formal Guarantees}
+  \sffamily\scriptsize
+  \begin{tabularx}{0.8\textwidth}{||c||c||X||}
+    \hline
+    \textbf{Property}
+    & \textbf{Domain}
+    & \textbf{Description}
+    \\ \hline
+    |Unambiguous|
+    & Language
+    & One string cannot be the encoding of two distinc values.
+    \\ \hline
+    |NonMalleable|
+    & Language
+    & Two distinct strings cannot be the encoding of the same value.
+    \\ \hline
+    |UniquePrefixes|
+    & Language
+    & Parsers have no degrees of freedom of which prefix of an input they
+    accept.
+    \\ \hline
+    |MaximalParser|
+    & Parser
+    & If the parser consumes a prefix, that prefix is the longest one in the language.
+    \\ \hline
+    |Sound|
+    & Parser
+    & If the parser accepts some prefix of an input, that prefix is in the
+    language.
+    \\ \hline
+    |Complete|
+    & Parser
+    & If the string is in the language, then the parser accepts some prefix of it.
+    \\ \hline
+    |StronglyComplete|
+    & Parser
+    & If a string is in the language and encodes value |v|, the parser consumes
+    \emph{exactly} that string and produces |v|.
+    \\ \hline
+  \end{tabularx}
+  \label{tab:app-formal-guarantees}
+\end{table*}
   
   
   % \begin{table*}[h]
