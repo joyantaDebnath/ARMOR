@@ -1,5 +1,5 @@
 \section{Conclusion}
-We presented \armor, which is an \xfon library 
+We presented \armor, which is an \xfon implementation
 with formal correctness guarantees. We evaluated \armor{}'s specificational accuracy %(part of its TCB) by 
 by 
 differentially testing it with $11$ open-source libraries and observed no inaccuracies. %of it. 

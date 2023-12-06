@@ -6,7 +6,7 @@ technical challenges.
 %overview of \armor's architecture.
 
 \subsection{Technical Challenges}
-Realizing \armor{}'s vision of a formally verified \xfon library 
+Realizing \armor{}'s vision of a formally verified \xfon implementation 
 requires addressing the following  challenges. 
 %There are several challenges for to our work.
 
@@ -98,7 +98,7 @@ a mistake previously found by Chau \etal~\cite{symcert} in some TLS libraries (\
 % \end{figure}
 
 \noindent\textbf{Supporting Different Certificate Representations.}
-An \xfon library has to expose different interfaces for
+An \xfon implementation has to expose different interfaces for
 supporting different representations of an \xfon certificate.
 As an example, the certificates in a root store are saved in
 the PEM format whereas the certificates obtained during a TLS

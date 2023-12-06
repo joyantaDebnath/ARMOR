@@ -2,7 +2,7 @@
 \section{Introduction}
 \label{sec:introduction}
 
-The \xfon PKI standard~\cite{cooper2008internet} provides a scalable way to verify the authenticity of the binding of an entity's identity with its public-key. 
+The \xfon PKI standard~\cite{cooper2008internet} provides a scalable way to verify the authenticity of the binding of an entity's identity with its public key. 
 This identity-public-key binding is represented as an \xfon certificate, which is digitally signed by an issuer 
 %\footnote{The issuer of an \xfon certificate can also be the entity itself, 
 %whose identity and public-key binding is vouched for in the certificate. Such
@@ -44,7 +44,9 @@ This is corroborated through many high impact bugs and vulnerabilities in some w
 In contrast, a formally-verified implementation of \xfon certificate chain
 validation can provide mathematical assurances that the implementation behaves
 correctly, setting a benchmark for developing other such implementations.
-Such a formally-verified implementation, however, is currently missing from the literature. \emph{The current paper takes a major step to addresses this research gap by designing and developing a high-assurance library for \xfon certificate chain validation, named \armor, whose compliance with the standard is established by formal,
+Such a formally-verified implementation, however, is currently missing from the
+literature. \emph{The current paper takes a major step to addresses this
+  research gap by designing and developing a high-assurance application for \xfon certificate chain validation, named \armor, whose compliance with the standard is established by formal,
 machine-checked proofs.}
 
 Although the current paper, to the best of our knowledge, presents the first implementation of \xfon certificate 
@@ -79,7 +81,7 @@ manageability of the implementation, and also formal verification efforts. Parti
 decompose the overall correctness guarantees into the correctness guarantees for each module, 
 which can then be discharged independently.
 Concretely, \armor, is organized into five main modules: parser, chain builder, string canonicalizer, semantic validator, and driver. The \emph{driver} module, written in \python, stitches together 
-the different components and exposes an interface expected from an \xfon library. 
+the different components and exposes an interface expected from an \xfon implementation. 
 %takes as input a certificate chain to be validated as well as some other 
 %necessary inputs (\eg, current system time, trust anchors), and returns a pair $\langle r, k\rangle$ 
 %in which the result of the validation process $r\in \{\mathsf{Invalid}, \mathsf{Valid}\}$ 
@@ -164,7 +166,7 @@ We notice that \armor has a much higher overhead compared
 to the \xfon libraries that are written in \cpp, \python, \java, and \go.
 % (\eg, \openssl~\cite{openssl}, \gnutls~\cite{gnutls}, \boringssl~\cite{boringssl}, \mbedtls~\cite{mbedtls}, \wolfssl~\cite{wolfssl}, \matrixssl~\cite{matrixssl}). 
 % Compared to libraries in our evaluation written in Python, Java, and Go, we observe that  \armor either outperforms them or has similar performance. 
-Our empirical evaluation signifies that \emph{\armor may be a reasonable choice of \xfon certificate validation library in some application domains where formal correctness 
+Our empirical evaluation signifies that \emph{\armor may be a reasonable choice of \xfon certificate validation application in some application domains where formal correctness 
 is more important than runtime overhead}.
 
 % Our formally-verified implementation, \armor, is organized into four main modules: the \driver, \parser, \stringtransformer, and \semantic. The \driver, implemented in \python, processes certificate inputs provided in a \pem (Privacy Enhanced Mail)~\cite{balenson1993privacy} file format, pre-assuming an ordered sequence of end-entity and CA certificates constituting a valid certification path. We leverage \agda~\cite{bove2009brief}, a dependently typed functional programming language and theorem prover, to formally-verify the \parser, \stringtransformer, and \semantic modules. We demonstrate both \soundness and \completeness in our verification step as overarching properties. \soundness guarantees that when \armor accepts a certificate chain, the formal specification will also. Conversely, \completeness ensures that if the formal specification accepts a certificate chain, \armor does too. By attaining both properties, we confirm that our implementation performs precisely as stipulated in the specification.
