@@ -1,7 +1,7 @@
 \section{Related Work}
-Due to the worldwide adoption of \xfon PKI, the research community has critically analyzed its implementation and deployment in recent years. 
-% In Section 2.2, we have already discussed the prior work on testing \xfon implementations. 
-We now present prior research efforts that are relevant to our work.
+% Due to the worldwide adoption of \xfon PKI, the research community has critically analyzed its implementation and deployment in recent years. 
+% % In Section 2.2, we have already discussed the prior work on testing \xfon implementations. 
+% We now present prior research efforts that are relevant to our work.
 
 Extensive research has previously been conducted to test the \xfon CCVL of SSL/TLS libraries using techniques such as fuzzing~\cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt} and symbolic execution~\cite{rfcguided, symcert}. Fuzzing is a popular software testing technique in which malformed inputs are automatically generated and injected into a target application to find implementation flaws~\cite{godefroid2020fuzzing}. Symbolic execution, on the other hand, is a way of executing a program abstractly so that one abstract execution covers multiple possible inputs of the program that share a particular execution path through the code~\cite{king1976symbolic}. Though these approaches found numerous implementation flaws and noncompliance issues, none can avoid false negatives in differential testing due to the lack of a formally-verified reference implementation of \xfon CCVL. Despite several efforts to implement and formally verify cryptographic libraries~\cite{bond2017vale, protzenko2020evercrypt, zinzindohoue2017hacl}, a formally-verified implementation of \xfon CCVL is still missing in the literature. 
 
