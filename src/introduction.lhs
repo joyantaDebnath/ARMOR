@@ -194,7 +194,7 @@ requires a correct \xfon PKI implementation to ensure its guarantees, which
 %drop-in replacement for the chain validation task.
 To evaluate the practicality of using \armor as part of 
 a TLS implementation, we integrate it with the TLS 1.3 implementation 
-of \boringssl and evaluate its performance. 
+of \boringssl~\cite{boringssl} and evaluate its performance. 
 %of this claim, we integrated \armor with the TLS 1.3
 %implementation of \mbedtls and tested with the widely-used data transfer tool
 %\curl. 
@@ -226,7 +226,7 @@ with respect to our formalized specification.
 %   enjoys some specific properties, indicating that it is possible to develop
 %   efficient parsers.\todo{\tiny This needs clarification.}
 \item We evaluate \armor with respect to its specificational accuracy and overhead against $11$ open-source libraries, and demonstrate its reasonable performance and effectiveness in practice.
-\item We show an end-to-end application of \armor, integrating it with TLS 1.3 implementation of \boringssl and testing with the widely-used data transfer tool \curl.
+\item We show an end-to-end application of \armor, integrating it with TLS 1.3 implementation of \boringssl and testing with the widely-used application \curl~\cite{curl}.
 \end{enumerate}
 
 % Our work presents significant contributions to the field of \xfon PKI, as stated below.
