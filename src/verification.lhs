@@ -23,7 +23,7 @@ and relegate the discussion of the other components in the full version of the p
 \sffamily\scriptsize
   \setlength\extrarowheight{1.5pt}
   \setlength{\tabcolsep}{1.5pt}
-  \caption{A summary of correctness guarantees for each module in \armor}
+  \caption{Correctness guarantees for each module in \armor}
   \sffamily\scriptsize
   \label{table:summary-of-guarantees}
 \centering
@@ -31,7 +31,7 @@ and relegate the discussion of the other components in the full version of the p
 \cline{2-6}
 \textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}DER\\ Parser\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
 \multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Maximality\\ Terminate\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular}                                                                    & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular} \\ \hline
-\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguous                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguous\\ Nonmalleable\\ No substrings\end{tabular} & N/A                                                                                                                                              & N/A                                                                            \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguous                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguous\\ Non-malleable\\ No substrings\end{tabular} & N/A                                                                                                                                              & N/A                                                                            \\ \hline
 \end{tabular}
 \end{table}
 
