@@ -20,7 +20,7 @@ across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
 been shown to suffer from inconsistencies, ambiguities, and
 under-specification~\cite{debnath2021re, larisch2022hammurabi, yen2021tools}.
 As an example, consider the following requirements of a
-certificate's \emph{serial number} extracted from 
+certificate's \emph{serial number}, quoted from 
 %the specification for version 3 \xfon
 %certificates, 
 RFC 5280~\cite{cooper2008internet}.
@@ -33,7 +33,7 @@ RFC 5280~\cite{cooper2008internet}.
   CAs MUST force the serialNumber to be a non-negative
   integer.%
 }%
-\noindent The two requirements here are inconsistent as one part 
+\noindent The two requirements here are inconsistent, as one part 
 excludes zero as serial number while the other allows it. 
 %This discrepancy is
 %noted in Errata ID 3200, the current status of which is ``Held for Document
@@ -45,7 +45,7 @@ Moreover, RFC 5280 encompasses rules not only for the certificate issuers (\ie,
 certificate chains (\eg, \emph{consumer} rules). In another way, RFC 5280 can be
 categorized into \emph{syntactic} and \emph{semantic} rules. While the syntactic
 rules are concerned with the parsing of an \xfon certificate serialized as a
-byte stream, the semantic rules impose constraints on the values of individual
+byte string, the semantic rules impose constraints on the values of individual
 fields within a certificate and on the relationships between field values across
 different certificates in a chain. Unfortunately, these intertwined sets of
 rules further complicate the specification, making it challenging to determine
@@ -57,7 +57,7 @@ whether to accept a chain).
 The internal representation of an \xfon certificate, while described in the
 \emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
 the \xsno Distinguished Encoding Rules (DER)~\cite{rec2002x}.
-This DER representation of the certificate byte stream internally 
+This DER representation of the certificate byte string internally 
 has the form \tlv, 
 %follows a \tlv
 %structure to represent each certificate field, 
@@ -65,18 +65,18 @@ where $t$ denotes the
 type, $v$ indicates the actual content, and $\ell$ signifies the length in bytes of
 the $v$ field. Additionally, the $v$ field can include multiple and nested \tlv
 structures, adding additional layers of complexity to the binary data.
-Parsing such a binary data is challenging and error-prone since it 
+Parsing such binary data is challenging and error-prone since it 
 always requires passing the value of the $\ell$ field
 (length) to accurately parse the subsequent $v$ field. Since the internal
 grammar of a DER-encoded certificate is \emph{context-sensitive}, 
 developing a \emph{correct} parser for such a grammar is 
 non-trivial~\cite{kaminsky2010pki, debnath2021re}. 
 
-To make matters worse, just correctly parsing the \asnone structure from the certificate byte stream 
+To make matters worse, just correctly parsing the \asnone structure from the certificate byte string 
 is insufficient because the relevant certificate field value may need to be further 
 decoded from the parsed \asnone value.
-Take the example of \xfon specification for using \field{UTCTime} format in certificate validity
-field. 
+Take the example of \xfon specification for using the \field{UTCTime} format in
+the certificate validity field. 
 It uses a two-digit year representation, $YY$, and here lies the potential for
 misinterpretation.
 In this format, values from $00$ to $49$ are deemed to belong to the $21st$
@@ -102,7 +102,7 @@ An \xfon implementation has to expose different interfaces for
 supporting different representations of an \xfon certificate.
 As an example, the certificates in a root store are saved in
 the PEM format whereas the certificates obtained during a TLS
-connection are represented as a DER encoded bytestream.
+connection are represented as a DER encoded byte string.
 
 
 \noindent\textbf{Complexities in Individual Stages.} 
@@ -123,7 +123,7 @@ the actual contents of the \field{SignatureValue} field with relevant
 cryptographic operations to prevent attacks (\eg, \emph{RSA signature
   forgery}~\cite{finney2006bleichenbacher,bleichenbacher1998chosen}).
 While these intermediate stages are conceptually straightforward, implementing
-them securely and proving their correctness are non-trivial.
+them securely and proving their correctness is non-trivial.
 
 
 \subsection{\armor{}'s Verification Philosophy}
@@ -140,11 +140,11 @@ Our motivation for adhering to this discipline is two-fold.
   to which it is verified.
   \emph{Relational} specifications that describe how the input and output are
   related without referencing implementation details are, in general, simpler. Such specifications 
-  are  also easier for humans to evaluate the trustworthiness of, than specifications
+  are  also easier for humans to evaluate for trustworthiness than specifications
   that reference implementation details~\cite{debnath2021re}.
   
 \item \textbf{A specification can be valuable in its own right.}
-  Specifications are useful as documentation, and they are made all the more
+  Specifications are useful documentation, and made all the more
   valuable by being applicable to a wide range of implementations for a
   particular software task.
   Due to the inherent complexity of the \xfon CCVL, there is a vast space for
@@ -253,25 +253,35 @@ leaving such a task for future research.
   
 \subsection{\armor{}'s Architecture}
 Figure~\ref{armor} shows the architecture
-and the workflow of \armor.
+and workflow of \armor.
 \armor \circled{A} takes a certificate chain, 
 % list of input certificates (\ie, end-user certificate
 % and relevant CA certificates), 
 a list of trusted CA certificates, the current
-system time, and optionally the expected certificate purpose as input and
-\circled{L} returns the certificate validation result (\ie, verdict) as well as
-the public-key of the end-user certificate as output. 
+system time, and optionally the expected certificate purpose as input, and
+\circled{L} outputs the certificate validation result (\ie, verdict) as well as
+the public key of the end-user certificate. 
 % \armor's architecture is modular, comprising
 % several distinct components. 
-\circled{B} The PEM Parser reads a
-PEM certificate file and converts each certificate in the PEM file into its
+\circled{B} The PEM parser reads a
+PEM certificate file and converts each certificate into its
 Base64 encoded format (sextets, \ie, unsigned 6 bit integers).
-\circled{C} The Base64 Decoder converts the the sextet strings into octet
-strings (\ie, unsigned 8 bit integers, or DER byte stream).
+\circled{C} The Base64 Decoder converts the sextet strings into octet
+strings (\ie, unsigned 8 bit integers).
 \circled{D} The \xsno DER parser and \xfon parser collaboratively
-parse the DER byte stream and convert each certificate into an intermediate
+parse the DER byte string and convert each certificate into an intermediate
 representation (\xfon IR). Note that if a certificate is already given in DER format as input, \circled{E} we can directly call the DER parser. 
-Next, \circled{F} The chain builder constructs candidate chains from the parsed certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to normalize strings in the certificate's Name field for accurate comparison. The semantic validator evaluates each candidate chain against certain semantic rules upon receiving \circled{I} the candidate chains and \circled{J} the current system time, and \circled{K} informs the driver whether any chain passes all the semantic checks. In this design, the driver is the central component that orchestrates the entire process. The driver's role is multifaceted: (1) it activates the parser modules with the correct input; (2) it initiates the chain builder to form candidate chains; (3) it directs the semantic validator with the required input; (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
+Next, \circled{F} The chain builder constructs candidate chains from the parsed
+certificates, \circled{G} -- \circled{H} utilizing the string canonicalizer to
+normalize strings in the certificate's \field{Name} field for accurate
+comparison. The semantic validator evaluates each candidate chain against
+certain semantic rules upon receiving \circled{I} the candidate chains and
+\circled{J} the current system time, and \circled{K} informs the driver whether
+any chain passes all the semantic checks. In this design, the driver is the
+central component that orchestrates the entire process. The driver's role is
+multifaceted: (1) it activates the parser modules with the correct input; (2) it
+initiates the chain builder to form candidate chains; (3) it directs the
+semantic validator with the required input; and (4) upon success of the previous stages, the driver checks the consistency of the end-user certificate's purpose with respect to the verifier's given expected purpose, verifies signatures of the chain, and finally displays the validation outcome to the verifier.
   
 % \subsection{Verified Modules and Correctness Guarantees} 
 
