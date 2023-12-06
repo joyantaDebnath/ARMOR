@@ -76,19 +76,20 @@ decoded from the parsed \asnone DER value. \emph{Finally}, the \xfon chain valid
 \noindent\textbf{Approach}. \armor is designed and developed with modularity in mind. 
 Inspired by prior work~\cite{debnath2021re, nqsb-tls}, 
 we modularly decompose the whole \xfon certificate chain validation 
-process into several modules. Such modularity facilitates both ease of implementation, 
-manageability of the implementation, and also formal verification efforts. Particularly, we 
-decompose the overall correctness guarantees into the correctness guarantees for each module, 
-which can then be discharged independently.
-Concretely, \armor, is organized into five main modules: parser, chain builder, string canonicalizer, semantic validator, and driver. The \emph{driver} module, written in \python, stitches together 
+process into several modules, making manageable both the implementation and
+formal verification efforts.
+In particular, we formulate correctness guarantees for each module, which can
+then be discharged independently.
+\armor is organized into five modules: parser, chain builder, string canonicalizer, semantic validator, and driver. The \emph{driver}, written in \python, stitches together 
 the different components and exposes an interface expected from an \xfon implementation. 
 %takes as input a certificate chain to be validated as well as some other 
 %necessary inputs (\eg, current system time, trust anchors), and returns a pair $\langle r, k\rangle$ 
 %in which the result of the validation process $r\in \{\mathsf{Invalid}, \mathsf{Valid}\}$ 
 %and $k$ is the public-key of the entity whose certificate is being validated. 
-The  rest of the modules, written in a dependently typed functional programming language called \agda~\cite{bove2009brief, No07_agda}, implement all the intermediate stages of certificate chain validation. Notably, 
-one can not only write programs in \agda but also prove their correctness properties 
-using 
+The  rest of the modules, written in the dependently typed functional
+programming language \agda~\cite{bove2009brief, No07_agda}, implement all the
+intermediate stages of certificate chain validation.
+Notably, one can both write programs in \agda and also prove their correctness using 
 %using an 
 %\agda not only allows one to write programs 
 %but also to prove correctness properties about those programs through 
@@ -110,8 +111,10 @@ the format specification is accepted by the parser). For our \xsno DER and
 (e.g., one bytestring cannot be the encoding of two distinct \xfon certificates)
 and \emph{non-malleability} (e.g., two distinct bytestrings cannot be the
 encoding of the same \xfon certificate) required for the above guarantees.
-Once these different proof obligations are discharged, we use \agda's extraction
-mechanism to obtain \haskell code, which is then invoked by the driver.
+For the full listing of properties proven, see
+Table~\ref{tab:app-formal-guarantees} in the Appendix.
+Once these proof obligations are discharged, we use \agda's extraction
+mechanism to obtain an executable, which is then invoked by the driver.
 %can then be used as an application invoked
 %through any imperative programming language (\eg, \python). 
 
@@ -141,9 +144,9 @@ mechanism to obtain \haskell code, which is then invoked by the driver.
 % for \xfon, although the grammar itself is context-sensitive. 
 
 \noindent\textbf{Evaluation}. As \armor, or any formally verified software, is only as
-good as its specification, it is crucial that we compare \armor{}'s specification 
-to other implementations to gain assurance that our interpretation of the natural language
-specification is indeed correct.
+good as its specification, it is crucial that we compare \armor{} 
+to other implementations to gain assurance that our formalization of the natural
+language specification is indeed correct.
 %To check the correctness of our specification, we employ \emph{differential
 %  testing}, a testing methodology for identifying software bugs by looking for
 %discrepancies in the output of two or more implementations of the same algorithm
@@ -160,7 +163,7 @@ We observe that \armor agrees with most libraries
 at least $99\%$ of the time. For the remaining $1\%$, we notice 
 that \armor strictly follows the requirements in RFC 5280~\cite{cooper2008internet}, whereas the other libraries 
 have a more relaxed enforcement of these requirements. 
-Finally, to evaluate the practical practicality of \armor, 
+Finally, to evaluate the practicality of \armor, 
 we measure its runtime overhead in terms of computational time and memory consumption. 
 We notice that \armor has a much higher overhead compared 
 to the \xfon libraries that are written in \cpp, \python, \java, and \go.
@@ -200,8 +203,8 @@ of \boringssl~\cite{boringssl} and evaluate its performance.
 %of this claim, we integrated \armor with the TLS 1.3
 %implementation of \mbedtls and tested with the widely-used data transfer tool
 %\curl. 
-We observe that \armor introduces reasonable overhead during TLS handshake.
-\armor can also be used as a test oracle for testing other \xfon 
+We observe that \armor introduces significant overhead during TLS handshake.
+\armor can also be used as an oracle for testing other \xfon 
 implementations. 
 %Another use case of \armor is as a \emph{test oracle} during software testing of
 %\xfon implementations for finding logical bugs.
@@ -219,7 +222,7 @@ formal reference for programmers to consult.
 \begin{enumerate}\setlength{\itemsep}{0em}
 \item We present a formalization of the requirements of the \xfon standard and a modular decomposition of them, facilitating development of other such formally-verified implementations in the future. 
 \item We prove that our formalization of the \xfon syntactic requirements is \emph{unambiguous} and \emph{non-malleable}.
-\item We present the design and implementation of \armor, which enjoys total correctness 
+\item We present the design and implementation of \armor, whose verified modules enjoy total correctness 
 %\emph{soundness} and \emph{completeness} 
 guarantees 
 %of the parsers 
@@ -227,7 +230,7 @@ with respect to our formalized specification.
 % \item We prove that our interpretation of the syntactic requirements of \xfon
 %   enjoys some specific properties, indicating that it is possible to develop
 %   efficient parsers.\todo{\tiny This needs clarification.}
-\item We evaluate \armor with respect to its specificational accuracy and overhead against $11$ open-source libraries, and demonstrate its reasonable performance and effectiveness in practice.
+\item We evaluate \armor with respect to its specificational accuracy and overhead against $11$ open-source libraries, and analyze its performance and effectiveness in practice.
 \item We show an end-to-end application of \armor, integrating it with TLS 1.3 implementation of \boringssl and testing with the widely-used application \curl~\cite{curl}.
 \end{enumerate}
 

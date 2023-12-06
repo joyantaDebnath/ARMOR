@@ -40,8 +40,8 @@
   %evaluated 
   for its specificational accuracy and runtime
   overhead. %comparing with $11$ open-source \xfon implementations. 
-  In our evaluation, \armor incurs moderate overhead while being strictly 
-  standard-compliant. Finally, we  show an end-to-end application 
+  In our evaluation, \armor incurs high overhead but remains strictly 
+  standards-compliant. Finally, we  show an end-to-end application 
   of \armor by integrating it with the TLS 1.3 implementation of \boringssl 
   %in \curl. 
   and testing it with \curl.
