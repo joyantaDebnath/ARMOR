@@ -1,7 +1,7 @@
 \section{Discussion}
 \noindent\textbf{Threat to Validity.} Recall that, 
 the specification of \armor is 
-part of its TCB. Although \armor{}'s compliance with its specification is mechanically 
+part of its TCB. Although \armor's compliance with its specification is mechanically 
 proven, we can neither guarantee the specification's completeness 
  nor its consistency with the natural language 
 description in RFC 5280. Empirical evaluation with real and synthetic 
@@ -19,12 +19,14 @@ Although \armor makes a substantial stride towards having a formally proven corr
 and high-assurance implementation of the \xfon PKI, there is still room for improvements 
 before it can be incorporated to an application such as a web browser. As an example, 
 in contrast to existing open-source libraries, \armor does not yet support \emph{hostname 
-verification} and \emph{revocation} (See Table~\ref{table:features} in Appendix). Although hostname 
+verification} and \emph{revocation}. Although hostname 
 verification is a critical step towards achieving the desired security guarantees of 
 \xfon PKI, we follow the lead of RFC 5280, in which it is not part of the standard but 
-is left to the application developer. Revocation, albeit highly desirable, is also not 
-supported by many mainstream SSL/TLS libraries such as GnuTLS, MatrixSSL, and woflSSL  
-(See Table~\ref{table:features}). In the context of extensions, we currently do not 
+is left to the application developer. 
+% Revocation, albeit highly desirable, is also not 
+% supported by many mainstream SSL/TLS libraries such as \gnutls and \matrixssl  
+% (See Table~\ref{table:features}). 
+In the context of extensions, we currently do not 
 support the enforcement of Subject key identifier (SKI) and Authority key identifier (AKI) 
 extensions. SKI and AKI can substantially simplify the construction of candidate 
 certificate chains. However, in a recent measurement study on Censys data \cite{debnath2021re}, 
