@@ -10,7 +10,7 @@ Realizing \armor{}'s vision of a formally verified \xfon library
 requires addressing the following  challenges. 
 %There are several challenges for to our work.
 
-\noindent\textbf{Complexities in specifications.}
+\noindent\textbf{Complexities in Specifications.}
 %\label{sec:s3-tc1}
 The \xfon specification is distributed 
 across different documents (\eg, ITU-T \xfon~\cite{rec2005x}, RFC
@@ -53,7 +53,7 @@ how an \xfon consumer implementation should respond in certain cases (\ie,
 whether to accept a chain).
 
 
-\noindent\textbf{Complexities in DER parsing.} 
+\noindent\textbf{Complexities in DER Parsing.} 
 The internal representation of an \xfon certificate, while described in the
 \emph{Abstract Syntax Notation One} (\asnone), is eventually serialized using
 the \xsno Distinguished Encoding Rules (DER)~\cite{rec2002x}.
@@ -97,7 +97,7 @@ a mistake previously found by Chau \etal~\cite{symcert} in some TLS libraries (\
 %   \label{cert_validation}
 % \end{figure}
 
-\noindent\textbf{Supporting different certificate representations.}
+\noindent\textbf{Supporting Different Certificate Representations.}
 An \xfon library has to expose different interfaces for
 supporting different representations of an \xfon certificate.
 As an example, the certificates in a root store are saved in
@@ -105,7 +105,7 @@ the PEM format whereas the certificates obtained during a TLS
 connection are represented as a DER encoded bytestream.
 
 
-\noindent\textbf{Complexities in individual stages.} 
+\noindent\textbf{Complexities in Individual Stages.} 
 The \xfon certificate chain validation
 algorithm can be conceptually decomposed into different stages, 
 % (\ie, PEM
@@ -245,6 +245,7 @@ leaving such a task for future research.
   \centering
   \scriptsize
   \includegraphics[scale=0.55]{img/armor.drawio.pdf} \\
+  Inputs marked with * are optional \\
   \vspace{0.2cm}
   \caption{Conceptual design and workflow of \armor}
   \label{armor}
