@@ -1,6 +1,5 @@
 \section{Verification Goals and Correctness Proofs}
-We now briefly discuss \armor{}'s verification 
-goals and their correctness proofs. 
+We now briefly discuss \armor{}'s correctness proofs. 
 % Recall that, as shown in Figure~\ref{armor}, 
 We provide formal correctness guarantee for the
 following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
@@ -31,13 +30,13 @@ and relegate the discussion of the other components in the full version of the p
 \cline{2-6}
 \textbf{}                                                                                                        & \textbf{\begin{tabular}[c]{@@{}c@@{}}PEM \\ Parser\end{tabular}}                              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Base64 \\ Decoder\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}DER\\ Parser\end{tabular}}             & \textbf{\begin{tabular}[c]{@@{}c@@{}}Chain \\ Builder\end{tabular}}              & \textbf{\begin{tabular}[c]{@@{}c@@{}}Semantic\\ Validator\end{tabular}}          \\ \hline
 \multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Correctness\\ Properties\end{tabular}}} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Maximality\\ Terminate\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular}             & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular}                                                                    & \begin{tabular}[c]{@@{}c@@{}}Sound\\ Complete\\ Terminate\end{tabular} \\ \hline
-\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguous                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguous\\ Non-malleable\\ No substrings\end{tabular} & N/A                                                                                                                                              & N/A                                                                            \\ \hline
+\multicolumn{1}{||c||}{\textbf{\begin{tabular}[c]{@@{}c@@{}}Language\\ Security\\ Properties\end{tabular}}}          & Unambiguous                                                                             & N/A                                                                            & \begin{tabular}[c]{@@{}c@@{}}Unambiguous\\ Non-malleable\\ Unique prefixes\end{tabular} & N/A                                                                                                                                              & N/A                                                                            \\ \hline
 \end{tabular}
 \end{table}
 
 
 \noindent\textbf{Trusted Computing Base (TCB).}
-Our TCB comprises of the \agda toolchain (v2.6.2.2), which includes its native
+Our TCB comprises the \agda toolchain (v2.6.2.2), which includes its native
 type-checker, compiler, and standard library (v1.7.1).
 % In particular, 
 Particularly, 
@@ -52,6 +51,8 @@ In our code base,  the only module which enables both features is the
 %(because it needs to invoke the \emph{String canonicalizer} and perform IO), 
 % which, 
 however, does not define any coinductive types.
+Finally, \armor uses Agda's FFI for two Haskell packages: \texttt{time} and
+\texttt{bytestring}.
 
 \textbf{Termination.}
 By default, \agda employs a syntactic termination checking that ensures that
@@ -78,12 +79,10 @@ expressions).
 This capability helps express rich properties of programs \emph{in the types of
   those programs}, and checking that programs satisfy those properties is
 reduced to typechecking.
-In other words, if a program compiles, it is also proven to meet the
-specifications described by its type.
-Under the \emph{Curry-Howard}
-correspondence~\cite{SU06_Lectures-on-the-Curry-Howard-Isomorphism}, we can view
-\agda's types as \emph{propositions} and its terms as \emph{proofs} of the
-propositions expressed by their types.
+This paradigm, known as the \emph{Curry-Howard}
+correspondence~\cite{SU06_Lectures-on-the-Curry-Howard-Isomorphism}, means we
+can view \agda's types as \emph{propositions} and its programs as \emph{proofs}
+of the propositions expressed by their types.
 This makes \agda a powerful tool for both expressing programs and their
 correctness, as it unifies the language of programs and proofs. 
 
@@ -111,96 +110,84 @@ type whose inhabitants correspond to the nonnegative integers strictly less than
 We now explain the code listing in the figure, starting with the declaration of |Fin|.
 \begin{itemize}
 \item The |data| keyword allows us to introduce a new inductive type or
-  inductive type family, in this case the type family |Fin|.
-  ``Inductive'' here means that \agda allows us to define functions over |Fin n|
-  by \emph{pattern matching} and \emph{structural recursion}, which we shall see shortly.
-  
-\item |Set| is the type of (small) types (we will omit the details of \agda's
-  universe hierarchy).
+  type family, in this case |Fin|.
+\item |Set| is the type of (small) types (we omit the details of \agda's
+  universe hierarchy). 
   
 \item |Fin| has two constructors, both of which have dual readings as ``mere
   data'' and as axiomatizations of the \emph{``is strictly less than''}
   predicate.
   As mere data, |fzero| corresponds to the integer 0; as an axiom, it states
-  that 0 is strictly less than the successor |1 + n| of any nonnegative integer
-  |n|.
+  that 0 is strictly less than the successor |1 + n| of any nonnegative |n|.
   Similarly, as mere data |fsuc| corresponds to a primitive successor operation
   (like the Peano numbers), and as an axiom it corresponds to the following
-  inference rule: if a number |i| is strictly less than |n|, then its successor
+  inference rule: if |i| is strictly less than |n|, then its successor
   is strictly less than |1 + n|.
  
 \item Curly braces indicate function arguments that need not be passed
-  explicitly, leaving \agda to infer their values from the types of other
-  arguments to the function.
+  explicitly.
   For example, if |i| has type |Fin 5|, then we can write |fsuc i| and Agda can
-  determine this has type |Fin 6|; if we wanted to make explicit the argument that
-  instantiates parameter |n|, we would write |fsuc {5} i|.
+  determine this has type |Fin 6|.
 \end{itemize}
 
-The next definition of the figure is the function |toNat|, which is defined by
-\emph{pattern matching} and \emph{recursion} over |Fin|.
-We can think of |toNat| as extracting the ``mere data'' contained in an
-expression of type |Fin n|.
+Since |Fin| is inductive, we can define functions over it by \emph{pattern
+  matching} and \emph{recursion}.
+This is shwon with function |toNat|, which we can think of as extracting the ``mere data''
+contained in an expression of type |Fin n|.
 \begin{itemize}
-\item In the type signature of |toNat|, we use the syntactic sugar |forall| to
+\item In the type signature, we use the syntactic sugar |forall| to
   omit the type of the parameter |n|, as Agda can infer this from the occurrence
-  of |n| in the rest of the type, |Fin n -> Nat|.
-  Note, we could have also use |forall| our presentation of the type signatures
-  of constructors |fzero| and |fsucc|.
+  of |n| in the rest of the type.
   
 \item The definition of |toNat| is given with two equations, one each for the
   two constructors of |Fin|.
   \begin{itemize}
   \item In the first equation, we send |fzero| to 0.
     
-  \item In the second equation, our |Fin| argument is of the form |fsuc i|.
+  \item In the second equation, our argument is of the form |fsuc i|.
     We make a recursive call |toNat i| and increment the result by |1|.
-    Here, \agda can determine that the recursion is terminating, as |i| is
-    structurally smaller than |fsuc i|.
+    \agda's termination checker accepts this, as |i| is structurally smaller
+    than |fsuc i|.
   \end{itemize}
 \end{itemize}
 
-
-
-
-
 \subsection{Input Strings and Base64 Decoding}
-We used |Fin| as our example throughout Section~\ref{sec:s4-preliminaries-agda}
-because it plays a central role as the type of the language alphabet for our
+|Fin| plays a central role as the type of the language alphabet for our
 \xsno DER and \xfon parsers, as well as the input and output types for Base64
 decoding.
 In general, parser inputs have types of the form |List A|, where |A| is the type
-of language alphabet; for our PEM parser this is |Char|, Agda's primitive type
-for character literals, and for our \xsno DER and \xfon parsers, this is
-|UInt8|, an alias for |Fin 256|.
+of language alphabet; for our PEM parser this is |Char|, Agda's character type,
+and for our \xsno DER and \xfon parsers, this is |UInt8|, an alias for |Fin 256|.
 The ultimate result of our PEM parser is a string of sextets, \ie, a value of
 type |List UInt6|, where |UInt6| is an alias for |Fin 64|.
 
-The hand-off between the result of PEM parsing and the input to \xsno DER /
-\xfon parsing (Figure~\ref{armor}, \circled{C} -- \circled{D}) is managed by the
+The hand-off between the result of PEM parsing and the input to \xfon parsing
+(Figure~\ref{armor}, \circled{C} -- \circled{D}) is managed by the 
 Base64 decoder, whose formal correctness properties are established with respect
-to a Base64 encoder (used only for specificational purposes).
+to a specificational encoder.%
+%(used only for specificational purposes).
 Specifically, we prove: 1) that the encoder always produces a valid sextet
 string; and 2) the encoder and decoder pair forms an
 isomorphism between octet strings and valid sextet strings for encoding them.
-This is summarized below in Figure~\ref{fig:s4-base64} (for space
-considerations, all definitions have been omitted).
+For a more detailed summary, see the full version of the paper~\cite{armor-full-version}
+% This is summarized below in Figure~\ref{fig:s4-base64} (for space
+% considerations, all definitions have been omitted).
 
-\begin{figure}[h]
-  \begin{code}
-ValidEncoding : List UInt6 -> Set
-encode : List UInt8 -> List UInt6
-decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
+% \begin{figure}[h]
+%   \begin{code}
+% ValidEncoding : List UInt6 -> Set
+% encode : List UInt8 -> List UInt6
+% decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
 
-encodeValid : (bs : List UInt8) -> ValidEncoding (encode bs)
+% encodeValid : (bs : List UInt8) -> ValidEncoding (encode bs)
 
-encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
-decodeEncode :  forall bs -> (v : ValidEncoding bs)
-                -> encode (decode bs v) == bs
-  \end{code}
-  \caption{Base64 encoding and decoding (types only)}
-  \label{fig:s4-base64}
-\end{figure}
+% encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
+% decodeEncode :  forall bs -> (v : ValidEncoding bs)
+%                 -> encode (decode bs v) == bs
+%   \end{code}
+%   \caption{Base64 encoding and decoding (types only)}
+%   \label{fig:s4-base64}
+% \end{figure}
 
 
 \subsection{Verification of Parsers} We conceptually separate each parser verification task into \emph{language
@@ -215,37 +202,35 @@ Much current research~\cite{ni2023asn1, ramananandro2019everparse}
 for applying formal methods to parsing uses serializers to specify the
 correctnes properties of parsers.
 Formal proofs of correctness (in any context) are only ever as good as the
-formal specification of those correctness properties, and by using serializers
+specification of those correctness properties, and by using serializers
 as part of the specification, this earlier research swells the trusted computing
-base by introducing implementation details. To avoid this issue, for our approach we use \emph{relational}
-specifications of languages.
-In addition to reducing the trusted computing base, this relational approach has
-two other advantages: (1) it allows for a clear distinction between correctness
+base by introducing implementation details.
+To avoid this issue, for our approach we use \emph{relational} specifications of
+languages. 
+This has two other advantages: (1) it allows for a clear distinction between correctness
 properties of the \emph{language} and \emph{parser}; and (2)
 it brings the formal language specification into closer correspondence with the
-natural language description.
-This second point in particular means the formal specification can serve as a
+natural language description, meaning we can be more confident the former
+captures the meaning of the later.
+This second point in particular als means the formal specification can serve as a
 machine-checked, rigorous alternative for the developers seeking to
 understand the relevant specifications. 
 
-More concretely, the relational specifications we give are of the
-following form.
+The relational specifications we give are of the following form.
 For a given language \(G\) with alphabet \(A\), we define a family of types
 |G : List A -> Set|, where the family |G| is indexed by strings |xs : List A|
-over the alphabet (for PEM the alphabet is characters, for X.690 and X.509 DER
-it is unsigned 8-bit integers).
-Such a family of types can serve the dual role as the internal representation of
-the value encoded by \(\mathit{xs}\), i.e., a value of type |G xs| is not only a
-proof that \(\mathit{xs}\) is in the language \(G\), 
-but also the internal representation of the value decoded from \(\mathit{xs}\).
+over the alphabet.
+Such a family of types serves the dual roles: a value of type |G xs| is not only a
+proof that \(\mathit{xs}\) is in the language \(G\), but also the internal
+representation of the value decoded from \(\mathit{xs}\).
 
 \begin{figure}[h]
   \begin{code}
 MinRep : UInt8 -> List UInt8 -> Set
-MinRep b1 [] = Top
-MinRep b1 (b2 :: bs) =
-  (b1 > 0 Lor (b1 == 0 Land b2 >= 128))
-  Land (b1 < 255 Lor (b1 == 255 Land b2 <=127))
+MinRep hd [] = Top
+MinRep hd (b2 :: tl) =
+  (hd > 0 Lor (hd == 0 Land b2 >= 128))
+  Land (hd < 255 Lor (hd == 255 Land b2 <=127))
     
 record IntegerValue (@0 bs : List UInt8) : Set where
   constructor mkIntVal
@@ -266,76 +251,63 @@ DER integer values, shown in Figure~\ref{fig:s4-integervalue}.
 This specification takes the form of an Agda record (roughly analogous to a
 C-style \texttt{struct}) that is parameterized by a bytestring |bs|.
 \begin{itemize}
-\item \textbf{Minimum representation.} \xsno DER requires that the two's
+\item \textbf{Erasure annotations.} The annotation |@0| marks the accompanying
+  identifier as \emph{erased at runtime}.
+  In |IntegerValue|, only field |val|, which is the integer encoded by |bs|, is
+  present at runtime; the remaining fields and parameter |bs| are erased by
+  Agda's GHC backend.
+  The annotations for runtime erasure not only improve \armor{}'s performance,
+  but also document the components that serve only specificational purposes for
+  programmers using \armor as a reference.
+
+\item \textbf{Minimum representation.} \xsno DER requires the two's
   complement encoding of an integer value consists of the minimum number of
-  octets needed for this purpose.
+  octets.
   We \emph{express} this property with |MinRep|, which defines a relation between the
-  first byte of the encoding and the remaining bytes; we \emph{enforce} that the
-  property holds with field |minRep| of |IntegerValue| (in order to construct an
-  expression of type |IntegerValue bs|, we must prove that |MinRep| holds for
-  the head and tail of |bs|).
+  first byte of the encoding and the remaining bytes.
+  We \emph{enforce} the property with field |minRep| of |IntegerValue|: in order
+  to construct an expression of type |IntegerValue bs|, one must prove that
+  |MinRep| holds for the head and tail of |bs|.
   
-  The definition of |MinRep| proceeds by cases on whether or not the remaining
-  byte string is empty.
+  The definition of |MinRep| proceeds by cases on |tl|.
   \begin{enumerate}
-  \item If it is, we return the trivially true proposition |Top|, because a
-    single byte is always minimal.
+  \item If |tl| is empty, we return the trivially true proposition |Top|,
+    because a single byte is always minimal.
     
-  \item Otherwise, if the bits of the first byte are all 0, the first bit of the
-    second byte must be 1 (i.e., |b2 >= 128|); and if the bits of the first byte
-    are all 1 (i.e., |b1 == 255|), then the first bit of the second byte must be
-    0 (i.e., |b2 <= 127|).
+  \item Otherwise, if the first byte is |0|, the second byte must be no less than
+    |128|; and if the first byte is |255|, then the the second byte must be no
+    greater than |127|.
   \end{enumerate}
   
-\item \textbf{Erasure annotations.} The string |@0| is an annotation that marks
-  the accompanying identifier as \emph{erased at runtime}.
-  In the figure, only the field |val| (the integer encoded by |bs|) is present
-  at runtime, with the remaining fields (and the parameter |bs|) erased by
-  Agda's GHC backend.
-  The annotations for runtime erasure not only improves the performance of ARMOR,
-  but also serve to document, for programmers using ARMOR as a reference
-  implementation, which components of the internal representation serve only
-  specificational purposes.
-
 \item \textbf{Nonempty encoding.} Fields |hd|, |tl|, and |bseq| together ensure
-  that the encoding of an integer value ``consists of one or more
-  octets.''~\cite{rec2002x}
+  the encoding of an integer value ``consists of one or more octets.''~\cite{rec2002x}
   Specifically, |bseq| ensures that |bs| is of the form |hd :: tl|, where |hd|
-  is the first content octet and |tl| contains the remaining content octets (if any).
+  is the first content octet and |tl| contains the remaining octets (if any).
   
 
 \item \textbf{Linking the value and its encoding.}
-  Field |valeq| forecloses any possibility that an expression of type |IntegerValue
-  bs| populates the field |val| with an arbitrary integer by requiring that this
-  field \emph{must} be equal to the result of decoding |bs| as a two's complement
-  binary value, where |Base256.twosComp| is the decoding operation.
+  Field |valeq| enforces that |val| be populated with a value equal to the
+  result of decoding |bs| as a two's complement binary value (|Base256.twosComp|
+  is the decoding operation).
 \end{itemize}
 
-
-A major advantage of our approach to specifying X.509 is that it facilitates
-proving properties \emph{about the grammar} without having to reason about
-parser implementation details.
-By verifying properties of grammar itself, we can be more confident that we have
-accurately captured the meaning of the natural language descriptions. 
 
 \subsubsection{Language security verification}
 \label{sec:s4-lang-security}
 
-We have proven \emph{unambiguousness} (a given input can encode \emph{at most one value} of a
-particular type) for the supported subsets of formats
-PEM,
-\xsno \der, and \xfon, \emph{non-malleability} (distinct
-inputs cannot encode identical values) for the supported
-subsets of formats \xsno \der and \xfon, and \emph{no-substrings} (a language permits parsers no degrees
-of freedom over which prefix of an input string it consumes) for all
-\tlv structures.
+A major advantage of our approach to specifying X.509 is that it facilitates
+proving properties \emph{about the grammar} without having to reason about
+parser implementation details.
+We have proven: \emph{unambiguousness} for the supported subsets of formats PEM, \xsno \der, and
+\xfon; \emph{non-malleability} for the supported subsets of formats \xsno \der
+and \xfon; and \emph{unique prefixes} for all \tlv structures.
 
 \textbf{Unambiguous.}
 We formally define unambiguousness of a language |G| in Agda as follows.
 \begin{code}
 Unambiguous G = forall {xs} -> (a1 a2 : G xs) -> a1 == a2
 \end{code}
-Read this definition as saying that for every string |xs|, any two inhabitants
+Read this as saying for every string |xs|, any two inhabitants
 of the internal representation of the value encoded by |xs| in |G| are equal.
 In the context of \xfon, format ambiguity could result in interoperability
 issues between standards-compliant producers and consumers (\eg, rejection
@@ -344,12 +316,10 @@ because the decoded certificate does not match the encoded certificate).
 \textit{Challenges.} |Unambiguous| expresses a property much stronger
 than might be first apparent.
 To illustrate, showing |Unambiguous IntegerValue| requires showing that the
-corresponding fields are equal --- \emph{even the purely specificaional fields.}
+corresponding fields are equal --- \emph{even the purely ones.}
 Once established, the additional strength afforded by |Unambiguous| significantly aids
-development of our verified parsers; however, this means that specifications must
-be carefuly crafted so as to admit unique proof terms.
-In the case of |IntegerValue|, this means showing that any two proofs of |MinRep
-hd tl| are equal.
+development of our verified parsers; however, this means that specifications
+(such as |MinRep|) mustbe carefuly crafted to admit unique proof terms.
 
 Another challenging aspect in proving unambiguousness for X.690 DER in
 particular is the format's support for sequences that have \emph{optional} and
@@ -357,7 +327,7 @@ particular is the format's support for sequences that have \emph{optional} and
 sequence.
 We are threatened with ambiguity if it is possible to mistake an optional field
 whose encoding is present for another optional field whose encoding is absent.
-To avoid this scenario, the X.690 format stipulates that every field of any
+To avoid this scenario, the \xsno format stipulates that every field of any
 ``block'' of optional or default fields must be given a tag distinct from every
 other such field.
 Our proof of unambiguousness for \xfon relies heavily on lemmas proving the
@@ -383,86 +353,80 @@ record Raw (G : List A -> Set) : Set where
     to : {@0 xs : List A} -> G xs -> D
 \end{code}
 
-An inhabitant of |Raw G| consists of a type |D|, intended to be the
-``raw data'' of |G|, together with a function |to| that should extract this data
-from any inhabitant of |G xs|.
-To illustrate, consider the case for |IntegerValue| below.
+An inhabitant of |Raw G| consists of a type |D| (be the ``mere data'' of |G|)
+together with a function |to| that extracts this data from any inhabitant of |G xs|.
+Consider the case for |IntegerValue| below.
 \begin{code}
   RawIntegerValue : Raw IntegerValue
   Raw.D RawIntegerValue = IntZ
   Raw.to RawIntegerValue = IntegerValue.val
 \end{code}
-\noindent This says that the raw representation for \xsno DER integer values is |IntZ| (a
-type for integers defined in Agda's standard library), and the extraction
-function is just the field accessor |IntegerValue.val|.
+\noindent This says that the raw representation for \xsno DER integer values is
+|IntZ|, and the extraction function is just the field accessor |IntegerValue.val|.
 
-Once we have defined an instance of |Raw G| for a language specification |G|,
-we express non-malleability of |G| with respect to that raw representation
-with the following property: give two input strings |xs1| and |xs2|, with witnesses
-|g1 : G xs1| and |g2 : G xs2|, if the raw representations of |g1| and |g2| are
-equal, then not only are strings |xs1| and |xs2| equal, but also |g1| and |g2|.
-In Agda, this is written as:
+Once we have defined an instance of |Raw G|, we express non-malleability of |G|
+with respect to that raw representation with the following property: give two
+``proof-carrying'' internal representations |g1 : G xs1| and |g2 : G xs2|, if
+the mere data of |g1| and |g2| are equal, then not only are strings
+|xs1| and |xs2| equal, but also |g1| and |g2|.
+In Agda, we write:
 \begin{code}
 NonMalleable : {G : @0 List A -> Set} -> Raw G -> Set
 NonMalleable{G} R =
   forall {@0 xs1 xs2} -> (g1 : G xs1) (g2 : G xs2)
   -> Raw.to R g1 == Raw.to R g2 -> (xs1 , g1) ==  (xs2 , g2)  
 \end{code}
-For |IntegerValue| in particular, proving |NonMalleable RawIntegerValue|
-requires showing |Base256.twosComp| is itself injective.
+Proving |NonMalleable RawIntegerValue| requires proving |Base256.twoComp| is
+injective. 
 
-\textbf{No-Substrings.}
-The final language property we discuss, which we dub \emph{``no-substrings,''}
-expresses formally the intuitive idea that a language permits parsers no degrees
-of freedom over which prefix of an input string it consumes.
-As we are striving for \emph{parser independence} in our language
-specifications, we formulate this property as follows: for any two prefixes of
-an input string, if both prefixes are in the language |G|, then they are equal.
-In Agda, we express this as |NoSubstrings| below.
+\textbf{Unique prefixes}
+The final language property we discuss, which we dub \emph{``unique prefixes,''}
+expresses that a language permits parsers no degrees of freedom over which
+prefix of an input string it consumes.
+Striving for \emph{parser independence} in our specifications, we formulate
+this property as follows: for any two prefixes of an input string, if both
+prefixes are in the language |G|, then they are equal.
+In Agda, we express this as |UniquePrefixes| below.
 \begin{code}
-NoSubstrings G =
-  forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
-  -> G xs1 -> G xs2 -> xs1 == xs2
+UniquePrefixes G = forall {xs1 ys1 xs2 ys2}
+   -> xs1 ++ ys1 == xs2 ++ ys2 -> G xs1 -> G xs2 -> xs1 == xs2
 \end{code}
 Given that \xfon uses \tlv encoding, it is
-unsurprising that we are able to prove |NoSubstrings| holds for our
-specification.
-However, we call explicit attention to this property here because for two
-reasons: 1) it an essential lemma in our proof of \emph{strong completeness} of
+unsurprising that we are able to prove |UniquePrefixes| holds.
+However, we call explicit attention to this property for two
+reasons: 1) it is an essential lemma in our proof of \emph{strong completeness} of
 our \xfon parser (see Section~\ref{sec:s4-parser-sound-complete-strong}); and 2)
 this property \emph{does not hold} for the PEM format due to leniency in
-end-of-line encoding, and so to show strong completeness we need an additional
-property for PEM parsers, \emph{maximality}.
+end-of-line encoding, so to show strong completeness for PEM parsers we need an
+additional property, \emph{maximality}.
 
-\subsubsection{Parser correctness verification}
-We now describe our approach to verified parsing. We write parsers that are \emph{sound} and \emph{complete}.
+\subsubsection{Parser correctness}
+We now describe our approach to verified sound and complete parsing.
 For a language \(G\), \emph{soundness} of a parser means that every
-bytestring it accepts is in the language, and \emph{completeness} means that it
-accepts every bytestring in the language.
+string it accepts is in the language, and \emph{completeness} means that it
+accepts every string in the language.
 Our approach to verifying these properties for all our parsers is to make them
 \emph{correct-by-construction}, meaning that parsers do not merely indicate
-success or failure with e.g.\ an integer code, but return \emph{proofs}. 
-If the parser is successful, this is a proof that some prefix of its input is in
-the language, and if the parser fails, it returns a proof that \emph{no} prefix
-of its input is. That is to say, our parsers are really proofs that membership
-(in \(G\)) of an input's prefix is decidable.
+success or failure with \eg an integer code, but return \emph{proofs}.
+Precisely, our parsers are correct-by-construction by being proofs that
+membership of an input's prefix in \(G\) is decidable: parsers return either a
+proof that some prefix of its input is in the language, or a proof that
+\emph{no} prefix is.
 
-\noindent\textbf{The type of correct-by-construction parsers:}
+\noindent\textbf{Correct-by-construction parsers:}
 \label{sec:s4-parsers-cbc}
-Our first step is to formally define what success in means.
+Our first step is to formally define success.
 In first-order logic, we would express the condition for the parser's success on a prefix of
 |xs| as \(\exists \mathit{ys}\, \mathit{zs}, \mathit{xs} = \mathit{ys} +\!\!\!+
 \mathit{zs} \land |G ys|\).
 That is to say, on success the parser consumes some prefix of the input string
 that is in the language |G|.
-In Agda, we express the result of successful parsing as the parameterized record
-|Success|, shown below.
+In Agda, we express this as the record |Success|, shown below.
 \begin{figure}[h]
   \centering
   \begin{code}
     record Success 
-      (G : List UInt8 -> Set) (xs : List UInt8) : Set where
-      constructor success
+      (G : List UInt8 -> Set) (@0 xs : List UInt8) : Set where
       field
         @0 prefix : List UInt8
         suffix : List UInt8
@@ -472,7 +436,7 @@ In Agda, we express the result of successful parsing as the parameterized record
   \caption{Success conditions for parsing}
   \label{fig:parser-success}
 \end{figure}
-In the definition, understand parameters |G| and |xs| as the language denoted by
+In the definition, parameters |G| and |xs| are the language denoted by
 a production rule and an input string, respectively.
 The fields of the record are: |prefix|, the consumed prefix of the input (erased
 at runtime); |suffix|, the remaining suffix of the input from which we parse
@@ -482,13 +446,10 @@ the internal data representation of the value encoded by |prefix| \textbf{and}
 a proof that |prefix| is in the language |G|.  
 As a consequence, \emph{soundness will be immediate}.
 
-Our next step is to define what parser failure means.
-We define this to be the condition that \emph{no} prefix of the input |xs| is in
-the language of |G|, which is to say the failure condition is the
-\emph{negation} of the success condition: |not Success G xs|.
-
+Failure is the negation of the success condition, |not Success G xs|, meaning
+\emph{no} prefix of the input |xs| is in the language of |G|.
 To have the parser return |Success G xs| on success and |not Success G xs| on
-failure, we use datatype |Dec| in the Agda standard library, shown below.
+failure, we the \agda standard library type datatype |Dec|, shown below.
 \begin{code}
 data Dec (Q : Set) : Set where
   yes : Q -> Dec Q
@@ -498,48 +459,19 @@ Reading |Dec| as programmers, |Dec Q| is a tagged union type which can be
 populated using either values of type |Q| or type |not Q|; as mathematicians, we
 read it as the type of proofs that |Q| is \emph{decidable}.
 Expressed as a formula of FOL, |Dec Q| is simply \(Q \lor \neg Q\); however,
-note that constructive logic (upon which Agda is based) does not admit LEM, so
-this disjunction must be proven on a case-by-case basis for each |A| in
-question, as there are some propositions which can neither be proven nor refuted.
+note that constructive logic (upon which \agda is based) does not admit LEM, so
+this disjunction must be proven on a case-by-case basis for each |Q| (there
+are some undecidable propositions). 
 
-We are now able to complete the definition of the type of parsers, shown below.
+We are now able to complete the definition of the type of parsers, shown in
+Figure~\ref{fig:parser-def}.
 \begin{figure}[h]
   \begin{code}
-Parser : (List UInt8 -> Set) -> Set
-Parser G = forall xs -> Dec (Success G xs)    
-  \end{code}
-  \caption{Definition of |Parser|}
-  \label{fig:parser-def}
-\end{figure}%
-|Parser| is a family of types, where for each language |G|, the type
-|Parser G| is the proposition that, for all bytestrings |xs|, it is decidable
-whether some prefix of |xs| is in |G|; alternatively, we can (as programmers)
-read it as the type of functions which take a bytestring and possibly return a
-parsed data structure and remaining bytestring to continue parsing.
+Parser : (List A -> Set) -> Set
+Parser G = forall xs -> Dec (Success G xs)
 
-\textit{Challenges.}
-The guarantee that, on failure, the parser returns |not Success G xs| is very
-strong, as it asserts a property concerning \emph{all possible prefixes} of the
-input.
-This strength is double-edged: while having this guarantee makes proving
-completeness straightforward, \emph{proving} it means ruling out all possible
-ways in which the input could be parsed.
-In some cases, we have made choices about parser implementations to facilitate
-the proofs concerning the failure case, at a cost to performance.
-The clearest example of such a trade-off is in our parsers for X.690
-\texttt{Choice} values, which are implemented using back-tracking.
-
-\textbf{Maximal parsers:} As we mentioned at the end of
-Section~\ref{sec:s4-lang-spec}, the PEM format does not enjoy the
-\emph{no-substrings} property.
-To facilitate our implementation of correct-by-construction PEM parsers, and
-(ultimately) prove strong completeness, we have augmented the specifications of
-these parsers to guarantee they consume \emph{the largest prefix of the input
-  compliant with the format.}
-
-\begin{figure}
-\begin{code}
-MaximalSuccess : forall G xs -> Dec (Success A xs) -> Set
+MaximalSuccess :  forall (G : List A -> Set) xs
+                  -> Dec (Success G xs) -> Set
 MaximalSuccess G xs (no _) = Top
 MaximalSuccess G xs (yes s) = forall pre suf -> pre ++ suf == xs
   -> G pre -> length pre <= length (Success.prefix s)
@@ -548,17 +480,37 @@ record MaximalParser (G : List A -> Set) : Set where
   field
     p : Parser G
     max : forall xs -> MaximalSuccess (p xs)
-\end{code}
-  \caption{Definition of |MaximalParser|}
-  \label{fig:s4-parser-maximal}
-\end{figure}
+  \end{code}
+  \caption{Definition of |Parser| and |MaximalParser|}
+  \label{fig:parser-def}
+\end{figure}%
+|Parser| is a family of types, where for each language |G|, the type
+|Parser G| is the proposition that, for all bytestrings |xs|, it is decidable
+whether some prefix of |xs| is in |G|.
 
+\textit{Challenges.}
+The guarantee that, on failure, the parser returns |not Success G xs| is very
+strong, as it asserts a property concerning \emph{all possible prefixes} of the
+input.
+This strength is double-edged: while having this guarantee makes proving
+completeness straightforward, \emph{proving} it means ruling out all possible
+ways in which the input could be parsed.
+In some cases, we implemented parsers to facilitate
+the proofs concerning the failure case, at a cost to performance.
+The clearest example of such a trade-off is in our parsers for \xsno
+\texttt{Choice} values, implemented using back-tracking.
+
+\textbf{Maximal parsers:} The PEM format does not enjoy the
+\emph{unique prefixes} property.
+To facilitate our implementation of correct-by-construction PEM parsers and
+prove strong completeness, we have augmented the specifications of these parsers
+to guarantee they consume \emph{the largest prefix of the input compliant with
+  the format.}
 The formalization of this in Agda is shown in
-Figure~\ref{fig:s4-parser-maximal}.
-Definition |MaximalSuccess| expresses what it means for a parser's successful
-result to be maximal: if parsing |xs| was successful (|yes s|), then any other
-prefix |pre| of |xs| in the language |G| is no greater than that consumed by the
-parser.
+Figure~\ref{fig:parser-def}.
+Definition |MaximalSuccess| expresses that if parsing |xs| was successful (|yes
+s|), then any other prefix |pre| of |xs| in |G| is no greater than
+that consumed by the parser.
 In the record |MaximalParser|, we couple together a parser |p| together with a
 proof |max| that, for \emph{every} input string |xs|, if |p| is successful
 parsing |xs| then that success is maximal.
@@ -567,24 +519,30 @@ parsing |xs| then that success is maximal.
 \label{sec:s4-parser-sound-complete-strong}
 We now show our formal definitions and proofs of soundness and completeness for
 parsing, beginning with soundness.
-\begin{figure}[h]
+\begin{figure}
   \begin{code}
 Sound : (G : List A -> Set) -> Parser G -> Set
 Sound G p =
   forall xs -> (w : IsYes (p xs)) -> G (Success.prefix (toWitness w))    
 
+Complete : (G : List A -> Set) -> Parser G -> Set
+Complete G p = forall xs -> G xs -> IsYes (p xs)
+
 soundness : forall {G} -> (p : Parser G) -> Sound G p
 soundness p xs w = Success.value (toWitness w)
+
+trivSuccess : forall {G} {xs} -> G xs -> Success G xs
+
+completeness : forall {G} -> (p : Parser G) -> Complete G p
+completeness p xs inG = fromWitness (p xs) (trivSuccess inG)
   \end{code}
-  \caption{Parser soundness (definition and proof)}
-  \label{fig:s4-parser-soundness}
+  \caption{Parser soundness and completeness}
+  \label{fig:s4-parser-soundness-completeness}
 \end{figure}%
 
 \textbf{Soundness.}
-Recall that parser soundness means that, if a parser for \(G\) accepts a prefix of the
-input string, then that prefix is in \(G\).
-The Agda definition and proof of soundness for all of our parsers is
-shown in Figure~\ref{fig:s4-parser-soundness}, which we now detail.
+The \agda definition and proof of soundness for all of our parsers is
+shown in Figure~\ref{fig:s4-parser-soundness-completeness}.
 Beginning with |Sound|, the predicate expressing that parser |p| is sound with
 respect to language |G|, the predicate |IsYes| (definition omitted) expresses
 the property that a given decision (in this case, one of type |Dec (Success G
@@ -597,124 +555,98 @@ parser |p| accepts |xs|, the the prefix it consumes is in |G|.''
 
 The proof |soundness| states that \emph{all parsers are sound}.
 As our parsers are correct-by-construction, the definition is straightforward:
-we use |toWitness| to extract the proof of parser success, i.e., a term of type
-|Success G xs|, then use the field accessor |Success.value| to obtain the
+we use |toWitness| to extract the proof of parser success, i.e., an expression of type
+|Success G xs|, then the field accessor |Success.value| obtains the
 desired proof that the consumed prefix is in |G|.
 
 \textbf{Completeness.}
-Recall that the definition of parser completeness with respect to a language |G|
-means that if an input string |xs| is in |G|, the parser accepts \emph{some
-  prefix of |xs|}.
-Of course, this property in isolation does not rule out certain bad behavior
-that threatens security; specifically, it does not constrain the parser's
-freedom over (1) which prefix of the input is consumed, and (2) how the internal
-datastructure is constructed.
-However, and as we have discussed in Section~\ref{sec:s4-lang-spec}, these
-should be thought of as properties of the \emph{language}, and \emph{not} its
-parsers.
-To emphasize this, after discussing the completeness proof we will show how,
-using language properties, it can be strengthed to address the aforementioned
-security concerns.
-
-\begin{figure}[h]
-\begin{code}
-Complete : (G : @0 List A -> Set) -> Parser G -> Set
-Complete G p = forall xs -> G xs -> IsYes (p xs)
-
-trivSuccess : forall {G} {xs} -> G xs -> Success G xs
-
-completeness : forall {G} -> (p : Parser G) -> Complete G p
-completeness p xs inG = fromWitness (p xs) (trivSuccess inG)
-\end{code}
-  \caption{Parser completeness (definition and proof)}
-  \label{fig:s4-parser-wkcompleteness}
-\end{figure}
-
-Figure~\ref{fig:s4-parser-wkcompleteness} shows our definition and proof of
-\emph{completeness} in \agda, which we now detail.
+% Recall that the definition of parser completeness with respect to a language |G|
+% means that if an input string |xs| is in |G|, the parser accepts \emph{some
+%   prefix of |xs|}.
+% Of course, this property in isolation does not rule out certain bad behavior
+% that threatens security; specifically, it does not constrain the parser's
+% freedom over (1) which prefix of the input is consumed, and (2) how the internal
+% datastructure is constructed.
+% However, and as we have discussed in Section~\ref{sec:s4-lang-spec}, these
+% should be thought of as properties of the \emph{language}, and \emph{not} its
+% parsers.
+% To emphasize this, after discussing the completeness proof we will show how,
+% using language properties, it can be strengthed to address the aforementioned
+% security concerns.
+%
+Figure~\ref{fig:s4-parser-soundness-completeness} also shows our definition and
+proof of \emph{completeness} in \agda.
 The definition of |Complete| directly translates our notion of completeness: for
 every input string |xs|, if |xs| is in |G|, then parser |p| accepts some prefix
 of |xs|.
-For the proof, we first prove a straightforward lemma |trivSuccess| (definition
-omitted) that states any proof that |xs| is in |G| can be turned into a proof
+For the proof, a straightforward lemma |trivSuccess| (definition
+omitted) states any proof that |xs| is in |G| can be turned into a proof
 that some prefix of |xs| (namely, |xs| itself) is in |G|.
-With this, the proof of |completeness| uses the function |fromWitness : {Q :
+With this lemma, the proof of |completeness| uses the function |fromWitness : {Q :
   Set} -> (d : Dec Q) -> Q -> IsYes d|, which intuitively states that if a
 proposition |Q| is true, then any decision for |Q| must be in the affirmative.
 
 
 \textbf{Strong completeness.}
-We will now see how, using language properties, our parser completeness result
-can be strengthened to rule out bad behavior that could compromises security.
-To be precise, when a string |xs| is in the language |G|, we desire that the
-parser consumes \emph{exactly} |xs|, and furthermore that there is only one way
-for it to construct the internal data representation of |G| from |xs|.
-To show both of these guarantees, it suffices that |G| satisfies the properties
-|Unambiguousness| and |NoSubstrings| (see Section~\ref{sec:s4-lang-spec}).
+In isolation, completeness does not rule out all bad behavior that threatens
+security.
+Specifically, it does not constrain the parser's freedom over (1) which prefix
+it consumes and (2) how the internal datastructure is constructed.
+As discussed in Section~\ref{sec:s4-lang-spec}, these should be thought of as
+\emph{language} properties.
+To show rule out both bad behaviors, it suffices that |G| satisfies the
+properties |Unambiguousness| and |UniquePrefixes|.
 
-\begin{figure}[h]
+\begin{figure}
   \begin{code}
 StronglyComplete : (G : @0 List A -> Set) -> Parser G -> Set
 StronglyComplete G p = forall xs -> (inG : G xs)
-  -> exists  (w : IsYes (p xs))
-             (  let s = toWitness w in
-                (xs , inG) == (Success.prefix x , Success.value s))
+  -> exists  (w : IsYes (p xs)) (let s = toWitness w in
+               (xs , inG) == (Success.prefix x , Success.value s))
 
 strongCompleteness
-  : forall {G} -> Unambiguous G -> NoSubstrings G
+  : forall {G} -> Unambiguous G -> UniquePrefixes G
     -> (p : Parser G) -> StronglyComplete G p
-strongCompleteness ua ns p xs inG = (w , strong xs inG s)
-  where
-  w = completeness p inG
-  s = toWitness w
-  strong : forall xs inG s -> (dashcomma inG) == (dashcomma Success.value s)
-  strong xs inG s with ns _ inG (Success.prefix s)
-  ... | refl with ua inG (Success.value s)
-  ... | refl = refl
+
+strongCompletenessMax : forall {G} -> Unambiguous G
+  -> (m : MaximalParser G)
+  -> StronglyComplete G (MaximalParser.p m)
   \end{code}
-  \caption{Strong completeness (definition and proof)}
+  \caption{Strong completeness (types only)}
   \label{fig:s4-parser-stcompleteness}
 \end{figure}
 
-Figure~\ref{fig:s4-parser-stcompleteness} shows the definition and proof of our
-strengthened completeness result.
-For the definition, |StronglyComplete G p| says that, if we have a proof |inG| that
+Figure~\ref{fig:s4-parser-stcompleteness} shows the types used in our proof of
+our strong completeness (see the full paper for more).
+|StronglyComplete G p| says that, if we have a proof |inG| that
 |xs| is in |G|, then not only does there exist a witness |w| that the parser
-accepts some prefix of |xs|, but prefix it consumes is |xs| and the
-proof it returns is |inG|.
+accepts some prefix of |xs|, but this prefix is |xs| and the proof it returns is
+|inG|.
 Recall that the assumption |inG| and the |value| field of the |Success| record
 serve dual roles: they are not only proofs that a string is in a language, but
 also the internal data representation of the value encoded by |xs|.
 So, saying they are equal means the internal representations are equal.
 
-The proof, |strongCompleteness|, shows that to prove |StronglyComplete|, it
-suffices that the language |G| satisfies |Unambiguous| and |NoSubstrings|.
-In the definition, we exhibit witness |w| using the previous proof
-|completeness|, and in the helper proof |strong| we use the assumptions |ns :
-NoSubstrings G| and |ua : Unambiguous G| to prove that |xs| and |inG| are equal
-to the |prefix| consumed and |value| returned by |p xs|.
-Note that in the type signature of |strong|, |dashcomma| is a \emph{function}
-(with precedence lower than ordinary function application) that builds a tuple,
-used when the type of the second component of the tuple uniquely determines the
-value of the first component.
+% The proof, |strongCompleteness|, shows that to prove |StronglyComplete|, it
+% suffices that the language |G| satisfies |Unambiguous| and |UniquePrefixes|.
+% In the definition, we exhibit witness |w| using the previous proof
+% |completeness|, and in the helper proof |strong| we use the assumptions |ns :
+% UniquePrefixes G| and |ua : Unambiguous G| to prove that |xs| and |inG| are equal
+% to the |prefix| consumed and |value| returned by |p xs|.
+% Note that in the type signature of |strong|, |dashcomma| is a \emph{function}
+% (with precedence lower than ordinary function application) that builds a tuple,
+% used when the type of the second component of the tuple uniquely determines the
+% value of the first component.
 
 \emph{Strong completeness from maximality.}
-For PEM, even though the format lacks the \emph{no-substrings} property we can
+For PEM, even though the format lacks the \emph{unique prefixes} property we can
 still prove strong completeness by leveraging the fact that our parsers are
 guaranteed to be \emph{maximal.}
 Intuitively, this is because if |xs| is in |G|, then the largest possible prefix
 of |xs| in |G| is |xs| itself.
-We show the formal statement of the theorem below, omitting the proof for space
-considerations.
-\begin{figure}[h]
-  \begin{code}
-strongCompletenessMax : forall {G} -> Unambiguous G
-  -> (m : MaximalParser G)
-  -> StronglyComplete G (MaximalParser.p m)
-  \end{code}
-  \caption{Strong completeness from parser maximality}
-  \label{fig:s4-parser-stcompleteness-max}
-\end{figure}
+We show the formal statement of the theorem in
+Figure~\ref{fig:s4-parser-soundness-completeness}, omitting the proof for space
+considerations. 
 
 % 
 % 
@@ -1164,14 +1096,14 @@ strongCompletenessMax : forall {G} -> Unambiguous G
 % % As we are striving for \emph{parser independence} in our language
 % % specifications, we formulate this property as follows: for any two prefixes of
 % % an input string, if both prefixes are in the language |G|, then they are equal.
-% % In Agda, we express this as |NoSubstrings| below.
+% % In Agda, we express this as |UniquePrefixes| below.
 % % \begin{code}
-% % NoSubstrings G =
+% % UniquePrefixes G =
 % %   forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
 % %   -> G xs1 -> G xs2 -> xs1 == xs2
 % % \end{code}
 % % Given that \xfon uses \(<T,L,V>\) encoding, it is
-% % unsurprising that that we are able to prove |NoSubstrings| holds for our
+% % unsurprising that that we are able to prove |UniquePrefixes| holds for our
 % % specification.
 % % However, this property is essential to understanding our \emph{strong
 % %   completeness} result (see Section~\ref{sec:s4-parser-sound-complete-strong})
@@ -1397,7 +1329,7 @@ strongCompletenessMax : forall {G} -> Unambiguous G
 % % parser consumes \emph{exactly} |xs|, and furthermore that there is only one way
 % % for it to construct the internal data representation of |G| from |xs|.
 % % To show both of these guarantees, it suffices that |G| satisfies the properties
-% % |Unambiguousness| and |NoSubstrings| (see Section~\ref{sec:s4-lang-spec}).
+% % |Unambiguousness| and |UniquePrefixes| (see Section~\ref{sec:s4-lang-spec}).
 
 % % \begin{figure}[h]
 % %   \begin{code}
