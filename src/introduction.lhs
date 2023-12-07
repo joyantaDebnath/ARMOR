@@ -53,7 +53,7 @@ Although the current paper, to the best of our knowledge, presents the first imp
 chain validation with machine-checked proofs of correctness, it draws inspirations from prior work in the area 
 \cite{nqsb-tls, barenghi2018systematic, ramananandro2019everparse, tao2021dice, debnath2021re, ni2023asn1}. 
 However, in comparison to \armor, prior work has at least one of the following 
-limitations: (1) lacks any formal guarantees; (2) focuses only on parsing and lacks formal correctness guarantees
+limitations: (1) no formal guarantees; (2) focuses only on parsing and lacks formal correctness guarantees
 of semantic aspects; (3) lacks explicit proof of \emph{soundness} and \emph{completeness} of certificate 
 parsing; (4) focuses only on verified encoding of certificates, not parsing.
 

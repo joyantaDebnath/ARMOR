@@ -146,7 +146,7 @@ contained in an expression of type |Fin n|.
 \item The definition of |toNat| is given with two equations, one each for the
   two constructors of |Fin|.
   \begin{itemize}
-  \item In the first equation, we send |fzero| to 0.
+  \item In the first equation, we set |fzero| to 0.
     
   \item In the second equation, our argument is of the form |fsuc i|.
     We make a recursive call |toNat i| and increment the result by |1|.
@@ -205,7 +205,7 @@ DER, and \xfon formats, greatly reducing the complexity of the specification
 and increasing trust that they faithfully capture the natural language
 description.
 Much current research~\cite{ni2023asn1, ramananandro2019everparse}
-for applying formal methods to parsing uses serializers to specify their
+on applying formal methods to parsing uses serializers to specify their
 correctnes properties.
 Formal proofs of correctness (in any context) are only ever as good as the
 specification of those correctness properties, and this earlier research swells
