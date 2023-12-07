@@ -15,21 +15,47 @@ This section evaluates \armor's efficiency, robustness, and applicability in rea
 % We initially considered establishing servers with individual test certificate chain and authoring a client application using each test library to initiate a TLS connection. However, this approach would necessitate terminating, rebooting, and re-configuring the server for each test certificate chain, leading to a time-consuming process that could take months to complete, even with parallelization. To mitigate this, 
 
 
-\noindent\textbf{Adjustment of System-Time.} There is a $1.5$ years of time difference between the collection of our \censys certificate dataset and our actual evaluation. Therefore, using these certificate chains directly in the experiment could result in the expiration of most of the certificate chains. To solve this challenge, we implemented a probabilistic approach within our experimental setup. Specifically, for $95\%$ certificate chains (randomly selected), we adjusted the system-time to older dates falling within the validity periods of the leaf certificates. For the remaining $5\%$ cases, we maintained the current system-time. Our time adjustment process is based on the \libfaketime~\cite{faketime} library, which allows modifying the system-time a program sees without having to change the time system-wide. This strategy allowed us to parallelize, even in \docker~\cite{docker} environment, and evaluate all the semantic rules, not only navigating the issue of certificate expiration but also ensuring a comprehensive and realistic assessment of the certificate validation process.
+\noindent\textbf{Adjustment of System-Time.} There is a $1.5$ years of time
+difference between the collection of our \censys certificate dataset and our
+actual evaluation. Therefore, using these certificate chains directly in the
+experiment could result in the expiration of many of the certificate chains. To
+solve this challenge, we implemented a probabilistic approach within our
+experimental setup. Specifically, for $95\%$ certificate chains (randomly
+selected), we adjusted the system-time to older dates falling within the
+validity periods of the leaf certificates. For the remaining $5\%$ cases, we
+maintained the current system-time. Our time adjustment process is based on the
+\libfaketime~\cite{faketime} library, which allows modifying the system-time a
+program sees without having to change the time system-wide. This strategy
+allowed us to parallelize, even in a \docker~\cite{docker} environment, and evaluate all the semantic rules, not only navigating the issue of certificate expiration but also ensuring a comprehensive and realistic assessment of the certificate validation process.
 
-\noindent\textbf{Configuration of Testbed.} For finding answers to $Q1$, we relied on a Linux server with Intel Xeon $2.10$ GHz $100$ cores CPU. We distributed subsets of our certificate chain datasets across those $100$ cores, running them simultaneously against the test harnesses. The results of the chain validation were then recorded in files for subsequent manual analysis. However, for $Q2$, we adopted a different strategy. In an effort to obtain realistic data on the execution time and memory consumption, we used another Linux machine with a $3.1$ GHz Intel Core-$i7$ CPU. In this run, we used $1,00,000$ certificate chains randomly selected from our \censys dataset. Finally, for $Q3$, our approach involves modifying the TLS 1.3 implementation in the \boringssl library to incorporate \armor. This modified version of \boringssl is then compiled with the \curl tool~\cite{curl}, a popular data transfer utility. Using this setup, the top 1000 websites from Alexa are visited. To evaluate the impact of the \armor integration, these visits are also conducted using the standard (unmodified) \boringssl implementation. This allows for a comparison of execution times and outcomes between the normal and modified cases.
+\noindent\textbf{Testbed Configuration.} To answer $Q1$, we relied on a Linux
+server with Intel Xeon $2.10$ GHz $100$ core CPU. We distributed subsets of our
+certificate chain datasets across those $100$ cores, running them simultaneously
+against the test harnesses. The results of the chain validation were then
+recorded in files for subsequent manual analysis. For $Q2$, we adopted a
+different strategy. In an effort to obtain realistic data on the execution time
+and memory consumption, we used another Linux machine with a $3.1$ GHz Intel
+Core-$i7$ CPU. In this run, we used $100,000$ certificate chains randomly
+selected from our \censys dataset. Finally, for $Q3$, our approach involves
+modifying the TLS 1.3 implementation in the \boringssl library to incorporate
+\armor. This modified version of \boringssl was then compiled with the \curl
+tool~\cite{curl}, a popular data transfer utility. Using this setup, the top
+1,000 websites from Alexa were visited. To evaluate the impact of the \armor
+integration, these visits were also conducted using the standard (unmodified)
+\boringssl implementation, and we compared of execution times and outcomes
+between the normal and modified cases.
 
-            \begin{table}[h]
-            \centering
-            \sffamily\scriptsize
-            \setlength\extrarowheight{1.5pt}
-            \setlength{\tabcolsep}{1.5pt}
-            \caption{Summary of datasets and their usage}
-            \label{dataset}
-            \centering
-                \begin{tabular}{||c||c||c||c||c||c||}
-                \hline
-                \textbf{Dataset}      & \begin{tabular}[c]{@@{}c@@{}}Censys\\ (PEM)\end{tabular}       & \begin{tabular}[c]{@@{}c@@{}}Frankencert\\ (PEM)\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}OpenSSL\\ (DER)\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}EFF\\ (DER)\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Alexa's Top\\ Websites\end{tabular}   \\ \hline
+\begin{table}[h]
+  \centering
+  \sffamily\scriptsize
+  \setlength\extrarowheight{1.5pt}
+  \setlength{\tabcolsep}{1.5pt}
+  \caption{Summary of datasets and their usage}
+  \label{dataset}
+  \centering
+  \begin{tabular}{||c||c||c||c||c||c||}
+    \hline
+    \textbf{Dataset}      & \begin{tabular}[c]{@@{}c@@{}}Censys\\ (PEM)\end{tabular}       & \begin{tabular}[c]{@@{}c@@{}}Frankencert\\ (PEM)\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}OpenSSL\\ (DER)\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}EFF\\ (DER)\end{tabular} & \begin{tabular}[c]{@@{}c@@{}}Alexa's Top\\ Websites\end{tabular}   \\ \hline
                 \textbf{Count}        & 2,000,000                                                    & 1,000,000                                                   & 2,242                                                   & 12,000                                              & 100                                                              \\ \hline
                 \textbf{Experiements} & \begin{tabular}[c]{@@{}c@@{}}Full Chain\\ Runtime\end{tabular} & Full Chain                                                  & Parser                                                  & Parser                                              & \begin{tabular}[c]{@@{}c@@{}}End-to-End\\ Application\end{tabular} \\ \hline
                 \end{tabular}
@@ -81,14 +107,40 @@ We now present our findings for each dataset.
 
 \textbf{b. Allowing Invalid CRL Distribution Point.} \armor rejected $5$ certificate chains because they did not enforce a semantic restriction on the values presented in CRL Distribution Points of subsequent certificates (violation of R21). This violation is present in all the libraries except \ceres.
 
-\textbf{c. Failure to Build Valid Chain.} There are $5,253$ inputs for which \bouncycastle, \sun, and \ceres failed to build any valid certificate chain, which entails presence of bugs in their chain building algorithm. Upon taking a closer look to those inputs, we found multiple chandidate chains can be built from them; however, just one chain is rooted to a trust anchor. Since the input list of certificate did not have the certificate of that trust anchor, these libraries failed to find the trusted path. However, we expect, in this kind of scenario, the chain building process must prioritize lookup on the trusted CA list to find issuer of a certificate.
+\textbf{c. Failure to Build Valid Chain.} There are $5,253$ inputs for which
+\bouncycastle, \sun, and \ceres failed to build any valid certificate chain,
+indicating the presence of bugs in their chain building algorithms. On a closer
+look of those inputs, we found that multiple candidate chains can be built from
+them; however, just one chain is rooted to a trust anchor. Since the input list
+of certificate did not have the certificate of that trust anchor, these
+libraries failed to find the trusted path. However, we expect that in such
+scenarios chain building must prioritize finding a certificate for an issuing CA
+\emph{in the trusted root store.}
 
-\textbf{d. No Support for IA5String.} There were $15$ chains that \ceres rejected due to parsing failure of the \texttt{Name} field, but \armor accepted those. Particularly, these certificates contain strings of type IA5String to represent ``emailAddress''. Although RFC 5280 recommends new certificates to include such ``emailAddress'' in \texttt{Subject Alternative Name} extension, the specification does not prohibit including ``emailAddress'' in \texttt{Name} (see 4.1.2.6 in RFC 5280). Thus, \armor correctly accepts those certificate chains.
+\textbf{d. No Support for \texttt{emailAddress} in \texttt{Name}.} There were $15$ chains \ceres rejected,
+due to parsing failure of the \texttt{Name} field, that \armor accepted.
+These certificates contain strings of type IA5String to represent
+\texttt{emailAddress}. Although RFC 5280 recommends new certificates include
+\texttt{emailAddress} in the \texttt{Subject Alternative Name} extension, the
+specification does not prohibit including it in \texttt{Name} (see 4.1.2.6 in
+RFC 5280).
+\armor correctly accepts those certificate chains. 
 
-\textbf{e. No Support for Standard Extension.} \certvalidator rejected $91$ certificate chains that \armor accepted. Upon examination, we found that this discrepancy arises since the \certvalidator does not support the \texttt{Subject Alternative Name} extension, reporting parsing errors for these chains. However, this is a standard extension documented in RFC 5280; and thus, \armor supports this extension and does not reject these certificate chains. \\
+\textbf{e. No Support for Standard Extension.} \certvalidator rejected $91$
+certificate chains that \armor accepted. Upon examination, we found that this
+discrepancy arises from \certvalidator's lack of support for the \texttt{Subject
+  Alternative Name} extension, reporting parsing errors for these chains.
+However, this is a standard extension documented in RFC 5280.
+\armor supports this extension and does not reject these certificate chains. \\
 
 \noindent\textbf{Runtime Analysis.}
-Tables \ref{comp} and \ref{mem} (in Appendix) show our execution time and memory consumption analysis of the test libraries during runtime, respectively. Considering the different programming languages in which the libraries are written, \cpp libraries (\ie, \openssl, \gnutls, \mbedtls, \wolfssl, \matrixssl, \boringssl) generally exhibit greater efficiency regarding memory usage and execution time. This can be attributed to their low-level access to hardware and memory and their static nature, which enables most errors to be caught at compile time. However, libraries written in higher-level languages, which is the case for \armor and the rest, tend to consume more memory and have longer execution times. We found \armor on average takes $2.641$ seconds when a certificate chain is accepted and $2.518$ seconds when a certificate chain is rejected. In terms of memory consumption, it on average takes  $1049$ megabytes when a certificate chain is accepted and $1069$ megabytes when a certificate chain is rejected. Compared to other libraries, \armor's runtime overhead is very large, but still within practical range of modern systems.
+Tables \ref{comp} and \ref{mem} in the Appendix show our execution time and
+memory consumption analysis of the test libraries during runtime, respectively.
+Considering the different programming languages in which the libraries are
+written, \cpp libraries (\ie, \openssl, \gnutls, \mbedtls, \wolfssl, \matrixssl,
+\boringssl) generally exhibit greater efficiency regarding memory usage and
+execution time. This can be attributed to their low-level access to hardware and
+memory. However, libraries written in higher-level languages, such as \armor and the rest, tend to consume more memory and have longer execution times. We found \armor on average takes $2.641$ seconds when a certificate chain is accepted and $2.518$ seconds when a certificate chain is rejected. In terms of memory consumption, it on average takes  $1049$ megabytes when a certificate chain is accepted and $1069$ megabytes when a certificate chain is rejected. Compared to other libraries, \armor's runtime overhead is very large, but still within practical range of modern systems.
 
 
 
