@@ -3,7 +3,7 @@
 % % In Section 2.2, we have already discussed the prior work on testing \xfon implementations. 
 % We now present prior research efforts that are relevant to our work.
 
-Extensive research has previously been conducted to test the \xfon CCVL of SSL/TLS libraries using techniques such as fuzzing~\cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt} and symbolic execution~\cite{rfcguided, symcert}. Fuzzing is a popular software testing technique in which malformed inputs are automatically generated and injected into a target application to find implementation flaws~\cite{godefroid2020fuzzing}. Symbolic execution, on the other hand, is a way of executing a program abstractly so that one abstract execution covers multiple possible inputs of the program that share a particular execution path through the code~\cite{king1976symbolic}. Though these approaches found numerous implementation flaws and noncompliance issues, none can avoid false negatives in differential testing due to the lack of a formally-verified reference implementation of \xfon CCVL. Despite several efforts to implement and formally verify cryptographic libraries~\cite{bond2017vale, protzenko2020evercrypt, zinzindohoue2017hacl}, a formally-verified implementation of \xfon CCVL is still missing in the literature. 
+Extensive research has previously been conducted to test the \xfon CCVL of SSL/TLS libraries using techniques such as fuzzing~\cite{frank, mucert, nezha, quan2020sadt, chen2023sbdt} and symbolic execution~\cite{rfcguided, symcert}. Fuzzing is a popular software testing technique in which malformed inputs are automatically generated and injected into a target application to find implementation flaws~\cite{godefroid2020fuzzing}. Symbolic execution, on the other hand, is a way of executing a program abstractly so that one abstract execution covers multiple possible inputs of the program that share a particular execution path through the code~\cite{king1976symbolic}. Though these approaches found numerous implementation flaws and noncompliance issues, none can avoid false negatives in differential testing due to the lack of a formally-verified reference implementation of \xfon CCVL. Despite several efforts to implement and formally verify cryptographic libraries~\cite{bond2017vale, protzenko2020evercrypt, zinzindohoue2017hacl}, a formally-verified implementation of \xfon CCVL is still missing from the literature. 
 
 Although our work presents a major step to address this research gap, there are other works that motivate our high-assurance implementation. As an example, we rely on the 
 prior re-engineering effort of the \xfon specification and implementation
@@ -17,7 +17,7 @@ framework for generating verified parsers and serializers from Type-Length-Value
 correctness (\ie, parsing is the inverse of serialization and vice versa), and
 non-malleable guarantees, it only focuses on parsing, and lacks formal correctness guarantees of other stages of the
 certificate chain validation. Barenghi \etal proposed an approach to automatically generate a parser for \xfon
-with the \antlr parser generator~\cite{barenghi2018systematic}, however they  do
+with the \antlr parser generator~\cite{barenghi2018systematic}; however, they  do
 major simplifications of the \xfon grammar to avoid complexities in parsing.
 Tao \etal developed a memory-safe and formally correct encoder for \xfon
 certificates~\cite{tao2021dice}, while our work does the reverse task,
@@ -29,7 +29,16 @@ certificates~\cite{tao2021dice}, while our work does the reverse task,
 
 % \textbf{Improvements on certificate revocation.} Another key research area is how to swiftly and effectively relay certificate revocation information to users to minimize the window of vulnerability. This window occurs between the instance a certificate is revoked and when this information reaches the end-user, during which an attacker could potentially exploit the invalidated certificate. The traditional methods, such as Certificate Revocation List (\crl)~\cite{cooper2008internet} and the Online Certificate Status Protocol (\ocsp)~\cite{ocsp}, often suffer from latency issues and excessive network overhead, respectively. A range of innovative solutions have emerged to counter these limitations. For instance, \crlite optimizes the process by condensing all CRLs into a more manageable data structure, which significantly enhances the speed of revocation status queries~\cite{crlite}. \ocspstapling is another such improvement, where the server periodically obtains the \ocsp response and then delivers it to the client along with the certificate, reducing the need for individual \ocsp requests by clients~\cite{oscpstple}. More recent developments include browser-centric solutions such as \onecrl~\cite{onecrl} from Mozilla and \crlsets~\cite{crlset} from Google, which employ a rapidly updatable, centralized list of revoked certificates.
 
-Parallel to our research aspect, some studies have unveiled that the \xfon PKI is intentionally deployed to allow TLS interceptions by antivirus programs, parental control applications, middleboxes, and proxy servers~\cite{de2016killed, durumeric2017security, waked2018intercept, huang2014analyzing, debnath2020tls}. This intervention disrupts the end-to-end security guarantee that TLS is supposed to provide, posing potential security risks. Furthermore, several studies also underlined a key issue: \textit{user unawareness}. Many users lack a proper understanding of \xfon PKI and TLS, potentially overlooking their browser's certificate-related warnings and, in the worst case helping adversaries compromise their own trust anchors~\cite{sasse2015scaring, ukrop2019will, felt2014experimenting, akhawe2013alice, schechter2007emperor, sunshine2009crying}.
+Parallel to our research, some studies have unveiled that the \xfon PKI is
+intentionally deployed to allow TLS interceptions by antivirus programs,
+parental control applications, middleboxes, and proxy
+servers~\cite{de2016killed, durumeric2017security, waked2018intercept,
+  huang2014analyzing, debnath2020tls}. This intervention disrupts the end-to-end
+security guarantee that TLS is supposed to provide, posing potential security
+risks. Furthermore, several studies also underlined a key issue: \textit{user
+  unawareness}. Many users lack a proper understanding of \xfon PKI and TLS,
+potentially overlooking their browser's certificate-related warnings and, in the
+worst case helping adversaries compromise users own trust anchors~\cite{sasse2015scaring, ukrop2019will, felt2014experimenting, akhawe2013alice, schechter2007emperor, sunshine2009crying}.
 
 
 

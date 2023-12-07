@@ -54,8 +54,9 @@ implement correctly in practice.
 Furthermore, some constraints RFC 5280 places on issuers lack clear directions
 regarding whether \emph{consumers} should reject noncompliance.
 Overall, we believe that the specification can and should be substantially 
-simplified and streamlined, removing bloat due to historical features, 
-to ensure improved interoperability and security. 
+simplified and streamlined, removing bloat due to historical features (such as
+the widely unsupported string canonicalization), to ensure improved
+interoperability and security.
 
 
 
