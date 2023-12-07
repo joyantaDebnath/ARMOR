@@ -1,9 +1,9 @@
 \section{Verification Goals and Correctness Proofs}
 We now discuss \armor{}'s correctness proofs. 
 % Recall that, as shown in Figure~\ref{armor}, 
-We provide formal correctness guarantee for the
-following modules of \armor: \emph{parsers (\ie, PEM parser, Base64 decoder, X.690 DER and
-  X.509 parsers)}, \emph{Semantic validator}, and \emph{Chain builder} (see
+We provide formal correctness guarantees for the
+following modules of \armor: \emph{parsers (\ie, PEM, X.690 DER, and
+  X.509 parsers)}, \emph{Base64 decoder}, \emph{Semantic validator}, and \emph{Chain builder} (see
 Table~\ref{table:summary-of-guarantees} for a summary of guarantees organized by
 module).
 % A summary of these guarantees is in Table \ref{table:summary-of-guarantees}. 
@@ -45,12 +45,12 @@ type-checker, compiler, and standard library (v1.7.1).
 % In particular, 
 Our use of \agda's standard library includes the module
 \texttt{\small Data.Trie} (for the \emph{String canonicalizer}), which requires the
-\texttt{\small --sized-types} language feature, and the module \texttt{\small IO}, which
-requires the \texttt{\small --guardedness} language feature.
+\texttt{\small -{}-sized-types} language feature, and the module \texttt{\small IO}, which
+requires the \texttt{\small -{}-guardedness} language feature.
 The use of these two features together \emph{in the declaration of a coinductive
   type} causes logical inconsistency~\cite{AgdaIssue-1209}.
 In our code base,  the only module which enables both features is the
-\emph{Driver Interface}. It, 
+\emph{Driver}. It, 
 %(because it needs to invoke the \emph{String canonicalizer} and perform IO), 
 % which, 
 however, does not define any coinductive types.
@@ -58,7 +58,7 @@ Finally, \armor uses Agda's FFI for two Haskell packages: \texttt{time} and
 \texttt{bytestring}.
 
 \textbf{Termination.}
-By default, \agda employs a syntactic termination checking that ensures that
+By default, \agda employs a syntactic termination checker that ensures 
 recursive functions respect a certain well-founded ordering~\cite{AgdaDocs}.
 This syntactic termination checker can be disabled through the explicit use of
 certain pragmas, or replaced with a \emph{type-based} termination checker
@@ -119,7 +119,7 @@ We now explain the declaration of |Fin|.
   
 \item |Fin| has two constructors, both of which have dual readings as ``mere
   data'' and as axiomatizations of the \emph{``is strictly less than''}
-  predicate.
+  relation.
   As mere data, |fzero| corresponds to the integer 0; as an axiom, it states
   that 0 is strictly less than the successor |1 + n| of any nonnegative |n|.
   Similarly, as mere data |fsuc| is a primitive successor operation
@@ -203,8 +203,8 @@ DER, and \xfon formats, greatly reducing the complexity of the specification
 and increasing trust that they faithfully capture the natural language
 description.
 Much current research~\cite{ni2023asn1, ramananandro2019everparse}
-for applying formal methods to parsing uses serializers to specify the
-correctnes properties of parsers.
+for applying formal methods to parsing uses serializers to specify their
+correctnes properties.
 Formal proofs of correctness (in any context) are only ever as good as the
 specification of those correctness properties, and this earlier research swells
 the trusted computing base by introducing implementation details for serialization.
@@ -271,13 +271,13 @@ bytestring |bs|.
   to construct an expression of type |IntegerValue bs|, one must prove that
   |MinRep| holds for the head and tail of |bs|.
   
-  The definition of |MinRep| proceeds by cases on |tl|.
+  The definition of |MinRep| is by pattern matching on |tl|.
   \begin{enumerate}
   \item If |tl| is empty, we return the trivially true proposition |Top|,
     because a single byte is always minimal.
     
   \item Otherwise, if the first byte is |0|, the second byte must be no less than
-    |128|; and if the first byte is |255|, then the the second byte must be no
+    |128|; and if the first byte is |255|, then the second byte must be no
     greater than |127|.
   \end{enumerate}
   
@@ -339,7 +339,7 @@ between internal representations |a1 : G xs1| and |a2 : G xs2| without
 Thus, to make non-malleability non-trivial, we must express what is the
 ``raw'' internal datatype corresponding to |G|, discarding the specificational
 components.
-We expresses this with |Raw|, given below.
+We express this with |Raw|, given below.
 \begin{code}
 record Raw (G : List A -> Set) : Set where
   field
@@ -395,11 +395,12 @@ end-of-line encoding, so to show strong completeness for PEM parsers we need an
 additional property, \emph{maximality}.
 
 \subsubsection{Parser correctness}
-We now describe our approach to verified sound and complete parsing.
-For a language \(G\), \emph{soundness} of a parser means that every
-string it accepts is in the language, and \emph{completeness} means that it
-accepts every string in the language.
-Our approach to verifying these properties for all our parsers is to make them
+We now describe our approach to verifying parser soundness and completeness.
+For a language \(G\), parser \emph{soundness} means every
+prefix it consumes is in the language, and \emph{completeness} means if a
+string is in the language, it consumes a prefix of it (we later show a strengthening
+this notion of completeness).
+Our approach to verifying these is to make our parsers
 \emph{correct-by-construction}, meaning that parsers do not merely indicate
 success or failure with \eg an integer code, but return \emph{proofs}.
 Precisely, our parsers are correct-by-construction by being proofs that
@@ -443,7 +444,7 @@ As a consequence, \emph{soundness will be immediate}.
 Failure is the negation of the success condition, |not Success G xs|, meaning
 \emph{no} prefix of the input |xs| is in the language of |G|.
 To have the parser return |Success G xs| on success and |not Success G xs| on
-failure, we the \agda standard library type datatype |Dec|, shown below.
+failure, we use the \agda standard library datatype |Dec|, shown below.
 \begin{code}
 data Dec (Q : Set) : Set where
   yes : Q -> Dec Q
@@ -497,7 +498,7 @@ The clearest example of such a trade-off is in our parsers for \xsno
 \textbf{Maximal parsers:} The PEM format does not enjoy the
 \emph{unique prefixes} property.
 To facilitate our implementation of correct-by-construction PEM parsers and
-prove strong completeness, we have augmented the specifications of these parsers
+prove a stronger completeness result, we have augmented the specifications of these parsers
 to guarantee they consume \emph{the largest prefix of the input compliant with
   the format.}
 The formalization of this in Agda is shown in
@@ -545,7 +546,7 @@ The function |toWitness : forall {Q} {d : Dec Q} -> IsYes d -> Q| takes a
 decision |d| for proposition |Q| and proof that it is affirmative, and produces
 the underlying proof of |Q|.
 Thus, we read the definition of |Sound G p| as: ``for all input strings |xs|, if
-parser |p| accepts |xs|, the the prefix it consumes is in |G|.''
+parser |p| accepts |xs|, the prefix it consumes is in |G|.''
 
 The proof |soundness| states that \emph{all parsers are sound}.
 As our parsers are correct-by-construction, the definition is straightforward:
@@ -588,7 +589,7 @@ Specifically, it does not constrain the parser's freedom over (1) which prefix
 it consumes and (2) how the internal datastructure is constructed.
 As discussed in Section~\ref{sec:s4-lang-spec}, these should be thought of as
 \emph{language} properties.
-To show rule out both bad behaviors, it suffices that |G| satisfies the
+To rule out both bad behaviors, it suffices that |G| satisfies the
 properties |Unambiguousness| and |UniquePrefixes|.
 
 \begin{figure}
