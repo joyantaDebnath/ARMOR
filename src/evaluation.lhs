@@ -139,11 +139,17 @@ However, this is a standard extension documented in RFC 5280.
 \noindent\textbf{Runtime Analysis.}
 Tables \ref{comp} and \ref{mem} in the Appendix show our execution time and
 memory consumption analysis of the test libraries during runtime, respectively.
-Considering different programming languages in which the libraries are
+Considering the different programming languages in which the libraries are
 written, \cpp libraries (\ie, \openssl, \gnutls, \mbedtls, \wolfssl, \matrixssl,
 \boringssl) generally exhibit greater efficiency regarding memory usage and
 execution time. This can be attributed to their low-level access to hardware and
-memory. However, libraries written in higher-level languages, such as \armor and the rest, tend to consume more memory and have longer execution times. We found \armor on average takes $2.641$ seconds when a certificate chain is accepted and $2.518$ seconds when a certificate chain is rejected. In terms of memory consumption, it on average takes  $1049$ megabytes when a certificate chain is accepted and $1069$ megabytes when a certificate chain is rejected. Compared to other libraries, \armor's runtime overhead is very large, but still within practical range.
+memory. However, libraries written in higher-level languages, such as \armor and
+the rest, tend to consume more memory and have longer execution times. We found
+\armor on average takes $2.641$ seconds when a certificate chain is accepted and
+$2.518$ seconds when a certificate chain is rejected. In terms of memory
+consumption, it on average takes  $1049$ megabytes when a certificate chain is
+accepted and $1069$ megabytes when a certificate chain is rejected. Compared to
+other libraries, \armor's runtime overhead is very large, but still within a practical range.
 
 
 
