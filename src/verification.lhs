@@ -175,7 +175,7 @@ to a specificational encoder. %
 Specifically, we prove: (1) that the encoder always produces a result accepted by
 the decoder; and (2) the encoder and decoder pair forms an
 isomorphism between octet strings and valid sextet strings for encoding them.
-For a more detailed summary, see the full version of the paper~\cite{armor-full-version}
+For a more detailed summary, see the full version of the paper~\cite{armor-full-version}.
 % This is summarized below in Figure~\ref{fig:s4-base64} (for space
 % considerations, all definitions have been omitted).
 
