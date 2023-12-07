@@ -6,7 +6,7 @@ technical challenges.
 %overview of \armor's architecture.
 
 \subsection{Technical Challenges}
-Realizing \armor{}'s vision of a formally verified \xfon implementation 
+Realizing \armor{}'s vision %of a formally verified \xfon implementation 
 requires addressing the following  challenges. 
 %There are several challenges for to our work.
 
