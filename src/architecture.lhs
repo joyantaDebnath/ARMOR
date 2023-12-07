@@ -244,7 +244,7 @@ leaving such a task for future research.
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.55]{img/armor.drawio.pdf} \\
+  \includegraphics[scale=0.52]{img/armor.drawio.pdf} \\
   Inputs marked with * are optional \\
   \vspace{0.2cm}
   \caption{Conceptual design and workflow of \armor}

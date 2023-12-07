@@ -64,10 +64,11 @@ the unconditional trust of $C_1$ through the intermediate CA certificates
 %\bigwedge_{i=1}^{n} P(C_i) \land \bigwedge_{i=1}^{n} \mathit{SCP}(C_i) \land \bigwedge_{i=2}^{n} \mathit{CCP}(C_i, C_{i-1}) \land T(C_1)
 %\]
 
+
 \begin{figure}[h]
   \centering
   \scriptsize
-  \includegraphics[scale=0.58]{img/cert_chain.drawio.pdf} \\
+  \includegraphics[scale=0.55]{img/cert_chain.drawio.pdf} \\
   Fields marked with * are optional \\
   \vspace{0.2cm}
   \caption{Representation of an \xfon certificate chain}
