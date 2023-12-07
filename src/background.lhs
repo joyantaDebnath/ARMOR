@@ -100,12 +100,12 @@ of the certificate chain validation. These efforts can be categorized into
 approaches that use \fuzzing~\cite{frank,  mucert, nezha, quan2020sadt, 
 chen2023sbdt} and \symex~\cite{rfcguided, symcert}. One of the main challenges 
 all of these approaches have to address is a lack of \emph{test oracle}. Most 
-of the prior approaches rely on differential testing whether different implementations 
+of the prior approaches rely on differential testing, where different implementations 
 are used as \emph{cross-checking test oracles}. These approaches, however, can potentially 
 suffer from undetected bugs, especially in the case that the implementations under test 
 have the same logical error. Having a formally verified \emph{test oracle} like \armor can substantially 
 decrease the chance of undetected bugs. In addition, these approaches cannot 
-provide any mathematical assurance of correctness for the tested implementations. 
+provide much mathematical assurance of correctness for the tested implementations. 
 This is corroborated through many high impact bugs and  vulnerabilities found in 
 some widely used applications and open-source libraries over the last decade~\cite{CVE-2020-14039, CVE-2016-11086, CVE-2020-1971, CVE-2020-35733, CVE-2020-36229, CVE-2023-33201, CVE-2023-40012}. In contrast, a formally verified implementation of \xfon certificate validation like \armor 
 can give mathematical assurance that it does not suffer from such logical bugs. 
