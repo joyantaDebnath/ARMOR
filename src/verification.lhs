@@ -439,8 +439,8 @@ additional property, \emph{maximality}.
 We now describe our approach to verifying parser soundness and completeness.
 For a language \(G\), parser \emph{soundness} means every
 prefix it consumes is in the language, and \emph{completeness} means if a
-string is in the language, it consumes a prefix of it (we later show a strengthening
-this notion of completeness).
+string is in the language, it consumes a prefix of it (we later show a
+strengthening of this notion of completeness).
 Our approach to verifying these is to make our parsers
 \emph{correct-by-construction}, meaning that parsers do not merely indicate
 success or failure with \eg an integer code, but return \emph{proofs}.
