@@ -234,7 +234,7 @@ with respect to our formalized specification.
 \item We show an end-to-end application of \armor, integrating it with TLS 1.3 implementation of \boringssl and testing with the widely-used application \curl~\cite{curl}.
 \end{enumerate}
 
-\noindent\textbf{Artifacts.} The full version of our paper and artifacts are available here: \url{https://anonymous.4open.science/r/armor-full-version/}.
+%\noindent\textbf{Artifacts.} The full version of our paper and artifacts are available here: \url{https://anonymous.4open.science/r/armor-full-version/}.
 
 \noindent\textbf{Responsible Disclosure.} We are currently in the process of sharing our findings with the  library developers.
 
