@@ -411,7 +411,7 @@ NonMalleable{G} R =
   forall {@0 xs1 xs2} -> (g1 : G xs1) (g2 : G xs2)
   -> Raw.to R g1 == Raw.to R g2 -> (xs1 , g1) ==  (xs2 , g2)  
 \end{code}
-Proving |NonMalleable RawIntegerValue| requires proving |Base256.twoComp| is
+Proving |NonMalleable RawIntegerValue| requires proving |Base256.twosComp| is
 injective. 
 
 \textbf{Unique prefixes}
