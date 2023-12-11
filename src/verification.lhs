@@ -12,9 +12,10 @@ module).
 For these verification tasks, 
 which took 12 person months to complete, we use the \agda interactive theorem
 prover~\cite{bove2009brief, No07_agda}. 
-Due to space constraints, we only discuss the correctness guarantees of the X.690 DER and X.509 parsers, 
-and relegate the discussion of the other components in the full version of the
-paper \cite{armor-full-version}; see Table~\ref{tab:app-formal-guarantees} for a
+% Due to space constraints, we only discuss the correctness guarantees of the X.690 DER and X.509 parsers, 
+% and relegate the discussion of the other components in the full version of the
+% paper \cite{armor-full-version};
+See Table~\ref{tab:app-formal-guarantees} for a
 listing and brief description of all formal guarantees proven.
 
 % In this section, we briefly introduce Agda and then detail the
@@ -175,26 +176,64 @@ to a specificational encoder. %
 Specifically, we prove: (1) that the encoder always produces a result accepted by
 the decoder; and (2) the encoder and decoder pair forms an
 isomorphism between octet strings and valid sextet strings for encoding them.
-For a more detailed summary, see the full version of the paper~\cite{armor-full-version}.
-% This is summarized below in Figure~\ref{fig:s4-base64} (for space
-% considerations, all definitions have been omitted).
+%For a more detailed summary, see the full version of the paper~\cite{armor-full-version}.
+This is summarized below in Figure~\ref{fig:s4-base64} (definitions omitted), which
+we now explain.
 
-% \begin{figure}[h]
-%   \begin{code}
-% ValidEncoding : List UInt6 -> Set
-% encode : List UInt8 -> List UInt6
-% decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
+\begin{figure}[h]
+  \begin{code}
+Valid64Encoding : List UInt6 -> Set
 
-% encodeValid : (bs : List UInt8) -> ValidEncoding (encode bs)
+encode : List UInt8 -> List UInt6
+decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
 
-% encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
-% decodeEncode :  forall bs -> (v : ValidEncoding bs)
-%                 -> encode (decode bs v) == bs
-%   \end{code}
-%   \caption{Base64 encoding and decoding (types only)}
-%   \label{fig:s4-base64}
-% \end{figure}
+encodeValid : forall bs -> Valid64Encoding (encode bs)
 
+encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
+decodeEncode :  forall bs -> (v : Valid64Encoding bs)
+                -> encode (decode bs v) == bs
+  \end{code}
+  \caption{Base64 encoding and decoding (types only)}
+  \label{fig:s4-base64}
+\end{figure}
+
+\begin{itemize}
+\item |Valid64Encoding| is a predicate for sextet strings that expresses what it
+  means for them to be valid encodings of an octet string.
+  Recall that Base64 decoding proceeds by mapping each group of four sextets to
+  three octets (24 bits in total).
+  \begin{itemize}
+  \item If a single sextet remains after this grouping, then the sextet string
+    is invalid (6 bits is not enough to encode an 8 bit value).
+    
+  \item If two sextets remain, then they encode a single octet iff the last 4
+    bits of the second sextet are set to 0.
+    
+  \item If three sextets remains, then they encode two octets iff the last 2 bits
+    of the third sextet are set to 0.
+  \end{itemize}
+  
+\item Next in the figure are the encoder, |encode|, and decoder, |decode|.
+  While the domain of the encoder is all octet strings, for the decoder the
+  domain is restricted to only those sextet strings for which the predicate
+  |Valid64Encoding| holds.
+
+  
+\item Lemma |encodeValid| is a proof that the specificational Base64encoder
+  always produces a valid Base64 encoding.
+
+  
+\item Finally, our main correctness result for the Base64 module is given by the
+  proofs |encodeDecode| and |decodeEncode|, which together state that the
+  encoder and decoder form an isomorphism (|==| is the symbol for propositional
+  equality).
+  In the first direction (|encodeDecode|), we pass to the decoder the result of
+  encoding octet string |bs| together with a proof that this encoding is valid,
+  and the result we get is the very same octet string |bs|.
+  In the second direction, we assume that the given sextet string |bs| is
+  already a valid encoding, and we obtain that the result of first decoding and
+  then re-encoding |bs| is |bs| itself.
+\end{itemize}
 
 \subsection{Verification of Parsers} We conceptually separate each parser verification task into \emph{language
 specification}, \emph{language security verification}, and \emph{parser correctness verification}.
