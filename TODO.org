@@ -301,11 +301,14 @@
     :END:
 ** Presentation
   
-*** TODO Note =--sized-types= =--guardedness= inconsistency        :@typeset:
+*** DONE Note =--sized-types= =--guardedness= inconsistency        :@typeset:
+    CLOSED: [2023-12-11 Mon 16:17]
     :PROPERTIES:
     :ASSIGNEE: Christa
     :END:
 
+    - State "DONE"       from "TODO"       [2023-12-11 Mon 16:17] \\
+      Noted in the paper under S4's TCB paragraph
    See the remark in the documentation [[https://agda.readthedocs.io/en/v2.6.1/language/safe-agda.html][here]], and the filed issue [[https://github.com/agda/agda/issues/1209][here]].
 
    - We only use sized types for the agda-stdlib trie implementation, and
@@ -335,8 +338,10 @@
     |---------------+---------------|
     | =Dig=         | =UInt8=       |
 
-*** TODO Remove postulates, =--allow-unsolved-metas=                  :@code:
+*** DONE Remove postulates, =--allow-unsolved-metas=                  :@code:
+    CLOSED: [2023-12-11 Mon 16:18]
 
+    - State "DONE"       from "TODO"       [2023-12-11 Mon 16:18]
 *** WONT Implement Set uniqueness constraints, or note                :@code:
     CLOSED: [2023-10-23 Mon 11:09]
 
@@ -363,6 +368,11 @@
     - Note taken on [2023-09-11 Mon 14:27] \\
       Joy is doing chain building in Agda, and would like Aeres to run the chain
       checks on every candidate chain.
+** Artifact and Full Version
+*** TODO Rename "Aeres" to "Armor"
+*** TODO Rename "NoSubstrings" to "UniquePrefixes"
+*** TODO Generate "Everything.agda"
+
 * PROJ AERES Paper
   :PROPERTIES:
   :CATEGORY: Aeres
