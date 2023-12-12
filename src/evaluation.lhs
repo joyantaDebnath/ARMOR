@@ -1,4 +1,5 @@
 \section{Empirical Evaluation}
+\label{sec:s6-empirical-eval}
 This section evaluates \armor's efficiency, robustness, and applicability in real-world scenarios. Particularly, we conduct differential testing against $11$ open-source \xfon implementations to evaluate the performance of \armor. We aim to find answers to the following questions.
 
 \noindent\textbf{Q1. Correctness of Specification's Interpretation.} How accurate is our interpretation of the specification? This can be shown by comparing the certificate chain validation results of \armor with the results from the test libraries. 

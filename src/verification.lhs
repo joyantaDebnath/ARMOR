@@ -681,36 +681,69 @@ guaranteed to be \emph{maximal.}
 Intuitively, this is because if |xs| is in |G|, then the largest possible prefix
 of |xs| in |G| is |xs| itself.
 We show the formal statement of the theorem in
-Figure~\ref{fig:s4-parser-soundness-completeness}, omitting the proof for space
-considerations. 
+Figure~\ref{fig:s4-parser-soundness-completeness} (proof omitted).
 
 % 
 % 
 % 
 
-% \subsection{Verification of Chain Builder}
-% The section presents the \emph{Chain builder}, for which we have proven
-% soundness.
-% Adhering to our discipline of providing high-level, relational specifications,
-% we dedicate the bulk of this section to explaining how soundness is formalized,
-% presenting at the end the type of our correct-by-construction chain builder.
+\subsection{Verification of Chain Builder}
+The section presents the \emph{Chain builder}, for which we have proven
+soundness and completeness.
+Adhering to our discipline of providing high-level, relational specifications,
+we dedicate the bulk of this section to explaining what we mean by soundness and
+completeness and how these notions are formalized,
+presenting at the end the type of our correct-by-construction chain builder.
 
-% \subsubsection{Relating a Certificate to a Certificate of its Issuer}
+\subsubsection{|Chain| Specification}
+Our notion of soundness for our |Chain Builder| module is as follows (cf.\, RFC
+5820, Section 6.1).
+Given a list of certificates \(c_1 \ldots c_n\) where \(n \geq 2\), this list forms a chain when:
+\begin{itemize}
+\item \(c_1\) is the certificate to be validated;
+  
+\item \(c_n\) is a certificate in the trusted root store;
+  
+\item for all \(i \in \{1 \ldots n-1\}\), the issuer field of \(c_i\) matches
+  the subject field of \(c_{i+1}\); and
+  
+\item if \(c_1\) is not a self-signed certificate that is present in the trusted root
+  store, then for all \(i,j \in {1 \ldots n}\), if \(c_i = c_j\) then \(i = j\).
+\end{itemize}
+\noindent Note that certificate validity checking is performed by the
+\emph{Semantic Validator}, and cryptographic signature verification is
+outsourced to external libraries (see Section~\ref{sec:s6-empirical-eval}).
 
-% \begin{figure}
-%   \begin{code}
-% _IsIssuerFor_ : forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2 -> Set
-% issuer IsIssuerFor issuee =
-%   NameMatch (Cert.getIssuer issuee) (Cert.getSubject issuer)    
 
-% _IsIssuerFor_In_ :  forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2
-%                     -> (certs : List (exists Cert)) -> Set
-% issuer IsIssuerFor issuee In certs =
-%   issuer IsIssuerFor issue Land (dashcomma issuer) `elem` certs
-%   \end{code}
-%   \caption{|_IsIssuerFor_In_| relation}
-%   \label{fig:isissuer}
-% \end{figure}
+\begin{figure}
+  \begin{code}
+_IsIssuerFor_ : forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2 -> Set
+issuer IsIssuerFor issuee =
+  NameMatch (Cert.getIssuer issuee) (Cert.getSubject issuer)    
+
+_IsIssuerFor_In_ :  forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2
+                    -> (certs : List (exists Cert)) -> Set
+issuer IsIssuerFor issuee In certs =
+  issuer IsIssuerFor issue Land (dashcomma issuer) `elem` certs
+
+IssuerFor_In_ : forall {@0 bs} -> Cert bs -> List (exists Cert) -> Set
+IssuerFor issuee In certs =
+  Sigma  (exists Cert)
+         (\ where (_ , issuer) -> issuer IsIssuerFor issuee In certs)
+  
+data Chain (trust candidates : List (exists Cert))
+  : forall {@0 xs} -> Cert xs -> Set where
+  root :  forall {@0 xs} {c : Cert xs} -> IssuerFor c In trust 
+          -> Chain trustedRoot candidates c
+  link :  forall {@0 xs1 xs2} (issuer : Cert xs1) {c : Cert xs2}
+          -> (isIn : issuer IsIssuerFor c In candidates)
+          -> Chain  (removeCertFromCerts issuer trust)
+                    (candidates emdash proj2 isIn) issuer
+          -> Chain trust candidates c
+  \end{code}
+  \caption{Definition of a sound |Chain|}
+  \label{fig:s4-chain}
+\end{figure}
 
 % In Figure~\ref{fig:isissuer}, |c1 IsIssuerFor c2| expresses the property that |c1|
 % is a certificate for the issuer of certificate |c2|.
