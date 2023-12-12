@@ -65,12 +65,7 @@ interoperability and security.
 % justification of library developers' ignoring these features is dictated by the engineering 
 % cost-benefit analysis tilts towards cost.  
 
-%\says{joy}{TODO for Omar}
-
 % \noindent\textbf{Limitations.} ARMOR has certain limitations: \emph{First}, it does not include verification of cryptographic operations, instead outsourcing signature verification to external libraries like \haclstar and \morpheus. Notably, an attempt to use the formally-verified WhyMP library~\cite{melquiond2020whymp} for \emph{modular exponentiation} proved unsuccessful for some inputs, leading to our reliance on \python's cryptography library for thus task. \emph{Second}, ARMOR offers no formal correctness guarantees for its memory-safety. \emph{Third}, \armor does not feature a formally-verified string canonicalizer. The existing string canonicalizer is limited, as it does not handle bidirectional characters and only supports UTF-8 encoded unicode characters. \emph{Finally}, \armor does not support features like hostname verification and revocation checking. This exclusion simplifies our verification efforts but limits \armor's practical usage with SSL/TLS protocol.
-
-% \says{joy}{TODO for Omar: how will you use the features table here?}
-
 
 
 
