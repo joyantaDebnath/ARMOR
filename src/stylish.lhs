@@ -108,6 +108,7 @@
 %format ~          = "\mathrel{\HSSym{\sim}} "
 %format ==         = "\mathrel{\HSSym{\equiv}} "
 %format /=         = "\mathrel{\HSSym{\not\equiv}} "
+%format /=?        = "\stackrel{?}{\HSSym{\not\equiv}}"
 %format =?         = "\stackrel{?}{=} "
 %format <=         = "\mathrel{\HSSym{\leq}} "
 %format >=         = "\mathrel{\HSSym{\geq}} "

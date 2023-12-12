@@ -696,7 +696,7 @@ completeness and how these notions are formalized,
 presenting at the end the type of our correct-by-construction chain builder.
 
 \subsubsection{|Chain| Specification}
-Our notion of soundness for our |Chain Builder| module is as follows (cf.\, RFC
+Our notion of soundness for the |Chain Builder| module is as follows (cf.\, RFC
 5820, Section 6.1).
 Given a list of certificates \(c_1 \ldots c_n\) where \(n \geq 2\), this list forms a chain when:
 \begin{itemize}
@@ -710,10 +710,10 @@ Given a list of certificates \(c_1 \ldots c_n\) where \(n \geq 2\), this list fo
 \item if \(c_1\) is not a self-signed certificate that is present in the trusted root
   store, then for all \(i,j \in {1 \ldots n}\), if \(c_i = c_j\) then \(i = j\).
 \end{itemize}
-\noindent Note that certificate validity checking is performed by the
-\emph{Semantic Validator}, and cryptographic signature verification is
-outsourced to external libraries (see Section~\ref{sec:s6-empirical-eval}).
-
+\noindent Note that it is the \emph{Semantic validator} that checks whether the
+certificate validity period contains the current time, and that and
+cryptographic signature verification is outsourced to external libraries (see
+Section~\ref{sec:s6-empirical-eval}).
 
 \begin{figure}
   \begin{code}
@@ -726,24 +726,78 @@ _IsIssuerFor_In_ :  forall {@0 xs1 xs2} -> Cert xs1 -> Cert xs2
 issuer IsIssuerFor issuee In certs =
   issuer IsIssuerFor issue Land (dashcomma issuer) `elem` certs
 
-IssuerFor_In_ : forall {@0 bs} -> Cert bs -> List (exists Cert) -> Set
-IssuerFor issuee In certs =
-  Sigma  (exists Cert)
-         (\ where (_ , issuer) -> issuer IsIssuerFor issuee In certs)
+removeCertFromCerts :  forall {@0 xs} -> Cert xs 
+                       -> List (exists Cert) -> List (exists Cert)
+removeCertFromCerts cert certs = filter (\ c -> c /=? (dashcomma cert)) certs
   
 data Chain (trust candidates : List (exists Cert))
   : forall {@0 xs} -> Cert xs -> Set where
-  root :  forall {@0 xs} {c : Cert xs} -> IssuerFor c In trust 
-          -> Chain trustedRoot candidates c
+  root :  forall {@0 xs1 xs2} {c1 : Cert xs1} (c2 : Cert xs2)
+          -> c2 IsIssuerFor c1 In trust
+          -> Chain trustedRoot candidates c1
   link :  forall {@0 xs1 xs2} (issuer : Cert xs1) {c : Cert xs2}
-          -> (isIn : issuer IsIssuerFor c In candidates)
+          -> issuer IsIssuerFor c In candidates
           -> Chain  (removeCertFromCerts issuer trust)
-                    (candidates emdash proj2 isIn) issuer
+                    (removeCertFromCerts issuer candidates)
+                    issuer
           -> Chain trust candidates c
   \end{code}
   \caption{Definition of a sound |Chain|}
   \label{fig:s4-chain}
 \end{figure}
+
+Figure~\ref{fig:s4-chain} lists our formalization of the specification for a
+sound chain, defined as |Chain|, which we now describe.
+\begin{itemize}
+\item |_IsIssuerFor_| is a binary relation on certificates expressing that the
+  subject field of the first certificate matches the subject of the second.
+  In \agda, one can define mixfix operators and relations by using underscores
+  in the identifier to mark the locations of arguments.
+  This allows us to write |issuer IsIssuerFor issuee| as syntactic sugar for
+  |_IsIssuerFor_ issuee issuer|.
+  
+\item The three-place relation |_IsIssuerFor_In_| augments the previous relation
+  by allowing us to track \emph{where} the issuer came from using the membership
+  relation \(\_\in\_\).
+  \begin{itemize}
+  \item In the signature of |_IsIssuerFor_In_|, the type of the third argument,
+    |List (exists Cert)|, is the type of \emph{lists of tuples} of byte strings
+    |xs : List UInt8| together with proofs |Cert xs| that the byte string
+    encodes a certificate.
+    
+  \item In the definition of |_IsIssuerFor_In_|, since |certs| is a list of
+    tuples, to express that |issuer| is present in certs we must tuple it
+    together with its octet string encoding.
+    This is neatly achieved with |(dashcomma issuer)|, which forms a tuple where only
+    the second component need by passed explicitly, leaving \agda to infer the
+    value of the first component.
+  \end{itemize}
+    
+\item Function |removeCertFromCerts| takes a certificate |cert| and list of
+  tupled certificates |certs| and uses the \agda standard library function
+  |filter| to remove all certificates from |certs| that are equal to |cert|.
+  
+\item Finally, we come to the definition of |Chain|, an inductive family of
+  types indexed by: |trust : List (exists Cert)|, the certificates in the
+  trusted root store; |candidates : List (exists Cert)|, the intermediate
+  CA certificates provided by the end entity to facilitate chain building; and
+  the certificate we are attempting to authenticate.
+  |Chain| has two constructors, axiomatizing the two ways we can extend trust to
+  the end entity.
+  \begin{itemize}
+  \item Constructor |root| expresses that we can trust certificate |c1| when we
+    can find a certificate |c2| in the trusted root store representing an issuer
+    for |c1|.
+    
+  \item Constructor |link| expresses that we can trust certificate |c| if we can
+    find an issuer's certificate |issuer| in |candidates|, and furthermore that
+    we (inductively) trust |issuer| through the construction of a |Chain|.
+    To avoid duplicate certificates in the chain (and ensure termination by
+    ruling out cycles), the chain of trust extended to |issuer| must use a
+    trusted root store and candidate certificate list from which |issuer| has
+    been removed; we express this using function |removeCertFromCerts|.
+  \end{itemize}
+\end{itemize}
 
 % In Figure~\ref{fig:isissuer}, |c1 IsIssuerFor c2| expresses the property that |c1|
 % is a certificate for the issuer of certificate |c2|.
