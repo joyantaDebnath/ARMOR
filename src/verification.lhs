@@ -689,15 +689,15 @@ Figure~\ref{fig:s4-parser-soundness-completeness} (proof omitted).
 
 \subsection{Verification of Chain Builder}
 The section presents the \emph{Chain builder}, for which we have proven
-soundness and completeness.
+soundness and completeness with respect to a partial specification.
 Adhering to our discipline of providing high-level, relational specifications,
-we dedicate the bulk of this section to explaining what we mean by soundness and
-completeness and how these notions are formalized,
-presenting at the end the type of our correct-by-construction chain builder.
+we dedicate the bulk of this section to describing the specification used,
+presenting at the end the type of our sound-by-construction chain builder and
+its proof of completeness
 
 \subsubsection{|Chain| Specification}
-Our notion of soundness for the |Chain Builder| module is as follows (cf.\, RFC
-5820, Section 6.1).
+Our operative definition of correctness for the |Chain Builder| module is as
+follows (cf.\, RFC 5820, Section 6.1).
 Given a list of certificates \(c_1 \ldots c_n\) where \(n \geq 2\), this list forms a chain when:
 \begin{itemize}
 \item \(c_1\) is the certificate to be validated;
@@ -711,9 +711,12 @@ Given a list of certificates \(c_1 \ldots c_n\) where \(n \geq 2\), this list fo
   store, then for all \(i,j \in {1 \ldots n}\), if \(c_i = c_j\) then \(i = j\).
 \end{itemize}
 \noindent Note that it is the \emph{Semantic validator} that checks whether the
-certificate validity period contains the current time, and that and
+certificate validity period contains the current time, that
 cryptographic signature verification is outsourced to external libraries (see
-Section~\ref{sec:s6-empirical-eval}).
+Section~\ref{sec:s6-empirical-eval}), and that we currently perform no policy
+mapping.
+Thus, our specification is \emph{partial} in the sense that we do not claim it
+captures the full set of desired correctness properties of chain building.
 
 \begin{figure}
   \begin{code}
@@ -798,6 +801,77 @@ sound chain, defined as |Chain|, which we now describe.
     been removed; we express this using function |removeCertFromCerts|.
   \end{itemize}
 \end{itemize}
+
+\subsubsection{Chain Uniqueness}
+
+As we did with our language formalizations, by having an implementation-independent,
+relational specification |Chain| we can prove that certain properties hold of
+\emph{all} chains constructed by our chain builder, \emph{without} reasoning
+about its implementation details.
+Given the limited scope of our specification of correctness for chains, we are
+primarily interested in verifying the \emph{uniqueness} property: ``A
+certificate MUST NOT appear more than once in a propsective certification
+path.''
+We are able to verify this property under the assumption that the end entity
+certificate is neither in the candidate list (ensured by a preprocessing step
+before the \emph{Chain Builder} is invoked) nor in the trusted root store.
+\begin{figure}
+\begin{code}
+toList :  forall {trust candidates} {@0 xs} (c : Cert xs)
+          -> Chain trust candidates c -> List (exists Cert)
+toList c (root issuer _) = (dashcomma c) :: [ issuer ]
+toList c (link issuer isIn chain) = (dashcomma c) ::toList issuer chain
+
+ChainUnique : forall {trust candidates} {@0 xs} {c : Cert xs}
+              -> Chain trust candidates c -> Set
+ChainUnique c = List.Unique (toList c)
+
+chainUnique
+  :  forall trust candidates {@0 xs} {issuee : Cert xs}
+     -> (dashcomma issuee) `notElem` candidates -> (dashcomma issuee) `notElem` trust
+     -> (c : Chain trust candidates issuee) -> ChainUnique c
+\end{code}
+  \caption{Chain Uniqueness}
+  \label{fig:s4-chain-unique}
+\end{figure}
+
+The specification and proof of chain uniqueness are listed in
+Figure~\ref{fig:s4-chain-unique}, which we now describe.
+\begin{itemize}
+\item Function |toList| extracts the list of certificates from the chain,
+  including the issuer found in the trusted root.
+  
+\item Predicate |ChainUnique| expresses the uniqueness of each certificates in a
+  chain by first using |toList| to extract the underlying list of certificates,
+  then uses the predicate |List.Unique| from \agda{}'s standard library.
+
+  
+\item Finally, the proof |chainUnique| (definition omitted) establishes that the
+  predicate |ChainUnique| holds for every chain |c : Chain trust candidates
+  issuee|, provided that |issuee| is not present in either the candidate
+  certificate list or the trusted root.
+\end{itemize}
+
+\subsubsection{Sound and Complete Chain Building}
+
+\begin{figure}
+\begin{code}
+buildChains
+  :  forall trust candidates {@0 bs} (issuee : Cert bs)
+    -> List (Chain trustedRoot candidates issuee)
+
+ChainEq :  forall {trust candidates} {@0 bs} {issuee : Cert bs}
+           -> (c1 c2 : Chain trust candidates issuee) -> Set
+ChainEq c1 c2 = toList c1 == toList c2
+
+buildChainsComplete
+  :  forall trust candidates {@0 bs} (issuee : Cert bs)
+     -> (c : Chain trust candidates issuee)
+     -> Any (ChainEq c) (buildChains trust candidates issuee)
+\end{code}
+  \caption{Verified chain builder}
+  \label{fig:s4-chain-builder}
+\end{figure}
 
 % In Figure~\ref{fig:isissuer}, |c1 IsIssuerFor c2| expresses the property that |c1|
 % is a certificate for the issuer of certificate |c2|.
