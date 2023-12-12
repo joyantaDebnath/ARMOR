@@ -1,0 +1,3 @@
+* Directory
+
+  - Paper (full version): [[file:dist/index.pdf]]
