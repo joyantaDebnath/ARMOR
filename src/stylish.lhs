@@ -305,6 +305,7 @@
 %format p2         = "\HSVar{\mathit{p}_{2}}"
 %format a1         = "\HSVar{\mathit{a}_{1}}"
 %format a2         = "\HSVar{\mathit{a}_{2}}"
+%format proj1         = "\HSVar{\mathit{proj}_{1}}"
 %format proj2         = "\HSVar{\mathit{proj}_{2}}"
 %format bseq         = "\HSVar{\mathit{bs}_{eq}}"
 %format valeq         = "\HSVar{\mathit{val}_{eq}}"

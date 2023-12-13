@@ -245,7 +245,7 @@ and increasing trust that they faithfully capture the natural language
 description.
 Much current research~\cite{ni2023asn1, ramananandro2019everparse}
 on applying formal methods to parsing uses serializers to specify their
-correctnes properties.
+correctness properties.
 Formal proofs of correctness (in any context) are only ever as good as the
 specification of those correctness properties, and this earlier research swells
 the trusted computing base by introducing implementation details for serialization.
@@ -693,7 +693,7 @@ soundness and completeness with respect to a partial specification.
 Adhering to our discipline of providing high-level, relational specifications,
 we dedicate the bulk of this section to describing the specification used,
 presenting at the end the type of our sound-by-construction chain builder and
-its proof of completeness
+its proof of completeness.
 
 \subsubsection{|Chain| Specification}
 Our operative definition of correctness for the |Chain Builder| module is as
@@ -841,7 +841,7 @@ Figure~\ref{fig:s4-chain-unique}, which we now describe.
 \item Function |toList| extracts the list of certificates from the chain,
   including the issuer found in the trusted root.
   
-\item Predicate |ChainUnique| expresses the uniqueness of each certificates in a
+\item Predicate |ChainUnique| expresses the uniqueness of each certificate in a
   chain by first using |toList| to extract the underlying list of certificates,
   then uses the predicate |List.Unique| from \agda{}'s standard library.
 
@@ -853,7 +853,7 @@ Figure~\ref{fig:s4-chain-unique}, which we now describe.
 \end{itemize}
 
 \subsubsection{Sound and Complete Chain Building}
-
+\label{sec:s4-sound-complete-chain-building}
 \begin{figure}
 \begin{code}
 buildChains
@@ -889,7 +889,7 @@ This is formalized in the remainder of the figure, which we now describe.
 \item Relation |ChainEq| expresses that the underlying certificate lists of two
   chains |c1 c2 : Chain trust candidates issuee| are equal.
   Observe that were we to define |ChainEq c1 c2| as |c1 == c2|, this would be
-  much stronger than is required: an value of type |Chain trust candidates
+  much stronger than is required: a value of type |Chain trust candidates
   issuee| carries with it not only the underlying certificate list, but also
   proofs relating each certificate with the next and with |trust| and
   |candidates|.
@@ -910,799 +910,137 @@ This is formalized in the remainder of the figure, which we now describe.
   each adjacent pair of certificates, the issuer of the first matches the
   subject of the second).
 \end{itemize}
-% In Figure~\ref{fig:isissuer}, |c1 IsIssuerFor c2| expresses the property that |c1|
-% is a certificate for the issuer of certificate |c2|.
-% \agda provides great flexibility in defining infix and mixfix operations through
-% the use of underscores in identifiers, so by writing |_IsIssuerFor_|, we can use
-% |IsIssuerFor| as a infix binary relation.
-% |IsIssuerFor| is defined using |NameMatch| (definition not shown), which
-% expresses that two distinguished names are equal after string canonicalization.
 
-% Of course, for chain building we are not just interested in \emph{whether} one
-% certificate represents an issuer for another, but \emph{where} that issuer came
-% from, \ie, whether it came from the trusted CA certificates or as part of the
-% message sent by the entity we are trying to authenticate.
-% It is therefore useful to define the 3-place (mixfix) relation |c1 IsIssuerFor
-% c2 In certs|, which expresses the additional property that |issuer| is an
-% element of |certs|.
-% We briefly explain the unfamiliar parts of this definition.
-% First, the type |exists
-% Cert| is a convenience notation for the type of pairs whose first component is a
-% bytestring |xs| and whose second component is a proof of type |Cert xs|;
-% therefore, the type of the argument |certs : List (exists Cert)| tells us
-% |certs| is a list of such tuples.
-% Second, the binary relation |_`elem`_| (appearing in the definition as
-% |(dashcomma issuer) `elem` certs|) is defined in \agda's standard library and
-% expresses that the left expression is an element of the list on the right.
+\subsection{Verification of Semantic Validator}
+We now describe our verification approach to the task of \emph{semantic
+  validation}.
+The checks performed by the \emph{Semantic validator} are separated into two
+categories: those that apply to a single certificate, and those that apply to a
+candidate certificate chain.
+For each property to validate, we formulate in \agda a predicate expressing
+satisfaction of the property by a given certificate or chain, then prove that
+these predicates are decidable (|Dec|, Section~\ref{sec:s4-parsers-cbc}).
+In what follows, we illustrate with two relatively simple concrete examples: one
+predicate for a single certificate and one for a certificate chain.
 
-% \subsubsection{Definition of |Chain| and the Sound-By-Construction Chain Builder}
+Before we illustrate with examples, we stress that the purpose of this setup is
+\emph{not} merely to give decidability results for the semantic checks of the \xfon
+specification, as this fact is intuitively obvious.
+Instead, and just like with our approach to verified parsing, formulating these
+semantic checks as decidability proofs (1) \emph{forces} us formalize the natural
+language property we wish to check \emph{independently of the code that performs
+the checking,} and (2) \emph{enables} us to write the checking code that is
+\emph{correct-by-construction}, as these decidability proofs are themselves
+the very functions called after parsing to check whether the certificate or chain
+satisfies the property in question.
 
-% \begin{figure}
-%   \begin{code}
-% data Chain (trust certs : List (exists Cert))
-%   : forall {@0 xs} -> Cert xs -> Set where
-%   root :  forall {@0 xs1 xs2} {c : Cert xs1} {r : Cert xs2}
-%           -> r IsIssuerFor c In trust -> Chain trust certs c
-%   link :  forall {@0 xs1 xs2} {c1 : Cert xs1} {c2 : Cert xs2}
-%           -> (isIn : c1 IsIssuerFor c2 In certs)
-%           -> Chain trust (certs emdash (proj2 isIn)) c2
-%           -> Chain trust certs c1
-%   \end{code}
-%   \caption{|Chain|}
-%   \label{fig:s4-chain}
-% \end{figure}
+\textbf{Single certificate property.}
+For a given certificate, it must be the case that its \texttt{SignatureAlgorithm} field
+contains the same algorithm identifier as the \texttt{Signature} field of
+its \texttt{TBSCertificate} (R1 in Table~\ref{rules} of the Appendix).
+As a formula of FOL, we could express this property with respect to
+certificate \(c\) as
+\[
+  \forall s_1\, s_2, \mathit{SignAlg}(s_1,c) \land \mathit{TBSCertSignAlg}(s_2,c)
+  \implies s_1 = s_2
+\]
+where \(\mathit{SignAlg}(s_1,c)\) and \(\mathit{TBSCertSignAlg}(s_2,c)\) express
+respectively the properties that \(s_1\) is the signature algorithm identifier
+of \(c\) and that \(s_2\) is the signature algorithm identifier of the
+\texttt{TBSCertificate} of \(c\).
+In \agda, we express this property, and the type of its corresponding
+decidability proof, as follows (we omit the proof for space considerations).
 
-% We now have everything need to specify a correct chain, shown in
-% Figure~\ref{fig:s4-chain}.
-% |Chain trust certs c| is the type of proofs that there exists a path beginning
-% with the entity whose certificate is |c|, ending with a certificate in |trust|,
-% and whose intermediate steps are pulled uniquely from |certs|.
-% The base case for |Chain| is given by constructor |root|, which says the chain
-% is complete if we find a certificate for the issuer of |c| in |trust|.
-% In the inductive case, we have that if |c1| is the certificate for an issuer of
-% |c2| in the input certificate list |certs|, then to build a valid chain of trust
-% to |c1| we need a valid chain of trust to |c2|.
+\begin{code}
+R1 : forall {@0 bs} -> Cert bs -> Set
+R1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
 
-% Moreover, to prohibit |c2| from appearing than once, the list of valid
-% intermediate certs between |c2| and the trust anchor must be reduced.
-% This is captured by the expression |certs emdash (proj2 isIn)|, where |emdash|
-% takes a list and a proof some element is a member of it and returns a list where
-% that member has been remove.
-% Not only does this capture a crucial correctness guarantee, but it is essential
-% for convincing \agda's termination checker that chain building is terminating:
-% since the element we are trying to remove has been proven to be in the list, the
-% length of the resulting list is strictly smaller than the list we started with.
+r1 : forall {@0 bs} (c : Cert bs) -> Dec (R1 c)
+r1 c = ...  
+\end{code}
+The predicate |R1| expresses that the two signature algorithm
+fields are equal using the binary relation |==|, which is defined in \agda{}'s
+standard library.
+Compared to the proof |r1|, |R1| is relatively simple: |==| is
+\emph{parametric} in the type of the values it relates (meaning it uses no
+specifics about the |SignAlg| type family), and is defined as the smallest
+reflexive relation.
+In contrast, the checking code |r1| \emph{must} concern itself with the
+specifics of |SignAlg|.
+In \xfon, signature algorithm fields are defined as a pair where the first
+component is an object identifier (OID) and the second is an optional field for
+parameters whose type \emph{depends upon that OID.}
+So, to implement |r1| we must prove equality is decidable for OIDs
+\emph{and} for all the signature algorithm parameter types we support.
 
-% \begin{figure}
-%   \begin{code}
-% buildChains
-%   :  forall (trust certs : List (exists Cert))
-%      -> forall {@0 bs} (c : Cert bs) -> List (Chain trust certs c)
-% buildChains = ...
-%   \end{code}
-%   \caption{Chain building function (type only)}
-%   \label{fig:s4-chain-builder}
-% \end{figure}
-% We can at last present the type of our sound-by-construction chain builder,
-% shown in Figure~\ref{fig:s4-chain-builder}.
-% We read it as follows: for all certificate lists |trust| and |certs|, and for
-% every certificate |c|, we can produce a list of chains which authenticates |c|
-% using intermediate certificates for |certs| and ending with an issuing
-% certificate from |trust|.
+\textbf{Certificate chain property.}
+\begin{figure}
+\begin{code}
+IsConfirmedCA : forall {@0 bs} -> Cert bs -> Set
 
+isConfirmedCA? : forall {@0 bs} (c : Cert bs) -> Dec (IsConfirmedCA c)
 
-% \subsection{Verification of String Canonicalizer}
+R23 :  forall {trust candidates} {@0 bs} (issuee : Cert bs) 
+       -> Chain trust candidates issuee -> Set
+R23 issuee c = All (IsConfirmedCA . proj2) (tail (toList c))
 
+r23 :  forall {trust candidates} {@0 bs} (issuee : Cert bs)
+       -> (c : Chain trust candidates issuee) -> Dec (R23 c)
+r23 c = All.all? (isConfirmedCA? . proj2) (tail (toList c))
+\end{code}  
+  \caption{Semantic check for R23}
+  \label{fig:s4-semantic-chain-check}
+\end{figure}
 
-% \subsection{Verification of Semantic Validator}
-% Our approach to semantic validation, as outlined in
-% Section~\ref{sec:s3-insights-on-tech-challenges}, is separating those properties that should
-% be verified for a single certificate and those that concern the entire chain.
-% For each property to validate, we formulate in Agda a predicate expressing
-% satisfaction of the property by a given certificate or chain, then prove that
-% these predicates are decidable (|Dec|, Section~\ref{sec:s4-parsers-cbc}).
-% In what follows, we illustrate with two relatively simple concrete examples: one
-% predicate for a single certificate and one for a certificate chain.
+For a certificate chain, it must be the case that every issuer certificate is a
+CA certificate.
+Specifically, RFC 5280 (Section 6.1.4) makes the following requirement for
+issuer certificates:
+\quoteRFC{%
+  If certificate i is a version 3 certificate, verify that the
+  basicConstraints extension is present and that cA is set to
+  TRUE.  (If certificate i is a version 1 or version 2
+  certificate, then the application MUST either verify that
+  certificate i is a CA certificate through out-of-band means
+  or reject the certificate.  Conforming implementations may
+  choose to reject all version 1 and version 2 intermediate
+  certificates.)
+}
+In \armor, we take the approach suggested in the last line of the quote (see
+entry R19 of Table~\ref{rules} in the Appendix), so our task reduces to checking
+that for each issuer certificate, the \texttt{basicConstraints} extension is
+present and its \texttt{cA} field is set to true.
 
-% Before we illustrate with examples, we stress that the purpose of this setup is
-% \emph{not} to give decidability results for the semantic checks of the \xfon
-% specification, as the mere fact that they are decidable is intuitively obvious.
-% Instead, and just like with our approach to verified parsing, formulating these
-% semantic checks as decidability proofs (1) \emph{forces} us formalize the natural
-% language property we wish to check \emph{independently of the code that performs
-% the checking,} and (2) \emph{enables} us to write the checking code that is
-% \emph{correct-by-construction}, as these decidability proofs are themselves
-% the functions called after parsing to check whether the certificate or chain
-% satisfies the property.
-
-% \textbf{Single certificate property.}
-% For a given certificate, it must be the case that its \texttt{SignatureAlgorithm} field
-% contains the same algorithm identifier as the \texttt{Signature} field of
-% its \texttt{TBSCertificate} (R1 in Table~\ref{rules} of the Appendix).
-% As a formula of FOL, we could express this property with respect to
-% certificate \(c\) as
-% \[
-%   \forall s_1\, s_2, \mathit{SignAlg}(s_1,c) \land \mathit{TBSCertSignAlg}(s_2,c)
-%   \implies s_1 = s_2
-% \]
-% where \(\mathit{SignAlg}(s_1,c)\) and \(\mathit{TBSCertSignAlg}(s_2,c)\) express
-% respectively the properties that \(s_1\) is the signature algorithm identifier
-% of \(c\) and that \(s_2\) is the signature algorithm identifier of the
-% \texttt{TBSCertificate} of \(c\).
-% In Agda, we express this property, and the type of its corresponding
-% decidability proof, as follows (we omit the proof for space considerations).
-
-% \begin{code}
-% R1 : forall {@0 bs} -> Cert bs -> Set
-% R1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
-
-% r1 : forall {@0 bs} (c : Cert bs) -> Dec (R1 c)
-% r1 c = ...  
-% \end{code}
-% The predicate |R1| expresses that the two signature algorithm
-% fields are equal using the binary relation |==| defined in Agda's standard library.
-% Compared to the proof |r1|, |R1| is relatively simple: |==| is
-% \emph{parametric} in the type of the values it relates (meaning it uses no
-% specifics about the |SignAlg| type family), and is defined as the smallest
-% reflexive relation.
-% In contrast, the checking code |r1| \emph{must} concern itself with the
-% specifics of |SignAlg|.
-% In \xfon, signature algorithm fields are defined as a pair where the first
-% component is an object identifier (OID) and the second is an optional parameters
-% field whose type \emph{depends upon that OID.}
-% So, to implement |r1| we must prove equality is decidable for OIDs
-% \emph{and} for all of the signature algorithm parameter types we support.
-
-% \textbf{Certificate chain property.}
-% For a certificate chain, it must be the case that a certificate does not appear
-% more than once in a prospective certificate path (R20 in Table~\ref{rules} of the Appendix).
-% As a formula of FOL, we could express this property with respect to a
-% certificate chain \(\mathit{cc}\) as
-% \[
-%   \begin{array}{l}
-%     \forall c_1\, c_2\, i_1\, i_2. \mathit{InChain}(c_1,i_1,\mathit{cc}) \land
-%     \mathit{InChain}(c_2,i_2,\mathit{cc})
-%     \\ \quad \land\ i_1 \neq i_2 \implies c_1 \neq c_2
-%   \end{array}
-% \]
-% where \(\mathit{InChain}(c_1,i_1,\mathit{cc})\) is the property that certificate
-% \(c_1\) is at index \(i_1\) in chain \(\mathit{cc}\).
-% The Agda standard library provides a definition of the property that all entries
-% of a list are distinct from each other, written below as |List.Unique|, as well
-% as a proof that this property is decidable, written |List.unique?|, provided
-% that the type of the list's elements support decidable equality.
-% We express this predicate and its corresponding decidability proof in Agda as
-% % We have proven equality is decidable for certificates, so we can express this
-% % property and corresponding decidability proof in Agda as
-% \begin{code}
-% R20 : forall {@0 bs} -> Chain bs -> Set
-% R20 c = List.Unique (chainToList c)
-
-% r20 : forall {@0 bs} (c : Chain bs) -> Dec (R20 c)
-% r20 c = List.unique? decCertEq (chainToList c)
-% \end{code}
-% where function |chainToList| converts a certificate chain to a
-% list of certificates and |decCertEq| is the proof that equality is decidable for
-% certificates.
-% Again, there is an asymmetry in the complexities of the specification and proof:
-% while |List.Unique| is defined in 3 lines of code as an inductive type, the proof
-% of |decCertEq| is substantially longer as it requires plumbing through the
-% details of our formalization of |Cert|.
-% By writing our checking function |r20| as a decision procedure, however, we do
-% not have to worry that there is a mistake hidden somewhere in this complexity:
-% by its very type, |r20| is \emph{correct-by-construction} with respect to the
-% specification given by |R20|.
-
-
-
-
-
-
-% % This section details the design and verified guarantees of our parser and
-% % semantic checker modules.
-% % \begin{itemize}
-% % \item We start with an overview of our specifications of the supported subsets
-% %   of the PEM, X.690 DER, and X.509 formats, emphasizing how their being
-% %   \emph{parser independent} facilitates verifying language properties without
-% %   mentioning implementation details.
+We formalize this semantic condition, listed as R23 in Table~\ref{rules} in
+Figure~\ref{fig:s4-semantic-chain-check}. 
+Predicate |IsConfirmedCA| (definition omitted) expresses the condition that the
+\texttt{basicConstraints} extension is present in a certificate with field
+\texttt{cA} set to |true|, and function |isConfirmedCA?| (definition omitted) is
+the correct-by-construction implementation of that check.
+Predicate |R23| is extends this property to all issuer certificates of a chain.
+\begin{itemize}
+\item The \agda standard library definition |All| is to |Any| (see
+  Section~\ref{sec:s4-sound-complete-chain-building}) what |forall| is to
+  |exists|.
+  Given a predicate |Q : A -> Set| and a list |xs : List A|, |All Q xs| is the
+  proposition that every element of |xs| satisfies |Q|.
   
-% % \item Next, we describe our parsers, which are designed to be \emph{correct by
-% %     construction} with respect to the language specifications.
-% %   We achieve this by having parsers return \emph{proofs} either affirming or
-% %   refuting language membership.
+\item The list we are concerned with in predicate |R23| is every certificate in the
+  chain except the first (i.e., the end entity).
+  This is expressed by |tail (toList c) : List (exists Cert)|.
   
-% % \item Finally, we describe approach to \emph{correct-by-construction} semantic
-% %   validation.
-% %   We express the desired properties of semantic checking as predicates over the
-% %   internal data representations, with the code executing these checks
-% %   implemented as proofs that these properties are decidable.
-% % \end{itemize}
-
-% % % \subsubsection*{Input Strings}
-% % % Inputs to our parser have types of the form |List A|, where |A| is the type of
-% % % the language alphabet.
-% % % For our PEM parser, this is |Char|, Agda's primitive type for character
-% % % literals.
-% % % For our X.690 and X.509 parsers, this is the type |UInt8|, which is an alias for
-% % % the Agda standard library type |Fin 256| (the type for nonnegative integers
-% % % strictly less than 256).
-% % % \subsubsection*{Base64 Decoding}
-% % % We hand off the result of the PEM parser, which extracts the Base64 encoding of the
-% % % certificates, to the X.509 parser, which expects an octet string, through a
-% % % Base64 decoder that is verified with respect to an encoder.
-% % % Specifically, we prove: 1) that the encoder always produces a valid sextet
-% % % string (Base64 binary string); and 2) the encoder and decoder pair forms an
-% % % isomorphism between octet strings and valid sextet strings for encoding them.
-% % % This is summarized below in Figure~\ref{fig:s4-base64} (for space
-% % % considerations, all definitions have been omitted).
-
-% % % \begin{figure}[h]
-% % %   \begin{code}
-% % % ValidEncoding : List UInt6 -> Set
-% % % encode : List UInt8 -> List UInt6
-% % % decode : (bs : List UInt6) -> Valid64Encoding bs -> List UInt8
-
-% % % encodeValid : (bs : List UInt8) -> ValidEncoding (encode bs)
-
-% % % encodeDecode :  forall bs -> decode (encode bs) (encodeValid bs) == bs
-% % % decodeEncode :  forall bs -> (v : ValidEncoding bs)
-% % %                 -> encode (decode bs v) == bs
-% % %   \end{code}
-% % %   \caption{Base64 encoding and decoding (types only)}
-% % %   \label{fig:s4-base64}
-% % % \end{figure}
+\item Since the elements of this list are \emph{tuples} of type |exists Cert|
+  (where the first component is an octet string and the second is a proof that
+  string encodes a certificate), we form the predicate supplied to |All| by
+  precomposing |IsConfirmedCA| with |proj2 : (c : exists Cert) -> Cert (proj1 c)|.
+\end{itemize}
+\noindent Finally, the sound-by-construction checker for this semantic condition
+is |r23|, which is defined using |All.all?|, defined in the \agda standard
+library.
+|All.all?| takes a decision procedure that applies to a single element (in this
+case, |isConfirmedCA? . proj2|) and returns a decision procedure that decides
+whether the predicate holds for \emph{all} elements of the given list.
 
 
-% % \subsection{Independent Specification}
-% % \label{sec:s4-lang-spec}
-% % Our first challenge concerns how the specification is represented, that is,
-% % answering the question ``parser soundness and completeness \emph{with respect to
-% %   what?}''
-% % Our answer is that for each production rule |G| of the supported subset of the
-% % PEM, X.690, and X.509 grammars, we define a predicate |G : List A -> Set| over
-% % the input strings.
-% % Membership of an input string |xs| in the language denoted by |G| corresponds to
-% % the inhabitation of the type |G xs|.
 
-% % \begin{figure}[h]
-% %   \begin{code}
-% % MinRep : UInt8 -> List UInt8 -> Set
-% % MinRep b1 [] = Top
-% % MinRep b1 (b2 :: bs) =
-% %   (b1 > 0 Lor (b1 == 0 Land b2 >= 128))
-% %   Land (b1 < 255 Lor (b1 == 255 Land b2 <=127))
-    
-% % record IntegerValue (@0 bs : List UInt8) : Set where
-% %   constructor mkIntVal
-% %   field
-% %     @0 hd : UInt8
-% %     @0 tl : List UInt8
-% %     @0 minRep : MinRep hd tl
-% %     val : IntZ
-% %     @0 valeq : val == Base256.twosComp bs
-% %     @0 bseq : bs == hd :: tl
-% %   \end{code}
-% %   \caption{Specification of integer values}
-% %   \label{fig:s4-integervalue}
-% % \end{figure}
-
-% % We illustrate our approach with a concrete example: our specification of X.690
-% % DER integer values, shown in Figure~\ref{fig:s4-integervalue}.
-% % This specification takes the form of an Agda record (roughly analogous to a
-% % C-style \texttt{struct}) that is parameterized by a bytestring |bs|.
-% % \begin{itemize}
-% % \item \textbf{Minimum representation.} \xsno BER requires that the two's
-% %   complement encoding of an integer value consists of the minimum number of
-% %   octets needed for this purpose.
-% %   We \emph{express} this property with |MinRep|, which defines a relation between the
-% %   first byte of the encoding and the remaining bytes; we \emph{enforce} that the
-% %   property holds with field |minRep| of |IntegerValue| (in order to construct an
-% %   expression of type |IntegerValue bs|, we must prove that |MinRep| holds for
-% %   the head and tail of |bs|).
-  
-% %   The definition of |MinRep| proceeds by cases on whether or not the remaining
-% %   byte string is empty.
-% %   \begin{enumerate}
-% %   \item If it is, we return the trivially true proposition |Top|, because a
-% %     single byte is always minimal.
-    
-% %   \item Otherwise, if the bits of the first byte are all 0, the first bit of the
-% %     second byte must be 1 (i.e., |b2 >= 128|); and if the bits of the first byte
-% %     are all 1 (i.e., |b1 == 255|), then the first bit of the second byte must be
-% %     0 (i.e., |b2 <= 127|).
-% %   \end{enumerate}
-  
-% % \item \textbf{Erasure annotations.} The string |@0| is an annotation that marks
-% %   the accompanying identifier as \emph{erased at runtime}.
-% %   In the figure, only the field |val| (the integer encoded by |bs|) is present
-% %   at runtime, with the remaining fields (and the parameter |bs|) erased by
-% %   Agda's GHC backend.
-% %   The annotations for runtime erasure not only improves the performance of ARMOR,
-% %   but also serve to document, for programmers using ARMOR as a reference
-% %   implementation, which components of the internal representation serve only
-% %   specificational purposes.
-
-% % \item \textbf{Nonempty encoding.} Fields |hd|, |tl|, and |bseq| together ensure
-% %   that the encoding of an integer value ``consists of one or more
-% %   octets.''~\cite{rec2002x}
-% %   Specifically, |bseq| ensures that |bs| is of the form |hd :: tl|, where |hd|
-% %   is the first content octet and |tl| contains the remaining bytes (if any).
-  
-
-% % \item \textbf{Linking the value and its encoding.}
-% %   Field |valeq| forecloses any possibility that an expression of type |IntegerValue
-% %   bs| populates the field |val| with an arbitrary integer by requiring that this
-% %   field \emph{must} be equal to the result of decoding |bs| as a two's complement
-% %   binary value, where |Base256.twosComp| is the decoding operation.
-% % \end{itemize}
-
-% % A major advantage of our approach to specifying X.509 is that it facilitates
-% % proving properties \emph{about the grammar} without having to reason about
-% % parser implementation details.
-% % By verifying properties of grammar itself, we can be more confident that we have
-% % accurately captured the meaning of the natural language descriptions. 
-% % Two properties in particular that we have proven hold of our specification
-% % capture the major design goal of X.690 DER formats: they are \emph{unambiguous},
-% % meaning that a given bytestring can encode \emph{at most one value} of a
-% % particular type; and they are \emph{non-malleable}, meaning that distinct
-% % bytestrings cannot encode identical values.
-
-% % \subsubsection{Unambiguous}
-% % We formally define unambiguousness of a language |G| in Agda as follows.
-% % \begin{code}
-% % Unambiguous G = forall {xs} -> (a1 a2 : G xs) -> a1 == a2
-% % \end{code}
-% % Read this definition as saying that for every string |xs|, any two inhabitants
-% % of the internal representation of the value encoded by |xs| in |G| are equal.
-
-% % \textbf{Challenges.} |Unambiguous| expresses a property much stronger
-% % than might be first apparent.
-% % To illustrate, showing |Unambiguous IntegerValue| requires showing that the
-% % corresponding fields are equal --- \emph{even the purely specificaional fields.}
-% % Once established, the additional strength that |Unambiguous| significantly aids
-% % development of the verified parser; however, this means that specifications must
-% % be carefuly crafted so as to admit unique proof terms.
-% % In the case of |IntegerValue|, this means showing that any two proofs of |MinRep
-% % hd tl| are equal.
-
-% % Another challenging aspect in proving unambiguousness for X.690 DER in
-% % particular is the format's support for sequences that have \emph{optional} and
-% % \emph{default} fields, that is, fields that might not be present in the
-% % sequence.
-% % We are threatened with ambiguity if it is possible to mistake an optional field
-% % whose encoding is present for another optional field that is absent.
-% % To avoid this scenario, the X.690 format stipulates that every field of any
-% % ``block'' of optional or default fields must be given a tag distinct from every
-% % other such field.
-% % Our proof of unambiguousness for \xfon relies heavily on lemmas proving the
-% % \xfon format obeys this stipulation.
-
-% % \subsubsection{Non-malleable}
-% % Compared to unambiguousness, non-malleability requires more machinery to
-% % express, so we begin by discussing the challenges motivating this machinery.
-% % Since the bytestring encodings are part of \emph{the very types of internal
-% % representations}, e.g., |IntegerValue xs|, it is impossible to express equality
-% % between internal representations |a1 : G xs1| and |a2 : G xs2| without
-% % \emph{already assuming |xs1| is equal to |xs2|}.
-% % Thus, to make non-malleability non-trivial, we must express what is the
-% % ``raw'' internal datatype corresponding to |G|, discarding the specificational
-% % components.
-% % We express this general notion in Agda by |Raw|, given below.
-% % \begin{code}
-% % record Raw (G : List A -> Set) : Set where
-% %   field
-% %     D : Set
-% %     to : {@0 xs : List A} -> G xs -> D
-% % \end{code}
-
-% % An inhabitant of |Raw G| consists of a type |D|, intended to be the
-% % ``raw data'' of |G|, together with a function |to| that should extract this data
-% % from any inhabitant of |G xs|.
-% % To illustrate, consider the case for |IntegerValue| below.
-% % \begin{code}
-% %   RawIntegerValue : Raw IntegerValue
-% %   Raw.D RawIntegerValue = IntZ
-% %   Raw.to RawIntegerValue = IntegerValue.val
-% % \end{code}
-% % \noindent This says that the raw representation for integer values is |IntZ| (a
-% % type for integers defined in Agda's standard library), and the extraction
-% % function is just the field accessor |IntegerValue.val|.
-
-% % Once we have defined an instance of |Raw G| for a language specification |G|,
-% % we express non-malleability of |G| with respect to that raw representation
-% % with the following property: give two input strings |xs1| and |xs2|, with witnesses
-% % |g1 : G xs1| and |g2 : G xs2|, if the raw representations of |g1| and |g2| are
-% % equal, then not only are strings |xs1| and |xs2| equal, but also |g1| and |g2|.
-% % In Agda, this is written as:
-% % \begin{code}
-% % NonMalleable : {G : @0 List A -> Set} -> Raw G -> Set
-% % NonMalleable{G} R =
-% %   forall {@0 xs1 xs2} -> (g1 : G xs1) (g2 : G xs2)
-% %   -> Raw.to R g1 == Raw.to R g2 -> (xs1 , g1) ==  (xs2 , g2)  
-% % \end{code}
-% % For |IntegerValue| in particular, proving |NonMalleable RawIntegerValue|
-% % requires showing |Base256.twosComp| is itself injective.
-
-% % \subsubsection{No Substrings}
-% % The final language property we discuss, which we dub \emph{``no substrings,''}
-% % expresses formally the intuitive idea that a language permits parsers no degrees
-% % of freedom over which prefix of an input string it consumes.
-% % As we are striving for \emph{parser independence} in our language
-% % specifications, we formulate this property as follows: for any two prefixes of
-% % an input string, if both prefixes are in the language |G|, then they are equal.
-% % In Agda, we express this as |UniquePrefixes| below.
-% % \begin{code}
-% % UniquePrefixes G =
-% %   forall {xs1 ys1 xs2 ys2} -> xs1 ++ ys1 == xs2 ++ ys2
-% %   -> G xs1 -> G xs2 -> xs1 == xs2
-% % \end{code}
-% % Given that \xfon uses \(<T,L,V>\) encoding, it is
-% % unsurprising that that we are able to prove |UniquePrefixes| holds for our
-% % specification.
-% % However, this property is essential to understanding our \emph{strong
-% %   completeness} result (see Section~\ref{sec:s4-parser-sound-complete-strong})
-% % for parsing.
-
-% % \subsubsection{Summary of Language Guarantees}
-% % We have proven \emph{unambiguousness} for the supported subsets of formats
-% % PEM,\todo{\tiny Remove if we haven't}
-% % \xsno \der, and \xfon; we have proven \emph{non-malleability} for the supported
-% % subsets of formats \xsno \der and \xfon, and proven \emph{no substrings} for all
-% % TLV-encoded values.
-
-% % % In addition, two properties in particular are essential to our proof of parser
-% % % completeness.
-% % % \begin{itemize}
-% % % \item \textbf{Unambiguous:} at most one prefix of a bytestring can belong to
-% % %   |G|.
-% % %   That means, \(\forall \mathit{ws}\, \mathit{xs}\, \mathit{ys}\, \mathit{zs},
-% % %   \mathit{ws} +\!\!\!+ \mathit{xs} = \mathit{ys} +\!\!\!+ \mathit{zs} \land
-% % %   |G ws| \land |G ys| \implies \mathit{ws} = \mathit{ys}\).
-  
-% % % \item \textbf{Uniqueness:} the internal representation of |G xs| is uniquely
-% % %   determined by |xs|.
-% % %   That means (using \(\mathit{Rep}_{|G|}(x,\mathit{xs})\) to express ``\(x\) is the
-% % %   internal representation of |G xs|''),
-% % %   \(\forall x\, y\, \mathit{xs}, \mathit{Rep}_{|G|}(x,\mathit{xs}) \land
-% % %   \mathit{Rep}_{|G|}(y,\mathit{xs}) \implies x = y\).
-% % % \end{itemize}
-% % % \noindent Both of these properties have been proven for our specification of
-% % % X.509 certificates.
-% % % In Agda, predicates |Unambiguous| and |Unique| are defined as follow.
-% % % \begin{figure}[h]
-% % %   \centering
-% % %   \begin{code}
-% % %     Unambiguous : (List UInt8 -> Set) -> Set
-% % %     Unambiguous G =  forall {ws xs ys zs} -> ws ++ xs == ys ++ zs
-% % %                      -> G ws -> G ys -> ws == ys
-% % %     Unique : (List UInt8 -> Set) -> Set
-% % %     Unique G = forall {xs} -> (g h : G xs) -> g == h
-% % %   \end{code}
-% % %   \caption{Definition of unambiguousness and uniqueness}
-% % %   \label{fig:unambig-uniq}
-% % % \end{figure}
-
-% % \subsection{Sound and Complete Parsing}
-% % We now describe our approach to verified parsing.
-% % Recall that, for a language \(G\), \emph{soundness} of a parser means that every
-% % bytestring it accepts is in the language, and \emph{completeness} means that it
-% % accepts every bytestring in the language.
-% % Our approach to verifying these properties for all our parsers is to make them
-% % \emph{correct-by-construction}, meaning that parsers do not merely indicate
-% % success or failure with e.g.\ an integer code, but return \emph{proofs}. 
-% % If the parser is successful, this is a proof that some prefix of its input is in
-% % the language, and if the parser fails, it returns a proof that \emph{no} prefix
-% % of its input is.
-
-% % \subsubsection{The Type of Correct-by-Construction Parsers}
-% % \label{sec:s4-parsers-cbc}
-% % Our first step is to formally define what success in means.
-% % In FOL, we would express the condition for the parser's success on a prefix of
-% % |xs| as \(\exists \mathit{ys}\, \mathit{zs}, \mathit{xs} = \mathit{ys} +\!\!\!+
-% % \mathit{zs} \land |G ys|\).
-% % That is to say, on success the parser consumes some prefix of the input string
-% % that is in the language |G|.
-% % In Agda, we express the result of successful parsing as the parameterized record
-% % |Success|, shown below.
-% % \begin{figure}[h]
-% %   \centering
-% %   \begin{code}
-% %     record Success 
-% %       (G : List UInt8 -> Set) (xs : List UInt8) : Set where
-% %       constructor success
-% %       field
-% %         @0 prefix : List UInt8
-% %         suffix : List UInt8
-% %         @0 pseq : prefix ++ suffix == xs
-% %         value : G prefix
-% %   \end{code}
-% %   \caption{Success conditions for parsing}
-% %   \label{fig:parser-success}
-% % \end{figure}
-% % In the definition, understand parameters |G| and |xs| as the language denoted by
-% % a production rule and an input string, respectively.
-% % The fields of the record are: |prefix|, the consumed prefix of the input (erased
-% % at runtime); |suffix|, the remaining suffix of the input from which we parse
-% % subsequent productions; |pseq|, which relates |prefix| and |suffix| to the input
-% % string |xs| (also runtime erased); and |value|, which serves dual roles as both
-% % the internal data representation of the value encoded by |prefix| \textbf{and}
-% % a proof that |prefix| is in the language |G|.  
-% % As a consequence, \emph{soundness will be immediate}.
-
-% % Our next step is to define what parser failure means.
-% % We define this to be the condition that \emph{no} prefix of the input |xs| is in
-% % the language of |G|, which is to say the failure condition is the
-% % \emph{negation} of the success condition: |not Success G xs|.
-
-% % To have the parser return |Success G xs| on success and |not Success G xs| on
-% % failure, we use datatype |Dec| in the Agda standard library, shown below.
-% % \begin{code}
-% % data Dec (A : Set) : Set where
-% %   yes : A -> Dec A
-% %   no  : not A -> Dec A
-% % \end{code}
-% % Reading |Dec| as programmers, |Dec A| is a tagged union type which can be
-% % populated using either values of type |A| or type |not A|; as mathematicians, we
-% % read it as the type of proofs that |A| is \emph{decidable}.
-% % Expressed as a formula of FOL, |Dec A| is simply \(A \lor \neg A\); however,
-% % note that constructive logic (upon which Agda is based) does not admit LEM, so
-% % this disjunction must be proven on a case-by-case basis for each |A| in
-% % question, as there are some propositions which can neither be proven nor refuted.
-
-% % We are now able to complete the definition of the type of parsers, shown below.
-% % \begin{figure}[h]
-% %   \begin{code}
-% % Parser : (List UInt8 -> Set) -> Set
-% % Parser G = forall xs -> Dec (Success G xs)    
-% %   \end{code}
-% %   \caption{Definition of |Parser|}
-% %   \label{fig:parser-def}
-% % \end{figure}%
-% % |Parser| is a family of types, where for each language |G|, the type
-% % |Parser G| is the proposition that, for all bytestrings |xs|, it is decidable
-% % whether some prefix of |xs| is in |G|; alternatively, we can (as programmers)
-% % read it as the type of functions which take a bytestring and possibly return a
-% % parsed data structure and remaining bytestring to continue parsing.
-
-% % \textbf{Challenges.}
-% % The guarantee that, on failure, the parser returns |not Success G xs| is very
-% % strong, as it asserts a property concerning \emph{all possible prefixes} of the
-% % input.
-% % This strength is double-edged: while having this guarantee makes proving
-% % completeness straightforward, \emph{proving} it means ruling out all possible
-% % ways in which the input could be parsed.
-% % In some cases, we have made choices about parser implementations to facilitate
-% % the proofs concerning the failure case, at a cost to performance.
-% % The clearest example of such a trade-off is in our parsers for X.690
-% % \texttt{Choice} values, which are implemented using back-tracking.
-
-% % \subsubsection{Parser Soundness, Completeness, and Strong Completeness}
-% % \label{sec:s4-parser-sound-complete-strong}
-% % We now show our formal definitions and proofs of soundness and completeness for
-% % parsing, beginning with soundness.
-% % \begin{figure}[h]
-% %   \begin{code}
-% % Sound : (G : @0 List A -> Set) -> Parser G -> Set
-% % Sound G p =
-% %   forall xs -> (w : IsYes (p xs)) -> G (Success.prefix (toWitness w))    
-
-% % @0 soundness : forall {G} -> (p : Parser G) -> Sound G p
-% % soundness p xs w = Success.value (toWitness w)
-% %   \end{code}
-% %   \caption{Parser soundness (definition and proof)}
-% %   \label{fig:s4-parser-soundness}
-% % \end{figure}%
-
-% % \textbf{Soundness.}
-% % Recall that parser soundness means that, if a parser for \(G\) accepts a prefix of the
-% % input string, then that prefix is in \(G\).
-% % The Agda definition and proof of soundness for all of our parsers is
-% % shown in Figure~\ref{fig:s4-parser-soundness}, which we now detail.
-% % Beginning with |Sound|, the predicate expressing that parser |p| is sound with
-% % respect to language |G|, the predicate |IsYes| (definition omitted) expresses
-% % the property that a given decision (in this case, one of type |Dec (Success G
-% % xs)|) is affirmative (i.e., constructed using |yes|).
-% % The function |toWitness : forall {Q} {d : Dec Q} -> IsYes d -> Q| takes a
-% % decision |d| for proposition |Q| and proof that it is affirmative, and produces
-% % the underlying proof of |Q|.
-% % Thus, we read the definition of |Sound G p| as: ``for all input strings |xs|, if
-% % parser |p| accepts |xs|, the the prefix it consumes is in |G|.''
-
-% % The proof |soundness| states that \emph{all parsers are sound}.
-% % As our parsers are correct-by-construction, the definition is straightforward:
-% % we use |toWitness| to extract the proof of parser success, i.e., a term of type
-% % |Success G xs|, then use the field accessor |Success.value| to obtain the
-% % desired proof that the consumed prefix is in |G|.
-
-% % \textbf{Completeness.}
-% % Recall that the definition of parser completeness with respect to a language |G|
-% % means that if an input string |xs| is in |G|, the parser accepts \emph{some
-% %   prefix of |xs|}.
-% % Of course, this property in isolation does not rule out certain bad behavior
-% % that threatens security; specifically, it does not constrain the parser's
-% % freedom over (1) which prefix of the input is consumed, and (2) how the internal
-% % datastructure is constructed.
-% % However, and as we have discussed in Section~\ref{sec:s4-lang-spec}, these
-% % should be thought of as properties of the \emph{language}, and \emph{not} its
-% % parsers.
-% % To emphasize this, after discussing the completeness proof we will show how,
-% % using language properties, it can be strengthed to address the aforementioned
-% % security concerns.
-
-% % \begin{figure}[h]
-% % \begin{code}
-% % Complete : (G : @0 List A -> Set) -> Parser G -> Set
-% % Complete G p = forall xs -> G xs -> IsYes (p xs)
-
-% % trivSuccess : forall {G} {xs} -> G xs -> Success G xs
-
-% % completeness : forall {G} -> (p : Parser G) -> Complete G p
-% % completeness p xs inG = fromWitness (p xs) (trivSuccess inG)
-% % \end{code}
-% %   \caption{Parser completeness (definition and proof)}
-% %   \label{fig:s4-parser-wkcompleteness}
-% % \end{figure}
-
-% % Figure~\ref{fig:s4-parser-wkcompleteness} shows our definition and proof of
-% % \emph{completeness} in \agda, which we now detail.
-% % The definition of |Complete| directly translates our notion of completeness: for
-% % every input string |xs|, if |xs| is in |G|, then parser |p| accepts some prefix
-% % of |xs|.
-% % For the proof, we first prove a straightforward lemma |trivSuccess| (definition
-% % omitted) that states any proof that |xs| is in |G| can be turned into a proof
-% % that some prefix of |xs| (namely, |xs| itself) is in |G|.
-% % With this, the proof of |completeness| uses the function |fromWitness : {Q :
-% %   Set} -> (d : Dec Q) -> Q -> IsYes d|, which intuitively states that if a
-% % proposition |Q| is true, then any decision for |Q| must be in the affirmative.
-
-
-% % \textbf{Strong completeness.}
-% % We will now see how, using language properties, our parser completeness result
-% % can be strengthened to rule out bad behavior that could compromises security.
-% % To be precise, when a string |xs| is in the language |G|, we desire that the
-% % parser consumes \emph{exactly} |xs|, and furthermore that there is only one way
-% % for it to construct the internal data representation of |G| from |xs|.
-% % To show both of these guarantees, it suffices that |G| satisfies the properties
-% % |Unambiguousness| and |UniquePrefixes| (see Section~\ref{sec:s4-lang-spec}).
-
-% % \begin{figure}[h]
-% %   \begin{code}
-% % StronglyComplete : (G : @0 List A -> Set) -> Parser G -> Set
-% % StronglyComplete G p = forall xs -> (inG : G xs)
-% %   -> exists  (w : IsYes (p xs))
-% %              (  let s = toWitness w in
-% %                 (xs , inG) == (Success.prefix x , Success.value s))
-
-% % strongCompleteness
-% %   : forall {G} -> Unambiguous G -> NoSubstrings G
-% %     -> (p : Parser G) -> StronglyComplete G p
-% % strongCompleteness ua ns p xs inG = (w , strong xs inG s)
-% %   where
-% %   w = completeness p inG
-% %   s = toWitness w
-% %   strong : forall xs inG s -> (_ , inG) == (_ , Success.value s)
-% %   strong xs inG s with ns _ inG (Success.prefix s)
-% %   ... | refl with ua inG (Success.value s)
-% %   ... | refl = refl
-% %   \end{code}
-% %   \caption{Strong completeness (definition and proof)}
-% %   \label{fig:s4-parser-stcompleteness}
-% % \end{figure}
-
-% % Figure~\ref{fig:s4-parser-stcompleteness} shows the definition and proof of our
-% % strengthened completeness result.
-% % For the definition, |StronglyComplete G p| says that, if we have a proof |inG| that
-% % |xs| is in |G|, then not only does there exist a witness |w| that the parser
-% % accepts some prefix of |xs|, but prefix it consumes is |xs| and the
-% % proof it returns is |inG|.
-% % Recall that the assumption |inG| and the |value| field of the |Success| record
-% % serve dual roles: they are not only proofs that a string is in a language, but
-% % also the internal data representation of the value encoded by |xs|.
-% % So, saying they are equal means the internal representations are equal.
-
-% % The proof, |strongCompleteness|, shows that to prove |StronglyComplete|, it
-% % suffices that the language |G| satisfies |Unambiguous| and |NoSubstrings|.
-% % In the definition, we exhibit witness |w| using the previous proof
-% % |completeness|, and in the helper proof |strong| we use the assumptions |ns :
-% % NoSubstrings G| and |ua : Unambiguous G| to prove that |xs| and |inG| are equal
-% % to the |prefix| consumed and |value| returned by |p xs|.
-
-% % \subsection{Semantic Validation}
-
-% % Our approach to semantic validation, as outlined in
-% % Section~\ref{sec:s3-insights-on-tech-challenges}, is separating those properties that should
-% % be verified for a single certificate and those that concern the entire chain.
-% % For each property to validate, we formulate in Agda a predicate expressing
-% % satisfaction of the property by a given certificate or chain, then prove that
-% % these predicates are decidable (|Dec|, Section~\ref{sec:s4-parsers-cbc}).
-% % In what follows, we illustrate with two relatively simple concrete examples: one
-% % predicate for a single certificate and one for a certificate chain.
-
-% % Before we illustrate with examples, we stress that the purpose of this setup is
-% % \emph{not} to give decidability results for the semantic checks of the \xfon
-% % specification, as the mere fact that they are decidable is intuitively obvious.
-% % Instead, and just like with our approach to verified parsing, formulating these
-% % semantic checks as decidability proofs (1) \emph{forces} us formalize the natural
-% % language property we wish to check \emph{independently of the code that performs
-% % the checking,} and (2) \emph{enables} us to write the checking code that is
-% % \emph{correct-by-construction,} as these decidability proofs are the themselves
-% % the functions called after parsing to check whether the certificate or chain
-% % satisfies the property.
-
-% % \textbf{Single certificate property.}
-% % For a given certificate, it must be the case that its \texttt{SignatureAlgorithm} field
-% % contains the same algorithm identifier as the \texttt{Signature} field of
-% % its \texttt{TBSCertificate} (R1 in Table~\ref{rules} of the Appendix).
-% % As a formula of FOL, we could express this property with respect to
-% % certificate \(c\) as
-% % \[
-% %   \forall s_1\, s_2, \mathit{SignAlg}(s_1,c) \land \mathit{TBSCertSignAlg}(s_2,c)
-% %   \implies s_1 = s_2
-% % \]
-% % where \(\mathit{SignAlg}(s_1,c)\) and \(\mathit{TBSCertSignAlg}(s_2,c)\) express
-% % respectively the properties that \(s_1\) is the signature algorithm identifier
-% % of \(c\) and that \(s_2\) is the signature algorithm identifier of the
-% % \texttt{TBSCertificate} of \(c\).
-% % In Agda, we express this property, and the type of its corresponding
-% % decidability proof, as follows (we omit the proof for space considerations).
-
-% % \begin{code}
-% % R1 : forall {@0 bs} -> Cert bs -> Set
-% % R1 c = Cert.getTBSCertSignAlg c == Cert.getCertSignAlg c
-
-% % r1 : forall {@0 bs} (c : Cert bs) -> Dec (R1 c)
-% % r1 c = ...  
-% % \end{code}
-% % The predicate |R1| expresses that the two signature algorithm
-% % fields are equal using the binary relation |==| defined in Agda's standard library.
-% % Compared to the proof |r1|, |R1| is relatively simple: |==| is
-% % \emph{parametric} in the type of the values it relates (meaning it uses no
-% % specifics about the |SignAlg| type family), and is defined as the smallest
-% % reflexive relation.
-% % In contrast, the checking code |r1| \emph{must} concern itself with the
-% % specifics of |SignAlg|.
-% % In \xfon, signature algorithm fields are defined as a pair where the first
-% % component is an object identifier (OID) and the second is an optional parameters
-% % field whose type \emph{depends upon that OID.}
-% % So, to implement |r1| we must prove equality is decidable for OIDs
-% % \emph{and} for all of the signature algorithm parameter types we support.
-
-% % \textbf{Certificate chain property.}
-% % For a certificate chain, it must be the case that a certificate does not appear
-% % more than once in a prospective certificate path (R20 in Table~\ref{rules} of the Appendix).
-% % As a formula of FOL, we could express this property with respect to a
-% % certificate chain \(\mathit{cc}\) as
-% % \[
-% %   \begin{array}{l}
-% %     \forall c_1\, c_2\, i_1\, i_2. \mathit{InChain}(c_1,i_1,\mathit{cc}) \land
-% %     \mathit{InChain}(c_2,i_2,\mathit{cc})
-% %     \\ \quad \land\ i_1 \neq i_2 \implies c_1 \neq c_2
-% %   \end{array}
-% % \]
-% % where \(\mathit{InChain}(c_1,i_1,\mathit{cc})\) is the property that certificate
-% % \(c_1\) is at index \(i_1\) in chain \(\mathit{cc}\).
-% % The Agda standard library provides a definition of the property that all entries
-% % of a list are distinct from each other, written below as |List.Unique|, as well
-% % as a proof that this property is decidable, written |List.unique?|, provided
-% % that the type of the list's elements support decidable equality.
-% % We express this predicate and its corresponding decidability proof in Agda as
-% % % We have proven equality is decidable for certificates, so we can express this
-% % % property and corresponding decidability proof in Agda as
-% % \begin{code}
-% % R20 : forall {@0 bs} -> Chain bs -> Set
-% % R20 c = List.Unique (chainToList c)
-
-% % r20 : forall {@0 bs} (c : Chain bs) -> Dec (R20 c)
-% % r20 c = List.unique? decCertEq (chainToList c)
-% % \end{code}
-% % where function |chainToList| converts a certificate chain to a
-% % list of certificates and |decCertEq| is the proof that equality is decidable for
-% % certificates.
-% % Again, there is an asymmetry in the complexities of the specification and proof:
-% % while |List.Unique| is defined in 3 lines of code as an inductive type, the proof
-% % of |decCertEq| is substantially longer as it requires plumbing through the
-% % details of our formalization of |Cert|.
-% % By writing our checking function |r20| as a decision procedure, however, we do
-% % not have to worry that there is a mistake hidden somewhere in this complexity:
-% % by its very type, |r20| is \emph{correct-by-construction} with respect to the
-% % specification given by |R20|.
+% LocalWords:  serializers cryptographic
