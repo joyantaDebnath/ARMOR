@@ -2,5 +2,5 @@
 
 * Directory
 
-  - Paper (full version): [[file:dist/index.pdf]]
-  - Source (clickable HTML): [[file:html/Everything.html]]
+  - Paper (full version): [[./dist/index.pdf]]
+  - Source (clickable HTML): [[./html/Everything.html]]
