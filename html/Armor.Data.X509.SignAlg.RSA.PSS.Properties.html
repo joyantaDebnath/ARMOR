@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.SignAlg.RSA.PSS.Properties</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Comment">-- open import Armor.Binary</a>
+<a id="29" class="Comment">-- open import Armor.Data.X509.HashAlg</a>
+<a id="68" class="Comment">-- import      Armor.Data.X509.HashAlg.TCB.OIDs        as OIDs</a>
+<a id="131" class="Comment">-- open import Armor.Data.X509.MaskGenAlg</a>
+<a id="173" class="Comment">-- open import Armor.Data.X509.SignAlg.RSA.PSS.TCB</a>
+<a id="224" class="Comment">-- import      Armor.Data.X509.SignAlg.TCB.OIDs        as OIDs</a>
+<a id="287" class="Comment">-- open import Armor.Data.X690-DER.Int</a>
+<a id="326" class="Comment">-- open import Armor.Data.X690-DER.OID.TCB</a>
+<a id="369" class="Comment">-- open import Armor.Data.X690-DER.OctetString.TCB</a>
+<a id="420" class="Comment">-- open import Armor.Data.X690-DER.Sequence.DefinedByOID</a>
+<a id="477" class="Comment">-- open import Armor.Data.X690-DER.TLV</a>
+<a id="516" class="Comment">-- import      Armor.Data.X690-DER.Tag                 as Tag</a>
+<a id="578" class="Comment">-- import      Armor.Grammar.Definitions</a>
+<a id="619" class="Comment">-- import      Armor.Grammar.Option</a>
+<a id="655" class="Comment">-- import      Armor.Grammar.Parallel</a>
+<a id="693" class="Comment">-- import      Armor.Grammar.Properties</a>
+<a id="733" class="Comment">-- import      Armor.Grammar.Seq</a>
+<a id="766" class="Comment">-- import      Armor.Grammar.Sum</a>
+<a id="799" class="Comment">-- open import Armor.Prelude</a>
+
+<a id="829" class="Keyword">module</a> <a id="836" href="Armor.Data.X509.SignAlg.RSA.PSS.Properties.html" class="Module">Armor.Data.X509.SignAlg.RSA.PSS.Properties</a> <a id="879" class="Keyword">where</a>
+
+<a id="886" class="Comment">-- open Armor.Grammar.Definitions UInt8</a>
+<a id="926" class="Comment">-- open Armor.Grammar.Option      UInt8</a>
+<a id="966" class="Comment">-- open Armor.Grammar.Parallel    UInt8</a>
+<a id="1006" class="Comment">-- open Armor.Grammar.Properties  UInt8</a>
+<a id="1046" class="Comment">-- open Armor.Grammar.Seq         UInt8</a>
+<a id="1086" class="Comment">-- open Armor.Grammar.Sum         UInt8</a>
+
+<a id="1127" class="Comment">-- iso : Iso PSSParamFieldsRep PSSParamFields</a>
+<a id="1173" class="Comment">-- proj₁ iso = equivalent</a>
+<a id="1199" class="Comment">-- proj₁ (proj₂ iso) (mk&amp;ₚ hashAlg (mk&amp;ₚ maskGenAlg (mk&amp;ₚ saltLen trailerField refl) refl) refl) = refl</a>
+<a id="1303" class="Comment">-- proj₂ (proj₂ iso) (mkPSSParam hashAlg maskGenAlg saltLength trailerField refl) = refl</a>
+
+<a id="1393" class="Comment">-- @0 unambiguous : Unambiguous PSSParamSeq</a>
+<a id="1437" class="Comment">-- unambiguous =</a>
+<a id="1454" class="Comment">--   TLV.unambiguous</a>
+<a id="1475" class="Comment">--     (Iso.unambiguous iso</a>
+<a id="1503" class="Comment">--       (Seq.unambiguous{A = PSSHashAlg}</a>
+<a id="1545" class="Comment">--         (TLV.unambiguous</a>
+<a id="1573" class="Comment">--           (Option.unambiguous HashAlg.RFC4055.unambiguous TLV.nonempty))</a>
+<a id="1649" class="Comment">--         TLV.nosubstrings</a>
+<a id="1677" class="Comment">--       (Seq.unambiguous</a>
+<a id="1703" class="Comment">--         (TLV.unambiguous</a>
+<a id="1731" class="Comment">--           (Option.unambiguous MaskGenAlg.RFC4055.unambiguous TLV.nonempty))</a>
+<a id="1810" class="Comment">--         TLV.nosubstrings</a>
+<a id="1838" class="Comment">--       (Seq.unambiguous</a>
+<a id="1864" class="Comment">--         (TLV.unambiguous (Option.unambiguous Int.unambiguous TLV.nonempty))</a>
+<a id="1943" class="Comment">--         TLV.nosubstrings</a>
+<a id="1971" class="Comment">--           (TLV.unambiguous</a>
+<a id="2001" class="Comment">--             (Option.unambiguous</a>
+<a id="2036" class="Comment">--               (Parallel.unambiguous Int.unambiguous (λ _ → ≡-unique))</a>
+<a id="2109" class="Comment">--               (Parallel.nonempty₁ TLV.nonempty)))))))</a>
+
+<a id="2167" class="Comment">-- @0 nonmalleable : NonMalleable RawPSSParamSeq</a>
+<a id="2216" class="Comment">-- nonmalleable =</a>
+<a id="2234" class="Comment">--   TLV.nonmalleable {R = RawPSSParamFields}</a>
+<a id="2280" class="Comment">--     (Iso.nonmalleable iso RawPSSParamFieldsRep</a>
+<a id="2330" class="Comment">--       (Seq.nonmalleable{ra = RawTLV _ (RawOption HashAlg.RawHashAlg)} {!!} {!!}))</a>
+
+<a id="2416" class="Comment">-- module Fields where</a>
+<a id="2439" class="Comment">--   module SupportedHashAlg where</a>
+<a id="2474" class="Comment">--     @0 noConfusion-SHA1-</a>
+<a id="2502" class="Comment">--       : NoConfusion</a>
+<a id="2525" class="Comment">--           HashAlg.SHA1</a>
+<a id="2551" class="Comment">--           (Sum HashAlg.SHA224</a>
+<a id="2584" class="Comment">--           (Sum HashAlg.SHA256</a>
+<a id="2617" class="Comment">--           (Sum HashAlg.SHA384</a>
+<a id="2650" class="Comment">--                HashAlg.SHA512)))</a>
+<a id="2686" class="Comment">--     noConfusion-SHA1- =</a>
+<a id="2713" class="Comment">--       (Sum.noconfusion {A = HashAlg.SHA1} (HashAlg.SHA-Like.noConfusion _ _)</a>
+<a id="2793" class="Comment">--         (Sum.noconfusion {A = HashAlg.SHA1} (HashAlg.SHA-Like.noConfusion _ _)</a>
+<a id="2875" class="Comment">--           (Sum.noconfusion {A = HashAlg.SHA1} (HashAlg.SHA-Like.noConfusion _ _) (HashAlg.SHA-Like.noConfusion _ _))))</a>
+
+<a id="2998" class="Comment">--     @0 noConfusion-SHA224-</a>
+<a id="3028" class="Comment">--       : NoConfusion HashAlg.SHA224</a>
+<a id="3066" class="Comment">--           (Sum HashAlg.SHA256 (Sum HashAlg.SHA384 HashAlg.SHA512))</a>
+<a id="3136" class="Comment">--     noConfusion-SHA224- =</a>
+<a id="3165" class="Comment">--       Sum.noconfusion {A = HashAlg.SHA224} (HashAlg.SHA-Like.noConfusion _ _)</a>
+<a id="3246" class="Comment">--        (Sum.noconfusion{A = HashAlg.SHA224}</a>
+<a id="3293" class="Comment">--          (HashAlg.SHA-Like.noConfusion _ _) (HashAlg.SHA-Like.noConfusion _ _))</a>
+
+<a id="3377" class="Comment">--     @0 noConfusion-SHA256-</a>
+<a id="3407" class="Comment">--       : NoConfusion HashAlg.SHA256 (Sum HashAlg.SHA384 HashAlg.SHA512)</a>
+<a id="3481" class="Comment">--     noConfusion-SHA256- =</a>
+<a id="3510" class="Comment">--       Sum.noconfusion{A = HashAlg.SHA256}</a>
+<a id="3555" class="Comment">--        (HashAlg.SHA-Like.noConfusion _ _)</a>
+<a id="3600" class="Comment">--        (HashAlg.SHA-Like.noConfusion _ _)</a>
+
+<a id="3646" class="Comment">--     @0 unambiguous : Unambiguous SupportedHashAlg</a>
+<a id="3699" class="Comment">--     unambiguous =</a>
+<a id="3720" class="Comment">--       Sum.unambiguous (HashAlg.SHA-Like.unambiguous _)</a>
+<a id="3778" class="Comment">--         (Sum.unambiguous (HashAlg.SHA-Like.unambiguous _)</a>
+<a id="3839" class="Comment">--           (Sum.unambiguous (HashAlg.SHA-Like.unambiguous _)</a>
+<a id="3902" class="Comment">--             (Sum.unambiguous</a>
+<a id="3934" class="Comment">--               (HashAlg.SHA-Like.unambiguous _)</a>
+<a id="3984" class="Comment">--               (HashAlg.SHA-Like.unambiguous _)</a>
+<a id="4034" class="Comment">--               (HashAlg.SHA-Like.noConfusion _ _))</a>
+<a id="4087" class="Comment">--             noConfusion-SHA256-)</a>
+<a id="4123" class="Comment">--           noConfusion-SHA224-)</a>
+<a id="4157" class="Comment">--         noConfusion-SHA1-</a>
+
+<a id="4187" class="Comment">--     @0 nosubstrings : NoSubstrings SupportedHashAlg</a>
+<a id="4242" class="Comment">--     nosubstrings =</a>
+<a id="4264" class="Comment">--       Sum.nosubstrings TLV.nosubstrings</a>
+<a id="4307" class="Comment">--         (Sum.nosubstrings TLV.nosubstrings</a>
+<a id="4353" class="Comment">--           (Sum.nosubstrings TLV.nosubstrings</a>
+<a id="4401" class="Comment">--             (Sum.nosubstrings TLV.nosubstrings TLV.nosubstrings</a>
+<a id="4468" class="Comment">--               (HashAlg.SHA-Like.noConfusion _ _))</a>
+<a id="4521" class="Comment">--             noConfusion-SHA256-)</a>
+<a id="4557" class="Comment">--           noConfusion-SHA224-)</a>
+<a id="4591" class="Comment">--         noConfusion-SHA1-</a>
+
+<a id="4621" class="Comment">--     nonempty : NonEmpty SupportedHashAlg</a>
+<a id="4665" class="Comment">--     nonempty = TLV.nonempty ∘ SH.erase</a>
+
+<a id="4708" class="Comment">--   Rep : @0 List UInt8 → Set</a>
+<a id="4739" class="Comment">--   Rep =  &amp;ₚ (TLV Tag.AA0 (Option SupportedHashAlg))</a>
+<a id="4794" class="Comment">--         (&amp;ₚ (TLV Tag.AA1 (Option MGF1.MaskGenAlg))</a>
+<a id="4848" class="Comment">--         (&amp;ₚ (TLV Tag.AA2 (Option Int))</a>
+<a id="4890" class="Comment">--             (TLV Tag.AA3 (Option (Σₚ Int λ _ i → Int.getVal i ≡ ℤ.1ℤ)))))</a>
+
+<a id="4968" class="Comment">--   equiv : Equivalent Rep PSSParamFields</a>
+<a id="5011" class="Comment">--   proj₁ equiv (mk&amp;ₚ fstₚ₁ (mk&amp;ₚ fstₚ₂ (mk&amp;ₚ fstₚ₃ sndₚ₁ refl) refl) bs≡) =</a>
+<a id="5089" class="Comment">--     mkPSSParam fstₚ₁ fstₚ₂ fstₚ₃ sndₚ₁ bs≡</a>
+<a id="5135" class="Comment">--   proj₂ equiv (mkPSSParam hashAlg maskGenAlgo saltLength trailerField bs≡) =</a>
+<a id="5215" class="Comment">--     mk&amp;ₚ hashAlg (mk&amp;ₚ maskGenAlgo (mk&amp;ₚ saltLength trailerField refl) refl) bs≡</a>
+
+<a id="5300" class="Comment">--   iso   : Iso Rep PSSParamFields</a>
+<a id="5336" class="Comment">--   proj₁ iso = equiv</a>
+<a id="5359" class="Comment">--   proj₁ (proj₂ iso) (mk&amp;ₚ fstₚ₁ (mk&amp;ₚ fstₚ₂ (mk&amp;ₚ fstₚ₃ sndₚ₁ refl) refl) bs≡) = refl</a>
+<a id="5448" class="Comment">--   proj₂ (proj₂ iso) (mkPSSParam hashAlg maskGenAlgo saltLength trailerField bs≡) = refl</a>
+
+<a id="5540" class="Comment">--   @0 unambiguous : Unambiguous PSSParamFields</a>
+<a id="5589" class="Comment">--   unambiguous =</a>
+<a id="5608" class="Comment">--     Iso.unambiguous iso</a>
+<a id="5635" class="Comment">--       (Seq.unambiguous</a>
+<a id="5661" class="Comment">--         (TLV.unambiguous</a>
+<a id="5689" class="Comment">--           (Option.unambiguous SupportedHashAlg.unambiguous SupportedHashAlg.nonempty))</a>
+<a id="5779" class="Comment">--         TLV.nosubstrings</a>
+<a id="5807" class="Comment">--         (Seq.unambiguous</a>
+<a id="5835" class="Comment">--           (TLV.unambiguous</a>
+<a id="5865" class="Comment">--             (Option.unambiguous MGF1.unambiguous TLV.nonempty))</a>
+<a id="5932" class="Comment">--           TLV.nosubstrings</a>
+<a id="5962" class="Comment">--           (Seq.unambiguous</a>
+<a id="5992" class="Comment">--             (TLV.unambiguous (Option.unambiguous Int.unambiguous</a>
+<a id="6060" class="Comment">--               TLV.nonempty))</a>
+<a id="6092" class="Comment">--             TLV.nosubstrings</a>
+<a id="6124" class="Comment">--             (TLV.unambiguous</a>
+<a id="6156" class="Comment">--               (Option.unambiguous</a>
+<a id="6193" class="Comment">--                 (Parallel.unambiguous Int.unambiguous</a>
+<a id="6250" class="Comment">--                   (λ _ → ≡-unique))</a>
+<a id="6289" class="Comment">--                 (Parallel.nonempty₁ TLV.nonempty))))))</a>
+
+<a id="6348" class="Comment">-- @0 unambiguous : Unambiguous PSS</a>
+<a id="6384" class="Comment">-- unambiguous =</a>
+<a id="6401" class="Comment">--   TLV.unambiguous</a>
+<a id="6422" class="Comment">--     (DefinedByOID.unambiguous PSSParam</a>
+<a id="6464" class="Comment">--       λ o →</a>
+<a id="6479" class="Comment">--        Parallel.unambiguous×ₚ Fields.unambiguous</a>
+<a id="6531" class="Comment">--          (λ where</a>
+<a id="6552" class="Comment">--            ≋-refl ≋-refl → refl))</a>
+
+</pre></body></html>

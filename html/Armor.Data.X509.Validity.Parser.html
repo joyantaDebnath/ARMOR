@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Validity.Parser</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.Validity.TCB.html" class="Module">Armor.Data.X509.Validity.TCB</a>
+<a id="67" class="Keyword">open</a> <a id="72" class="Keyword">import</a> <a id="79" href="Armor.Data.X509.Validity.Time.html" class="Module">Armor.Data.X509.Validity.Time</a>
+<a id="109" class="Keyword">open</a> <a id="114" class="Keyword">import</a> <a id="121" href="Armor.Data.X509.Validity.Properties.html" class="Module">Armor.Data.X509.Validity.Properties</a>
+<a id="157" class="Keyword">open</a> <a id="162" class="Keyword">import</a> <a id="169" href="Armor.Data.X690-DER.html" class="Module">Armor.Data.X690-DER</a>
+<a id="189" class="Keyword">import</a>      <a id="201" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="227" class="Keyword">import</a>      <a id="239" href="Armor.Grammar.Parallel.html" class="Module">Armor.Grammar.Parallel</a>
+<a id="262" class="Keyword">import</a>      <a id="274" href="Armor.Grammar.Parser.html" class="Module">Armor.Grammar.Parser</a>
+<a id="295" class="Keyword">import</a>      <a id="307" href="Armor.Grammar.Seq.html" class="Module">Armor.Grammar.Seq</a>
+<a id="325" class="Keyword">open</a> <a id="330" class="Keyword">import</a> <a id="337" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="352" class="Keyword">module</a> <a id="359" href="Armor.Data.X509.Validity.Parser.html" class="Module">Armor.Data.X509.Validity.Parser</a> <a id="391" class="Keyword">where</a>
+
+<a id="398" class="Keyword">open</a> <a id="403" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="429" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="435" class="Keyword">open</a> <a id="440" href="Armor.Grammar.Parallel.html" class="Module">Armor.Grammar.Parallel</a>    <a id="466" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="472" class="Keyword">open</a> <a id="477" href="Armor.Grammar.Parser.html" class="Module">Armor.Grammar.Parser</a>      <a id="503" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="509" class="Keyword">open</a> <a id="514" href="Armor.Grammar.Seq.html" class="Module">Armor.Grammar.Seq</a>         <a id="540" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="547" class="Keyword">module</a> <a id="parseValidityFields"></a><a id="554" href="Armor.Data.X509.Validity.Parser.html#554" class="Module">parseValidityFields</a> <a id="574" class="Keyword">where</a>
+  <a id="parseValidityFields.here&#39;"></a><a id="582" href="Armor.Data.X509.Validity.Parser.html#582" class="Function">here&#39;</a> <a id="588" class="Symbol">=</a> <a id="590" class="String">&quot;X509: Validity&quot;</a>
+
+  <a id="parseValidityFields.parseValidityFields"></a><a id="610" href="Armor.Data.X509.Validity.Parser.html#610" class="Function">parseValidityFields</a> <a id="630" class="Symbol">:</a> <a id="632" href="Armor.Grammar.Parser.Core.html#844" class="Function">Parser</a> <a id="639" class="Symbol">(</a><a id="640" href="Armor.Prelude.html#14201" class="Record">Logging</a> <a id="648" href="Function.Base.html#1031" class="Function Operator">∘</a> <a id="650" href="Relation.Nullary.html#1511" class="Record">Dec</a><a id="653" class="Symbol">)</a> <a id="655" href="Armor.Data.X509.Validity.TCB.html#1649" class="Record">ValidityFields</a>
+  <a id="672" href="Armor.Data.X509.Validity.Parser.html#610" class="Function">parseValidityFields</a> <a id="692" class="Symbol">=</a>
+    <a id="698" href="Armor.Grammar.Parser.Core.html#977" class="Function">parseEquivalent</a> <a id="714" href="Armor.Data.X509.Validity.TCB.html#1905" class="Function">equivalent</a>
+      <a id="731" class="Symbol">(</a><a id="732" href="Armor.Grammar.Seq.Parser.html#663" class="Function">parse&amp;</a> <a id="739" href="Armor.Data.X509.Validity.Time.Properties.html#631" class="Function">Time.nosubstrings</a> <a id="757" href="Armor.Data.X509.Validity.Time.Parser.html#582" class="Function">Time.parse</a> <a id="768" href="Armor.Data.X509.Validity.Time.Parser.html#582" class="Function">Time.parse</a><a id="778" class="Symbol">)</a>
+
+<a id="781" class="Keyword">open</a> <a id="786" href="Armor.Data.X509.Validity.Parser.html#554" class="Module">parseValidityFields</a> <a id="806" class="Keyword">public</a> <a id="813" class="Keyword">using</a> <a id="819" class="Symbol">(</a><a id="820" href="Armor.Data.X509.Validity.Parser.html#610" class="Function">parseValidityFields</a><a id="839" class="Symbol">)</a>
+
+<a id="parseValidity"></a><a id="842" href="Armor.Data.X509.Validity.Parser.html#842" class="Function">parseValidity</a> <a id="856" class="Symbol">:</a> <a id="858" href="Armor.Grammar.Parser.Core.html#844" class="Function">Parser</a> <a id="865" class="Symbol">(</a><a id="866" href="Armor.Prelude.html#14201" class="Record">Logging</a> <a id="874" href="Function.Base.html#1031" class="Function Operator">∘</a> <a id="876" href="Relation.Nullary.html#1511" class="Record">Dec</a><a id="879" class="Symbol">)</a> <a id="881" href="Armor.Data.X509.Validity.TCB.html#2300" class="Function">Validity</a>
+<a id="890" href="Armor.Data.X509.Validity.Parser.html#842" class="Function">parseValidity</a> <a id="904" class="Symbol">=</a>
+  <a id="908" href="Armor.Data.X690-DER.TLV.Parser.html#788" class="Function">parseTLV</a> <a id="917" class="Symbol">_</a> <a id="919" href="Armor.Data.X509.Validity.Parser.html#582" class="Function">parseValidityFields.here&#39;</a> <a id="945" class="Symbol">_</a>
+    <a id="951" class="Symbol">(</a><a id="952" href="Armor.Grammar.Parallel.Parser.html#3682" class="Function">parseExactLength</a> <a id="969" href="Armor.Data.X509.Validity.Properties.html#578" class="Function">nosubstrings</a>
+      <a id="988" class="Symbol">(</a><a id="989" href="Armor.Prelude.html#14135" class="Field">tell</a> <a id="994" href="Function.Base.html#1919" class="Function Operator">$</a> <a id="996" href="Armor.Data.X509.Validity.Parser.html#582" class="Function">parseValidityFields.here&#39;</a> <a id="1022" href="Data.String.Base.html#2366" class="Function Operator">String.++</a> <a id="1032" class="String">&quot;: length mismatch&quot;</a><a id="1051" class="Symbol">)</a>
+      <a id="1059" href="Armor.Data.X509.Validity.Parser.html#610" class="Function">parseValidityFields</a><a id="1078" class="Symbol">)</a>
+
+<a id="1081" class="Comment">-- private</a>
+<a id="1092" class="Comment">--   module Test where</a>
+
+<a id="1116" class="Comment">--     Validity₁ : List Dig</a>
+<a id="1144" class="Comment">--     Validity₁ = Tag.Sequence ∷ # 32 ∷ # Tag.GeneralizedTime ∷ # 15 ∷ # 50 ∷ # 56 ∷ # 52 ∷ # 49 ∷ # 48 ∷ # 54 ∷ # 50 ∷ # 52 ∷ # 49 ∷ # 56 ∷ # 51 ∷ # 54 ∷ # 53 ∷ # 52 ∷ # 90 ∷ # Tag.UTCTime ∷ # 13 ∷ # 57 ∷ # 55 ∷ # 48 ∷ # 53 ∷ # 51 ∷ # 48 ∷ # 49 ∷ # 52 ∷ # 52 ∷ # 56 ∷ # 50 ∷ # 50 ∷ [ # 90 ]</a>
+
+<a id="1438" class="Comment">--     test₁ : Validity Validity₁</a>
+<a id="1472" class="Comment">--     test₁ = Success.value (toWitness {Q = Logging.val (runParser parseValidity Validity₁)} tt)</a>
+</pre></body></html>

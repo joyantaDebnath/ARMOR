@@ -858,7 +858,7 @@ Figure~\ref{fig:s4-chain-unique}, which we now describe.
 \begin{code}
 buildChains
   :  forall trust candidates {@0 bs} (issuee : Cert bs)
-    -> List (Chain trustedRoot candidates issuee)
+     -> List (Chain trust candidates issuee)
 
 ChainEq :  forall {trust candidates} {@0 bs} {issuee : Cert bs}
            -> (c1 c2 : Chain trust candidates issuee) -> Set
@@ -873,6 +873,43 @@ buildChainsComplete
   \label{fig:s4-chain-builder}
 \end{figure}
 
+We now present our chain builder, verified sound and complete with
+respect to the specification |Chain|, in Figure~\ref{fig:s4-chain-builder}.
+First, observe that by its type |buildChains| (definition omitted) is
+\emph{sound by construction}: every chain that it returns has type |Chain trust
+candidates issuee|.
+Of course, the \emph{trivial} chain builder (one that always returns the empty
+list) is also sound by construction, and so the other property we are interested
+in is \emph{completeness:} if there \emph{exists} a chain of trust extending to
+the |issuee| from the |trust| store using intermediate certificates pulled from
+|candidates|, then our chain builder enumerates it.
+This is formalized in the remainder of the figure, which we now describe.
+
+\begin{itemize}
+\item Relation |ChainEq| expresses that the underlying certificate lists of two
+  chains |c1 c2 : Chain trust candidates issuee| are equal.
+  Observe that were we to define |ChainEq c1 c2| as |c1 == c2|, this would be
+  much stronger than is required: an value of type |Chain trust candidates
+  issuee| carries with it not only the underlying certificate list, but also
+  proofs relating each certificate with the next and with |trust| and
+  |candidates|.
+  It is not necessary that these proof terms are also equal, so |ChainEq|
+  discards these using |toList|.
+  
+\item In the type signature of |buildChainsComplete|, we use |Any| from the \agda standard
+  library |Any|.
+  Given any type |T|, a predicate |Q : T -> Set| and a list |xs : List T|, |Any
+  Q xs| is the proposition that there exists \emph{some} element of xs for which
+  |Q| holds.
+  
+\item Putting these together, we can read the type signature of
+  |buildChainsComplete| as follows: for every chain |c : Chain trust candidates
+  issuee|, there exists a chain in the result of |buildChains trust candidates
+  issuee| which is equal to |c| modulo some proof terms (i.e., the proofs that
+  issuers are present in either |candidates| or |trust| and the proofs that for
+  each adjacent pair of certificates, the issuer of the first matches the
+  subject of the second).
+\end{itemize}
 % In Figure~\ref{fig:isissuer}, |c1 IsIssuerFor c2| expresses the property that |c1|
 % is a certificate for the issuer of certificate |c2|.
 % \agda provides great flexibility in defining infix and mixfix operations through

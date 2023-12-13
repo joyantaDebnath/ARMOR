@@ -1,3 +1,6 @@
+#+TITLE: ARMOR Full Version: README
+
 * Directory
 
   - Paper (full version): [[file:dist/index.pdf]]
+  - Source (clickable HTML): [[file:html/Everything.html]]

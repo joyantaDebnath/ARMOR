@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.TBSCert.Version.Parser</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.TBSCert.Version.Properties.html" class="Module">Armor.Data.X509.TBSCert.Version.Properties</a>
+<a id="81" class="Keyword">open</a> <a id="86" class="Keyword">import</a> <a id="93" href="Armor.Data.X509.TBSCert.Version.TCB.html" class="Module">Armor.Data.X509.TBSCert.Version.TCB</a>
+<a id="129" class="Keyword">open</a> <a id="134" class="Keyword">import</a> <a id="141" href="Armor.Data.X690-DER.Int.html" class="Module">Armor.Data.X690-DER.Int</a>
+<a id="165" class="Keyword">open</a> <a id="170" class="Keyword">import</a> <a id="177" href="Armor.Data.X690-DER.TLV.html" class="Module">Armor.Data.X690-DER.TLV</a>
+<a id="201" class="Keyword">import</a>      <a id="213" href="Armor.Data.X690-DER.Tag.html" class="Module">Armor.Data.X690-DER.Tag</a> <a id="237" class="Symbol">as</a> <a id="240" class="Module">Tag</a>
+<a id="244" class="Keyword">import</a>      <a id="256" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="282" class="Keyword">import</a>      <a id="294" href="Armor.Grammar.Parallel.html" class="Module">Armor.Grammar.Parallel</a>
+<a id="317" class="Keyword">import</a>      <a id="329" href="Armor.Grammar.Parser.html" class="Module">Armor.Grammar.Parser</a>
+<a id="350" class="Keyword">open</a> <a id="355" class="Keyword">import</a> <a id="362" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="377" class="Keyword">module</a> <a id="384" href="Armor.Data.X509.TBSCert.Version.Parser.html" class="Module">Armor.Data.X509.TBSCert.Version.Parser</a> <a id="423" class="Keyword">where</a>
+
+<a id="430" class="Keyword">open</a> <a id="435" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="461" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="467" class="Keyword">open</a> <a id="472" href="Armor.Grammar.Parallel.html" class="Module">Armor.Grammar.Parallel</a>    <a id="498" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="504" class="Keyword">open</a> <a id="509" href="Armor.Grammar.Parser.html" class="Module">Armor.Grammar.Parser</a>      <a id="535" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="542" class="Keyword">private</a>
+  <a id="here&#39;"></a><a id="552" href="Armor.Data.X509.TBSCert.Version.Parser.html#552" class="Function">here&#39;</a> <a id="558" class="Symbol">=</a> <a id="560" class="String">&quot;X509: TBSCert: Version&quot;</a>
+
+<a id="parse"></a><a id="586" href="Armor.Data.X509.TBSCert.Version.Parser.html#586" class="Function">parse</a> <a id="592" class="Symbol">:</a> <a id="594" href="Armor.Grammar.Parser.Core.html#844" class="Function">Parser</a> <a id="601" class="Symbol">(</a><a id="602" href="Armor.Prelude.html#14201" class="Record">Logging</a> <a id="610" href="Function.Base.html#1031" class="Function Operator">∘</a> <a id="612" href="Relation.Nullary.html#1511" class="Record">Dec</a><a id="615" class="Symbol">)</a> <a id="617" href="Armor.Data.X509.TBSCert.Version.TCB.html#1500" class="Function">Version</a>
+<a id="625" href="Armor.Data.X509.TBSCert.Version.Parser.html#586" class="Function">parse</a> <a id="631" class="Symbol">=</a>
+  <a id="635" href="Armor.Grammar.Parallel.Parser.html#2210" class="Function">parseSigma</a> <a id="646" href="Armor.Data.X690-DER.TLV.Properties.html#592" class="Function">TLV.nosubstrings</a> <a id="663" href="Armor.Data.X690-DER.Int.Properties.html#966" class="Function">Int.unambiguous</a> <a id="679" class="Symbol">(</a><a id="680" href="Armor.Data.X690-DER.Int.Parser.html#2459" class="Function">Int.parse</a> <a id="690" href="Armor.Data.X509.TBSCert.Version.Parser.html#552" class="Function">here&#39;</a><a id="695" class="Symbol">)</a>
+    <a id="701" class="Symbol">(λ</a> <a id="704" href="Armor.Data.X509.TBSCert.Version.Parser.html#704" class="Bound">i</a> <a id="706" class="Symbol">→</a> <a id="708" href="Armor.Prelude.html#8079" class="Function">erased?</a> <a id="716" class="Symbol">(_</a> <a id="719" href="Armor.Prelude.html#11072" class="Function Operator">∈?</a> <a id="722" class="Symbol">_))</a>
+
+<a id="parse[0]Explicit"></a><a id="727" href="Armor.Data.X509.TBSCert.Version.Parser.html#727" class="Function">parse[0]Explicit</a> <a id="744" class="Symbol">:</a> <a id="746" href="Armor.Grammar.Parser.Core.html#844" class="Function">Parser</a> <a id="753" class="Symbol">(</a><a id="754" href="Armor.Prelude.html#14201" class="Record">Logging</a> <a id="762" href="Function.Base.html#1031" class="Function Operator">∘</a> <a id="764" href="Relation.Nullary.html#1511" class="Record">Dec</a><a id="767" class="Symbol">)</a> <a id="769" href="Armor.Data.X509.TBSCert.Version.TCB.html#2608" class="Function">[0]ExplicitVersion</a>
+<a id="788" href="Armor.Data.X509.TBSCert.Version.Parser.html#727" class="Function">parse[0]Explicit</a> <a id="805" class="Symbol">=</a>
+  <a id="809" href="Armor.Data.X690-DER.TLV.Parser.html#788" class="Function">parseTLV</a> <a id="818" class="Symbol">_</a> <a id="820" href="Armor.Data.X509.TBSCert.Version.Parser.html#552" class="Function">here&#39;</a> <a id="826" class="Symbol">_</a>
+    <a id="832" class="Symbol">(</a><a id="833" href="Armor.Grammar.Parallel.Parser.html#3682" class="Function">parseExactLength</a> <a id="850" href="Armor.Data.X509.TBSCert.Version.Properties.html#795" class="Function">nosubstrings</a> <a id="863" class="Symbol">(</a><a id="864" href="Armor.Prelude.html#14135" class="Field">tell</a> <a id="869" href="Function.Base.html#1919" class="Function Operator">$</a> <a id="871" href="Armor.Data.X509.TBSCert.Version.Parser.html#552" class="Function">here&#39;</a> <a id="877" href="Data.String.Base.html#2366" class="Function Operator">String.++</a> <a id="887" class="String">&quot; (nondefault): length mismatch&quot;</a><a id="919" class="Symbol">)</a>
+      <a id="927" href="Armor.Data.X509.TBSCert.Version.Parser.html#586" class="Function">parse</a><a id="932" class="Symbol">)</a>
+</pre></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Name.RDN.TCB</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X690-DER.SequenceOf.TCB.html" class="Module">Armor.Data.X690-DER.SequenceOf.TCB</a>
+<a id="73" class="Keyword">open</a> <a id="78" class="Keyword">import</a> <a id="85" href="Armor.Data.X690-DER.SetOf.TCB.html" class="Module">Armor.Data.X690-DER.SetOf.TCB</a>
+<a id="115" class="Keyword">open</a> <a id="120" class="Keyword">import</a> <a id="127" href="Armor.Data.X690-DER.TLV.TCB.html" class="Module">Armor.Data.X690-DER.TLV.TCB</a>
+<a id="155" class="Keyword">import</a>      <a id="167" href="Armor.Data.X690-DER.Tag.html" class="Module">Armor.Data.X690-DER.Tag</a> <a id="191" class="Symbol">as</a> <a id="194" class="Module">Tag</a>
+<a id="198" class="Keyword">open</a> <a id="203" class="Keyword">import</a> <a id="210" href="Armor.Data.X509.Name.RDN.ATV.TCB.html" class="Module">Armor.Data.X509.Name.RDN.ATV.TCB</a>
+<a id="243" class="Keyword">import</a>      <a id="255" href="Armor.Grammar.Definitions.NonMalleable.Base.html" class="Module">Armor.Grammar.Definitions.NonMalleable.Base</a>
+<a id="299" class="Keyword">open</a> <a id="304" class="Keyword">import</a> <a id="311" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="326" class="Keyword">module</a> <a id="333" href="Armor.Data.X509.Name.RDN.TCB.html" class="Module">Armor.Data.X509.Name.RDN.TCB</a> <a id="362" class="Keyword">where</a>
+
+<a id="369" class="Keyword">open</a> <a id="374" href="Armor.Grammar.Definitions.NonMalleable.Base.html" class="Module">Armor.Grammar.Definitions.NonMalleable.Base</a> <a id="418" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="425" class="Comment">-- https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.4</a>
+<a id="490" class="Comment">-- Name ::= CHOICE { -- only one possibility for now --</a>
+<a id="546" class="Comment">--   rdnSequence  RDNSequence }</a>
+<a id="578" class="Comment">--</a>
+<a id="581" class="Comment">-- RDNSequence ::= SEQUENCE OF RelativeDistinguishedName</a>
+<a id="638" class="Comment">--</a>
+<a id="641" class="Comment">-- RelativeDistinguishedName ::=</a>
+<a id="674" class="Comment">--   SET SIZE (1..MAX) OF AttributeTypeAndValue</a>
+
+<a id="[_]RDN"></a><a id="723" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">[_]RDN</a> <a id="730" class="Symbol">:</a> <a id="732" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="738" class="Symbol">→</a> <a id="740" class="Symbol">@</a><a id="741" class="Symbol">0</a> <a id="743" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="748" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="754" class="Symbol">→</a> <a id="756" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="760" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">[</a> <a id="762" href="Armor.Data.X509.Name.RDN.TCB.html#762" class="Bound">t</a> <a id="764" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">]RDN</a> <a id="769" class="Symbol">=</a> <a id="771" href="Armor.Data.X690-DER.TLV.TCB.html#534" class="Record">TLV</a> <a id="775" href="Armor.Data.X509.Name.RDN.TCB.html#762" class="Bound">t</a> <a id="777" class="Symbol">(</a><a id="778" href="Armor.Data.X690-DER.SetOf.TCB.html#1227" class="Record">SetOfFields</a> <a id="790" href="Armor.Data.X509.Name.RDN.ATV.TCB.html#2059" class="Function">ATV</a><a id="793" class="Symbol">)</a>
+
+<a id="RDN"></a><a id="796" href="Armor.Data.X509.Name.RDN.TCB.html#796" class="Function">RDN</a> <a id="800" class="Symbol">:</a> <a id="802" class="Symbol">@</a><a id="803" class="Symbol">0</a> <a id="805" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="810" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="816" class="Symbol">→</a> <a id="818" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="822" href="Armor.Data.X509.Name.RDN.TCB.html#796" class="Function">RDN</a> <a id="826" class="Symbol">=</a> <a id="828" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">[</a> <a id="830" href="Armor.Data.X690-DER.Tag.html#810" class="Function">Tag.Sett</a> <a id="839" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">]RDN</a>
+
+<a id="[_]RawRDN"></a><a id="845" href="Armor.Data.X509.Name.RDN.TCB.html#845" class="Function Operator">[_]RawRDN</a> <a id="855" class="Symbol">:</a> <a id="857" class="Symbol">∀</a> <a id="859" href="Armor.Data.X509.Name.RDN.TCB.html#859" class="Bound">t</a> <a id="861" class="Symbol">→</a> <a id="863" href="Armor.Grammar.Definitions.NonMalleable.Base.html#125" class="Record">Raw</a> <a id="867" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">[</a> <a id="869" href="Armor.Data.X509.Name.RDN.TCB.html#859" class="Bound">t</a> <a id="871" href="Armor.Data.X509.Name.RDN.TCB.html#723" class="Function Operator">]RDN</a>
+<a id="876" href="Armor.Data.X509.Name.RDN.TCB.html#845" class="Function Operator">[</a> <a id="878" href="Armor.Data.X509.Name.RDN.TCB.html#878" class="Bound">t</a> <a id="880" href="Armor.Data.X509.Name.RDN.TCB.html#845" class="Function Operator">]RawRDN</a> <a id="888" class="Symbol">=</a> <a id="890" href="Armor.Data.X690-DER.TLV.TCB.html#1272" class="Function">RawTLV</a> <a id="897" href="Armor.Data.X509.Name.RDN.TCB.html#878" class="Bound">t</a> <a id="899" class="Symbol">(</a><a id="900" href="Armor.Data.X690-DER.SetOf.TCB.html#1819" class="Function">RawSetOfFields</a> <a id="915" href="Armor.Data.X509.Name.RDN.ATV.TCB.html#3304" class="Function">RawATV</a><a id="921" class="Symbol">)</a>
+
+<a id="RawRDN"></a><a id="924" href="Armor.Data.X509.Name.RDN.TCB.html#924" class="Function">RawRDN</a> <a id="931" class="Symbol">:</a> <a id="933" href="Armor.Grammar.Definitions.NonMalleable.Base.html#125" class="Record">Raw</a> <a id="937" href="Armor.Data.X509.Name.RDN.TCB.html#796" class="Function">RDN</a>
+<a id="941" href="Armor.Data.X509.Name.RDN.TCB.html#924" class="Function">RawRDN</a> <a id="948" class="Symbol">=</a> <a id="950" href="Armor.Data.X509.Name.RDN.TCB.html#845" class="Function Operator">[</a> <a id="952" href="Armor.Data.X690-DER.Tag.html#810" class="Function">Tag.Sett</a> <a id="961" href="Armor.Data.X509.Name.RDN.TCB.html#845" class="Function Operator">]RawRDN</a>
+
+<a id="RDNSequence"></a><a id="970" href="Armor.Data.X509.Name.RDN.TCB.html#970" class="Function">RDNSequence</a> <a id="982" class="Symbol">:</a> <a id="984" class="Symbol">@</a><a id="985" class="Symbol">0</a> <a id="987" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="992" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="998" class="Symbol">→</a> <a id="1000" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="1004" href="Armor.Data.X509.Name.RDN.TCB.html#970" class="Function">RDNSequence</a> <a id="1016" class="Symbol">=</a> <a id="1018" href="Armor.Data.X690-DER.SequenceOf.TCB.html#1212" class="Function">Seq</a> <a id="1022" href="Armor.Data.X509.Name.RDN.TCB.html#796" class="Function">RDN</a>
+
+<a id="RawRDNSequence"></a><a id="1027" href="Armor.Data.X509.Name.RDN.TCB.html#1027" class="Function">RawRDNSequence</a> <a id="1042" class="Symbol">:</a> <a id="1044" href="Armor.Grammar.Definitions.NonMalleable.Base.html#125" class="Record">Raw</a> <a id="1048" href="Armor.Data.X509.Name.RDN.TCB.html#970" class="Function">RDNSequence</a>
+<a id="1060" href="Armor.Data.X509.Name.RDN.TCB.html#1027" class="Function">RawRDNSequence</a> <a id="1075" class="Symbol">=</a> <a id="1077" href="Armor.Data.X690-DER.TLV.TCB.html#1272" class="Function">RawTLV</a> <a id="1084" class="Symbol">_</a> <a id="1086" class="Symbol">(</a><a id="1087" href="Armor.Data.X690-DER.SequenceOf.TCB.html#1448" class="Function">RawSequenceOf</a> <a id="1101" href="Armor.Data.X509.Name.RDN.TCB.html#924" class="Function">RawRDN</a><a id="1107" class="Symbol">)</a>
+</pre></body></html>

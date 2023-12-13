@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Extension.PM.Eq</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.Extension.PM.Properties.html" class="Module">Armor.Data.X509.Extension.PM.Properties</a>
+<a id="78" class="Keyword">open</a> <a id="83" class="Keyword">import</a> <a id="90" href="Armor.Data.X509.Extension.PM.TCB.html" class="Module">Armor.Data.X509.Extension.PM.TCB</a>
+<a id="123" class="Keyword">open</a> <a id="128" class="Keyword">import</a> <a id="135" href="Armor.Data.X690-DER.OID.html" class="Module">Armor.Data.X690-DER.OID</a>
+<a id="159" class="Keyword">open</a> <a id="164" class="Keyword">import</a> <a id="171" href="Armor.Data.X690-DER.TLV.html" class="Module">Armor.Data.X690-DER.TLV</a>
+<a id="195" class="Keyword">import</a>      <a id="207" href="Armor.Data.X690-DER.Tag.html" class="Module">Armor.Data.X690-DER.Tag</a> <a id="231" class="Symbol">as</a> <a id="234" class="Module">Tag</a>
+<a id="238" class="Keyword">open</a> <a id="243" class="Keyword">import</a> <a id="250" href="Armor.Data.X690-DER.SequenceOf.TCB.html" class="Module">Armor.Data.X690-DER.SequenceOf.TCB</a>
+<a id="285" class="Keyword">import</a>      <a id="297" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="323" class="Keyword">import</a>      <a id="335" href="Armor.Grammar.Seq.html" class="Module">Armor.Grammar.Seq</a>
+<a id="353" class="Keyword">open</a> <a id="358" class="Keyword">import</a> <a id="365" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="380" class="Keyword">module</a> <a id="387" href="Armor.Data.X509.Extension.PM.Eq.html" class="Module">Armor.Data.X509.Extension.PM.Eq</a> <a id="419" class="Keyword">where</a>
+
+<a id="426" class="Keyword">open</a> <a id="431" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="457" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="463" class="Keyword">open</a> <a id="468" href="Armor.Grammar.Seq.html" class="Module">Armor.Grammar.Seq</a>         <a id="494" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="501" class="Keyword">instance</a>
+  <a id="eq≋"></a><a id="512" href="Armor.Data.X509.Extension.PM.Eq.html#512" class="Function">eq≋</a> <a id="516" class="Symbol">:</a> <a id="518" href="Armor.Grammar.Definitions.Eq.html#1243" class="Record">Eq≋</a> <a id="522" href="Armor.Data.X509.Extension.PM.TCB.html#734" class="Record">PolicyMapFields</a>
+  <a id="540" href="Armor.Data.X509.Extension.PM.Eq.html#512" class="Function">eq≋</a> <a id="544" class="Symbol">=</a> <a id="546" href="Armor.Grammar.Definitions.Iso.Properties.html#4464" class="Function">Iso.isoEq≋</a> <a id="557" href="Armor.Data.X509.Extension.PM.Properties.html#453" class="Function">iso</a> <a id="561" class="Symbol">(</a><a id="562" href="Armor.Grammar.Seq.Properties.html#17035" class="Function">Seq.eq≋&amp;ₚ</a> <a id="572" href="Armor.Prelude.html#3275" class="Function">it</a> <a id="575" href="Armor.Prelude.html#3275" class="Function">it</a><a id="577" class="Symbol">)</a>
+</pre></body></html>

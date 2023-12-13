@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Semantic.Cert</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.html" class="Module">Armor.Data.X509</a>
+<a id="54" class="Keyword">import</a>      <a id="66" href="Armor.Data.X509.Extension.TCB.OIDs.html" class="Module">Armor.Data.X509.Extension.TCB.OIDs</a> <a id="101" class="Symbol">as</a> <a id="104" class="Module">OIDs</a>
+<a id="109" class="Keyword">open</a> <a id="114" class="Keyword">import</a> <a id="121" href="Armor.Data.X509.Semantic.Cert.Utils.html" class="Module">Armor.Data.X509.Semantic.Cert.Utils</a>
+<a id="157" class="Keyword">import</a>      <a id="169" href="Armor.Data.X509.Semantic.Cert.SCP1.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP1</a> <a id="204" class="Symbol">as</a> <a id="207" class="Module">SCP1</a>
+<a id="212" class="Keyword">import</a>      <a id="224" href="Armor.Data.X509.Semantic.Cert.SCP2.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP2</a> <a id="259" class="Symbol">as</a> <a id="262" class="Module">SCP2</a>
+<a id="267" class="Comment">-- import      Armor.Data.X509.Semantic.Cert.SCP3 as SCP3</a>
+<a id="325" class="Keyword">import</a>      <a id="337" href="Armor.Data.X509.Semantic.Cert.SCP4.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP4</a> <a id="372" class="Symbol">as</a> <a id="375" class="Module">SCP4</a>
+<a id="380" class="Keyword">import</a>      <a id="392" href="Armor.Data.X509.Semantic.Cert.SCP5.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP5</a> <a id="427" class="Symbol">as</a> <a id="430" class="Module">SCP5</a>
+<a id="435" class="Keyword">import</a>      <a id="447" href="Armor.Data.X509.Semantic.Cert.SCP6.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP6</a> <a id="482" class="Symbol">as</a> <a id="485" class="Module">SCP6</a>
+<a id="490" class="Keyword">import</a>      <a id="502" href="Armor.Data.X509.Semantic.Cert.SCP7.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP7</a> <a id="537" class="Symbol">as</a> <a id="540" class="Module">SCP7</a>
+<a id="545" class="Keyword">import</a>      <a id="557" href="Armor.Data.X509.Semantic.Cert.SCP8.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP8</a> <a id="592" class="Symbol">as</a> <a id="595" class="Module">SCP8</a>
+<a id="600" class="Keyword">import</a>      <a id="612" href="Armor.Data.X509.Semantic.Cert.SCP9.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP9</a> <a id="647" class="Symbol">as</a> <a id="650" class="Module">SCP9</a>
+<a id="655" class="Keyword">import</a>      <a id="667" href="Armor.Data.X509.Semantic.Cert.SCP10.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP10</a> <a id="703" class="Symbol">as</a> <a id="706" class="Module">SCP10</a>
+<a id="712" class="Keyword">import</a>      <a id="724" href="Armor.Data.X509.Semantic.Cert.SCP11.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP11</a> <a id="760" class="Symbol">as</a> <a id="763" class="Module">SCP11</a>
+<a id="769" class="Keyword">import</a>      <a id="781" href="Armor.Data.X509.Semantic.Cert.SCP12.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP12</a> <a id="817" class="Symbol">as</a> <a id="820" class="Module">SCP12</a>
+<a id="826" class="Keyword">import</a>      <a id="838" href="Armor.Data.X509.Semantic.Cert.SCP13.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP13</a> <a id="874" class="Symbol">as</a> <a id="877" class="Module">SCP13</a>
+<a id="883" class="Keyword">import</a>      <a id="895" href="Armor.Data.X509.Semantic.Cert.SCP14.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP14</a> <a id="931" class="Symbol">as</a> <a id="934" class="Module">SCP14</a>
+<a id="940" class="Keyword">import</a>      <a id="952" href="Armor.Data.X509.Semantic.Cert.SCP15.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP15</a> <a id="988" class="Symbol">as</a> <a id="991" class="Module">SCP15</a>
+<a id="997" class="Keyword">import</a>      <a id="1009" href="Armor.Data.X509.Semantic.Cert.SCP16.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP16</a> <a id="1045" class="Symbol">as</a> <a id="1048" class="Module">SCP16</a>
+<a id="1054" class="Keyword">import</a>      <a id="1066" href="Armor.Data.X509.Semantic.Cert.SCP17.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP17</a> <a id="1102" class="Symbol">as</a> <a id="1105" class="Module">SCP17</a>
+<a id="1111" class="Keyword">import</a>      <a id="1123" href="Armor.Data.X509.Semantic.Cert.SCP18.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP18</a> <a id="1159" class="Symbol">as</a> <a id="1162" class="Module">SCP18</a>
+<a id="1168" class="Keyword">import</a>      <a id="1180" href="Armor.Data.X509.Semantic.Cert.SCP19.html" class="Module">Armor.Data.X509.Semantic.Cert.SCP19</a> <a id="1216" class="Symbol">as</a> <a id="1219" class="Module">SCP19</a>
+<a id="1225" class="Keyword">import</a>      <a id="1237" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="1263" class="Keyword">import</a>      <a id="1275" href="Armor.Grammar.Option.html" class="Module">Armor.Grammar.Option</a>
+<a id="1296" class="Keyword">open</a> <a id="1301" class="Keyword">import</a> <a id="1308" href="Armor.Grammar.IList.html" class="Module">Armor.Grammar.IList</a> <a id="1328" class="Symbol">as</a> <a id="1331" class="Module">IList</a>
+<a id="1337" class="Keyword">open</a> <a id="1342" class="Keyword">import</a> <a id="1349" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="1364" class="Keyword">module</a> <a id="1371" href="Armor.Data.X509.Semantic.Cert.html" class="Module">Armor.Data.X509.Semantic.Cert</a> <a id="1401" class="Keyword">where</a>
+
+<a id="1408" class="Keyword">open</a> <a id="1413" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="1439" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="1445" class="Keyword">open</a> <a id="1450" href="Armor.Grammar.Option.html" class="Module">Armor.Grammar.Option</a>      <a id="1476" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="1483" class="Comment">---------------------- SCP rules -----------------</a>
+
+<a id="1535" class="Comment">-- SignatureAlgorithm field MUST contain the same algorithm identifier as</a>
+<a id="1609" class="Comment">-- the Signature field in the sequence TbsCertificate.</a>
+<a id="1664" class="Keyword">open</a> <a id="1669" href="Armor.Data.X509.Semantic.Cert.SCP1.html" class="Module">SCP1</a> <a id="1674" class="Keyword">public</a>
+
+<a id="1682" class="Comment">-- Extension field MUST only appear if the Version is 3(2).</a>
+<a id="1742" class="Keyword">open</a> <a id="1747" href="Armor.Data.X509.Semantic.Cert.SCP2.html" class="Module">SCP2</a> <a id="1752" class="Keyword">public</a>
+
+<a id="1760" class="Comment">-- At a minimum, conforming implementations MUST recognize Version 3 certificates.</a>
+<a id="1843" class="Comment">-- Generation of Version 2 certificates is not expected by implementations based on this profile.</a>
+<a id="1941" class="Comment">-- note : but, version 1 and 2 certs can be present for CA certificates. So, we are checking whether</a>
+<a id="2042" class="Comment">-- the version is 1, 2, or 3 (0 - 2).</a>
+<a id="2080" class="Comment">-- open SCP3 public</a>
+
+<a id="2101" class="Comment">-- The Serial number MUST be a positive integer assigned by the CA to each certificate.</a>
+<a id="2189" class="Keyword">open</a> <a id="2194" href="Armor.Data.X509.Semantic.Cert.SCP4.html" class="Module">SCP4</a> <a id="2199" class="Keyword">public</a>
+
+<a id="2207" class="Comment">-- The Issuer field MUST contain a non-empty distinguished name (DN).</a>
+<a id="2277" class="Comment">-- TODO : fix the parser to enforce set length to minimum 1</a>
+<a id="2337" class="Keyword">open</a> <a id="2342" href="Armor.Data.X509.Semantic.Cert.SCP5.html" class="Module">SCP5</a> <a id="2347" class="Keyword">public</a>
+
+
+<a id="2356" class="Comment">-- If the Subject is a CA (e.g., the Basic Constraints extension, is present and the value of CA is TRUE),</a>
+<a id="2463" class="Comment">-- then the Subject field MUST be populated with a non-empty distinguished name.</a>
+<a id="2544" class="Keyword">open</a> <a id="2549" href="Armor.Data.X509.Semantic.Cert.SCP6.html" class="Module">SCP6</a> <a id="2554" class="Keyword">public</a>
+
+<a id="2562" class="Comment">-- -- Unique Identifiers fields MUST only appear if the Version is 2 or 3.</a>
+<a id="2637" class="Keyword">open</a> <a id="2642" href="Armor.Data.X509.Semantic.Cert.SCP7.html" class="Module">SCP7</a> <a id="2647" class="Keyword">public</a>
+
+
+<a id="2656" class="Comment">-- -- Where it appears, the PathLenConstraint field MUST be greater than or equal to zero.</a>
+<a id="2747" class="Keyword">open</a> <a id="2752" href="Armor.Data.X509.Semantic.Cert.SCP8.html" class="Module">SCP8</a> <a id="2757" class="Keyword">public</a>
+
+<a id="2765" class="Comment">-- if the Subject is a CRL issuer (e.g., the Key Usage extension, is present and the value of CRLSign is TRUE),</a>
+<a id="2877" class="Comment">-- then the Subject field MUST be populated with a non-empty distinguished name.</a>
+<a id="2958" class="Keyword">open</a> <a id="2963" href="Armor.Data.X509.Semantic.Cert.SCP9.html" class="Module">SCP9</a> <a id="2968" class="Keyword">public</a>
+
+<a id="2976" class="Comment">-- When the Key Usage extension appears in a certificate, at least one of the bits MUST be set to 1.</a>
+<a id="3077" class="Keyword">open</a> <a id="3082" href="Armor.Data.X509.Semantic.Cert.SCP10.html" class="Module">SCP10</a> <a id="3088" class="Keyword">public</a>
+
+<a id="3096" class="Comment">-- If subject naming information is present only in the Subject Alternative Name extension ,</a>
+<a id="3189" class="Comment">-- then the Subject name MUST be an empty sequence and the Subject Alternative Name extension MUST be critical.</a>
+<a id="3301" class="Comment">-- If the subject field contains an empty sequence, then the issuing CA MUST include a</a>
+<a id="3388" class="Comment">-- subjectAltName extension that is marked as critical.</a>
+<a id="3444" class="Keyword">open</a> <a id="3449" href="Armor.Data.X509.Semantic.Cert.SCP11.html" class="Module">SCP11</a> <a id="3455" class="Keyword">public</a>
+
+<a id="3463" class="Comment">-- If the Subject Alternative Name extension is present, the sequence MUST contain at least one entry.</a>
+<a id="3566" class="Keyword">open</a> <a id="3571" href="Armor.Data.X509.Semantic.Cert.SCP12.html" class="Module">SCP12</a> <a id="3577" class="Keyword">public</a>
+
+<a id="3585" class="Comment">-- If the KeyCertSign bit is asserted, then the CA bit in the Basic Constraints extension MUST also be asserted.</a>
+<a id="3698" class="Keyword">open</a> <a id="3703" href="Armor.Data.X509.Semantic.Cert.SCP13.html" class="Module">SCP13</a> <a id="3709" class="Keyword">public</a>
+
+<a id="3717" class="Comment">-- A certificate MUST NOT include more than one instance of a particular Extension.</a>
+<a id="3801" class="Keyword">open</a> <a id="3806" href="Armor.Data.X509.Semantic.Cert.SCP14.html" class="Module">SCP14</a> <a id="3812" class="Keyword">public</a>
+
+<a id="3820" class="Comment">-- A certificate-using system MUST reject the certificate if it encounters a critical Extension</a>
+<a id="3916" class="Comment">-- it does not recognize or a critical Extension that contains information that it cannot process.</a>
+<a id="4015" class="Keyword">open</a> <a id="4020" href="Armor.Data.X509.Semantic.Cert.SCP15.html" class="Module">SCP15</a> <a id="4026" class="Keyword">public</a>
+
+<a id="4034" class="Comment">-- A certificate policy OID MUST NOT appear more than once in a Certificate Policies extension.</a>
+<a id="4130" class="Keyword">open</a> <a id="4135" href="Armor.Data.X509.Semantic.Cert.SCP16.html" class="Module">SCP16</a> <a id="4141" class="Keyword">public</a>
+
+<a id="4149" class="Comment">-- While each of these fields is optional, a DistributionPoint MUST NOT consist of only the Reasons field;</a>
+<a id="4256" class="Comment">-- either distributionPoint or CRLIssuer MUST be present.</a>
+<a id="4314" class="Keyword">open</a> <a id="4319" href="Armor.Data.X509.Semantic.Cert.SCP17.html" class="Module">SCP17</a> <a id="4325" class="Keyword">public</a>
+
+<a id="4333" class="Comment">-- The certificate Validity period includes the current time</a>
+<a id="4394" class="Keyword">open</a> <a id="4399" href="Armor.Data.X509.Semantic.Cert.SCP18.html" class="Module">SCP18</a> <a id="4405" class="Keyword">public</a>
+
+<a id="4413" class="Comment">--- consistency of certificate purposes based on key usage bits and extended key usage OIDs</a>
+<a id="4505" class="Keyword">open</a> <a id="4510" href="Armor.Data.X509.Semantic.Cert.SCP19.html" class="Module">SCP19</a> <a id="4516" class="Keyword">public</a>
+</pre></body></html>

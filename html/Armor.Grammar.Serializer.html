@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Grammar.Serializer</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">import</a>      <a id="13" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="39" class="Keyword">open</a> <a id="44" class="Keyword">import</a> <a id="51" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="66" class="Keyword">module</a> <a id="73" href="Armor.Grammar.Serializer.html" class="Module">Armor.Grammar.Serializer</a> <a id="98" class="Symbol">(</a><a id="99" href="Armor.Grammar.Serializer.html#99" class="Bound">Σ</a> <a id="101" class="Symbol">:</a> <a id="103" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="106" class="Symbol">)</a> <a id="108" class="Keyword">where</a>
+
+<a id="Serializer"></a><a id="115" href="Armor.Grammar.Serializer.html#115" class="Function">Serializer</a> <a id="126" class="Symbol">:</a> <a id="128" class="Symbol">(</a><a id="129" href="Armor.Grammar.Serializer.html#129" class="Bound">A</a> <a id="131" class="Symbol">:</a> <a id="133" class="Symbol">@</a><a id="134" class="Symbol">0</a> <a id="136" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="141" href="Armor.Grammar.Serializer.html#99" class="Bound">Σ</a> <a id="143" class="Symbol">→</a> <a id="145" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="148" class="Symbol">)</a> <a id="150" class="Symbol">→</a> <a id="152" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="156" href="Armor.Grammar.Serializer.html#115" class="Function">Serializer</a> <a id="167" href="Armor.Grammar.Serializer.html#167" class="Bound">A</a> <a id="169" class="Symbol">=</a> <a id="171" class="Symbol">∀</a> <a id="173" class="Symbol">{@</a><a id="175" class="Symbol">0</a> <a id="177" href="Armor.Grammar.Serializer.html#177" class="Bound">bs</a><a id="179" class="Symbol">}</a> <a id="181" class="Symbol">→</a> <a id="183" href="Armor.Grammar.Serializer.html#167" class="Bound">A</a> <a id="185" href="Armor.Grammar.Serializer.html#177" class="Bound">bs</a> <a id="188" class="Symbol">→</a> <a id="190" href="Armor.Prelude.html#7068" class="Record">Singleton</a> <a id="200" href="Armor.Grammar.Serializer.html#177" class="Bound">bs</a>
+
+<a id="204" class="Keyword">open</a> <a id="209" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="235" href="Armor.Grammar.Serializer.html#99" class="Bound">Σ</a>
+
+<a id="238" class="Comment">-- serializeEquivalent : ∀ {@0 A B} → Equivalent A B → Serializer A → Serializer B</a>
+<a id="321" class="Comment">-- serializeEquivalent (fst , snd) sa b = sa (snd b)</a>
+
+<a id="375" class="Comment">-- serialize&amp;ₚ : ∀ {@0 A B} → Serializer A → Serializer B → Serializer (&amp;ₚ A B)</a>
+<a id="455" class="Comment">-- Singleton.x (serialize&amp;ₚ sa sb  (mk&amp;ₚ fstₚ₁ sndₚ₁ bs≡)) =</a>
+<a id="516" class="Comment">--   Singleton.x (sa fstₚ₁) ++ Singleton.x (sb sndₚ₁)</a>
+<a id="570" class="Comment">-- Singleton.x≡ (serialize&amp;ₚ sa sb (mk&amp;ₚ{bs₁}{bs₂} fstₚ₁ sndₚ₁ bs≡)) =</a>
+<a id="641" class="Comment">--   begin Singleton.x (sa fstₚ₁) ++ Singleton.x (sb sndₚ₁)</a>
+<a id="701" class="Comment">--           ≡⟨ cong₂ _++_ (Singleton.x≡ (sa fstₚ₁)) (Singleton.x≡ (sb sndₚ₁)) ⟩</a>
+<a id="782" class="Comment">--         bs₁ ++ bs₂</a>
+<a id="804" class="Comment">--           ≡⟨ sym bs≡ ⟩</a>
+<a id="830" class="Comment">--         _ ∎</a>
+<a id="845" class="Comment">--   where</a>
+<a id="856" class="Comment">--   open import Relation.Binary.PropositionalEquality</a>
+<a id="911" class="Comment">--   open ≡-Reasoning</a>
+</pre></body></html>

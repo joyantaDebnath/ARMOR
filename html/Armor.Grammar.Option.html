@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Grammar.Option</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">import</a>      <a id="13" href="Armor.Grammar.Serializer.html" class="Module">Armor.Grammar.Serializer</a>
+<a id="38" class="Keyword">import</a>      <a id="50" href="Armor.Grammar.Option.Parser.html" class="Module">Armor.Grammar.Option.Parser</a>
+<a id="78" class="Keyword">import</a>      <a id="90" href="Armor.Grammar.Option.Properties.html" class="Module">Armor.Grammar.Option.Properties</a>
+<a id="122" class="Keyword">import</a>      <a id="134" href="Armor.Grammar.Option.TCB.html" class="Module">Armor.Grammar.Option.TCB</a>
+<a id="159" class="Keyword">open</a> <a id="164" class="Keyword">import</a> <a id="171" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="186" class="Keyword">module</a> <a id="193" href="Armor.Grammar.Option.html" class="Module">Armor.Grammar.Option</a> <a id="214" class="Symbol">(</a><a id="215" href="Armor.Grammar.Option.html#215" class="Bound">Σ</a> <a id="217" class="Symbol">:</a> <a id="219" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="222" class="Symbol">)</a> <a id="224" class="Keyword">where</a>
+
+<a id="231" class="Keyword">open</a> <a id="236" href="Armor.Grammar.Serializer.html" class="Module">Armor.Grammar.Serializer</a>  <a id="262" href="Armor.Grammar.Option.html#215" class="Bound">Σ</a>
+
+<a id="265" class="Keyword">open</a> <a id="270" href="Armor.Grammar.Option.TCB.html" class="Module">Armor.Grammar.Option.TCB</a> <a id="295" href="Armor.Grammar.Option.html#215" class="Bound">Σ</a>
+  <a id="299" class="Keyword">public</a>
+  <a id="308" class="Keyword">hiding</a> <a id="315" class="Symbol">(</a><a id="316" class="Keyword">module</a> <a id="323" href="Armor.Grammar.Option.TCB.html#175" class="Module">Option</a><a id="329" class="Symbol">)</a>
+
+<a id="332" class="Keyword">module</a> <a id="Option"></a><a id="339" href="Armor.Grammar.Option.html#339" class="Module">Option</a> <a id="346" class="Keyword">where</a>
+  <a id="354" class="Keyword">open</a> <a id="359" class="Keyword">import</a> <a id="366" href="Armor.Grammar.Option.Parser.html" class="Module">Armor.Grammar.Option.Parser</a> <a id="394" href="Armor.Grammar.Option.html#215" class="Bound">Σ</a> <a id="396" class="Keyword">public</a>
+  <a id="405" class="Keyword">open</a> <a id="410" class="Keyword">import</a> <a id="417" href="Armor.Grammar.Option.Properties.html" class="Module">Armor.Grammar.Option.Properties</a> <a id="449" href="Armor.Grammar.Option.html#215" class="Bound">Σ</a> <a id="451" class="Keyword">public</a>
+
+  <a id="Option.serialize"></a><a id="461" href="Armor.Grammar.Option.html#461" class="Function">serialize</a> <a id="471" class="Symbol">:</a> <a id="473" class="Symbol">∀</a> <a id="475" class="Symbol">{@</a><a id="477" class="Number">0</a> <a id="479" href="Armor.Grammar.Option.html#479" class="Bound">A</a><a id="480" class="Symbol">}</a> <a id="482" class="Symbol">→</a> <a id="484" href="Armor.Grammar.Serializer.html#115" class="Function">Serializer</a> <a id="495" href="Armor.Grammar.Option.html#479" class="Bound">A</a> <a id="497" class="Symbol">→</a> <a id="499" href="Armor.Grammar.Serializer.html#115" class="Function">Serializer</a> <a id="510" class="Symbol">(</a><a id="511" href="Armor.Grammar.Option.TCB.html#175" class="Datatype">Option</a> <a id="518" href="Armor.Grammar.Option.html#479" class="Bound">A</a><a id="519" class="Symbol">)</a>
+  <a id="523" href="Armor.Grammar.Option.html#461" class="Function">serialize</a> <a id="533" href="Armor.Grammar.Option.html#533" class="Bound">s</a> <a id="535" href="Armor.Grammar.Option.TCB.html#235" class="InductiveConstructor">none</a> <a id="540" class="Symbol">=</a> <a id="542" href="Armor.Prelude.html#7209" class="InductiveConstructor">self</a>
+  <a id="549" href="Armor.Grammar.Option.html#461" class="Function">serialize</a> <a id="559" href="Armor.Grammar.Option.html#559" class="Bound">s</a> <a id="561" class="Symbol">(</a><a id="562" href="Armor.Grammar.Option.TCB.html#255" class="InductiveConstructor">some</a> <a id="567" href="Armor.Grammar.Option.html#567" class="Bound">x</a><a id="568" class="Symbol">)</a> <a id="570" class="Symbol">=</a> <a id="572" href="Armor.Grammar.Option.html#559" class="Bound">s</a> <a id="574" href="Armor.Grammar.Option.html#567" class="Bound">x</a>
+</pre></body></html>

@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X690-DER.Strings.BMPString.TCB</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.Unicode.UTF16.TCB.html" class="Module">Armor.Data.Unicode.UTF16.TCB</a>
+<a id="67" class="Keyword">open</a> <a id="72" class="Keyword">import</a> <a id="79" href="Armor.Data.X690-DER.TLV.TCB.html" class="Module">Armor.Data.X690-DER.TLV.TCB</a>
+<a id="107" class="Keyword">import</a>      <a id="119" href="Armor.Data.X690-DER.Tag.html" class="Module">Armor.Data.X690-DER.Tag</a> <a id="143" class="Symbol">as</a> <a id="146" class="Module">Tag</a>
+<a id="150" class="Keyword">import</a>      <a id="162" href="Armor.Grammar.Definitions.NonMalleable.html" class="Module">Armor.Grammar.Definitions.NonMalleable</a>
+<a id="201" class="Keyword">import</a>      <a id="213" href="Armor.Grammar.IList.TCB.html" class="Module">Armor.Grammar.IList.TCB</a>
+<a id="237" class="Keyword">import</a>      <a id="249" href="Armor.Grammar.Sum.TCB.html" class="Module">Armor.Grammar.Sum.TCB</a>
+<a id="271" class="Keyword">open</a> <a id="276" class="Keyword">import</a> <a id="283" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="298" class="Keyword">module</a> <a id="305" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html" class="Module">Armor.Data.X690-DER.Strings.BMPString.TCB</a> <a id="347" class="Keyword">where</a>
+
+<a id="354" class="Keyword">open</a> <a id="359" href="Armor.Grammar.IList.TCB.html" class="Module">Armor.Grammar.IList.TCB</a> <a id="383" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="389" class="Keyword">open</a> <a id="394" href="Armor.Grammar.Definitions.NonMalleable.html" class="Module">Armor.Grammar.Definitions.NonMalleable</a> <a id="433" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="BMPString"></a><a id="440" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#440" class="Function">BMPString</a> <a id="450" class="Symbol">:</a> <a id="452" class="Symbol">@</a><a id="453" class="Symbol">0</a> <a id="455" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="460" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="466" class="Symbol">→</a> <a id="468" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="472" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#440" class="Function">BMPString</a> <a id="482" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#482" class="Bound">xs</a> <a id="485" class="Symbol">=</a> <a id="487" href="Armor.Data.X690-DER.TLV.TCB.html#534" class="Record">TLV</a> <a id="491" href="Armor.Data.X690-DER.Tag.html#740" class="Function">Tag.BMPString</a> <a id="505" href="Armor.Data.Unicode.UTF16.TCB.html#616" class="Function">BMP</a> <a id="509" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#482" class="Bound">xs</a>
+
+<a id="RawBMPString"></a><a id="513" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#513" class="Function">RawBMPString</a> <a id="526" class="Symbol">:</a> <a id="528" href="Armor.Grammar.Definitions.NonMalleable.Base.html#125" class="Record">Raw</a> <a id="532" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#440" class="Function">BMPString</a> 
+<a id="543" href="Armor.Data.X690-DER.Strings.BMPString.TCB.html#513" class="Function">RawBMPString</a> <a id="556" class="Symbol">=</a> <a id="558" href="Armor.Data.X690-DER.TLV.TCB.html#1272" class="Function">RawTLV</a> <a id="565" class="Symbol">_</a> <a id="567" href="Armor.Data.Unicode.UTF16.TCB.html#663" class="Function">RawBMP</a>
+</pre></body></html>

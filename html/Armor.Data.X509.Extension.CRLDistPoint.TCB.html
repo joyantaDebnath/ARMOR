@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Extension.CRLDistPoint.TCB</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.GeneralNames.TCB.html" class="Module">Armor.Data.X509.GeneralNames.TCB</a>
+<a id="71" class="Keyword">open</a> <a id="76" class="Keyword">import</a> <a id="83" href="Armor.Data.X509.Extension.CRLDistPoint.DistPoint.TCB.html" class="Module">Armor.Data.X509.Extension.CRLDistPoint.DistPoint.TCB</a>
+<a id="136" class="Keyword">open</a> <a id="141" class="Keyword">import</a> <a id="148" href="Armor.Data.X690-DER.SequenceOf.TCB.html" class="Module">Armor.Data.X690-DER.SequenceOf.TCB</a>
+<a id="183" class="Keyword">open</a> <a id="188" class="Keyword">import</a> <a id="195" href="Armor.Data.X690-DER.TLV.TCB.html" class="Module">Armor.Data.X690-DER.TLV.TCB</a>
+<a id="223" class="Keyword">import</a>      <a id="235" href="Armor.Data.X690-DER.Tag.html" class="Module">Armor.Data.X690-DER.Tag</a> <a id="259" class="Symbol">as</a> <a id="262" class="Module">Tag</a>
+<a id="266" class="Keyword">import</a>      <a id="278" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="304" class="Keyword">open</a> <a id="309" class="Keyword">import</a> <a id="316" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="331" class="Keyword">module</a> <a id="338" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html" class="Module">Armor.Data.X509.Extension.CRLDistPoint.TCB</a> <a id="381" class="Keyword">where</a>
+
+<a id="388" class="Keyword">open</a> <a id="393" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="419" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="426" class="Comment">-- https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.13</a>
+<a id="492" class="Comment">--    id-ce-cRLDistributionPoints OBJECT IDENTIFIER ::=  { id-ce 31 }</a>
+
+<a id="563" class="Comment">--    CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint</a>
+
+<a id="640" class="Comment">--    DistributionPoint ::= SEQUENCE {</a>
+<a id="679" class="Comment">--         distributionPoint       [0]     DistributionPointName OPTIONAL,</a>
+<a id="754" class="Comment">--         reasons                 [1]     ReasonFlags OPTIONAL,</a>
+<a id="819" class="Comment">--         cRLIssuer               [2]     GeneralNames OPTIONAL }</a>
+
+<a id="887" class="Comment">--    DistributionPointName ::= CHOICE {</a>
+<a id="928" class="Comment">--         fullName                [0]     GeneralNames,</a>
+<a id="985" class="Comment">--         nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }</a>
+
+<a id="1057" class="Comment">--    ReasonFlags ::= BIT STRING {</a>
+<a id="1092" class="Comment">--         unused                  (0),</a>
+<a id="1132" class="Comment">--         keyCompromise           (1),</a>
+<a id="1172" class="Comment">--         cACompromise            (2),</a>
+<a id="1212" class="Comment">--         affiliationChanged      (3),</a>
+<a id="1252" class="Comment">--         superseded              (4),</a>
+<a id="1292" class="Comment">--         cessationOfOperation    (5),</a>
+<a id="1332" class="Comment">--         certificateHold         (6),</a>
+<a id="1372" class="Comment">--         privilegeWithdrawn      (7),</a>
+<a id="1412" class="Comment">--         aACompromise            (8) }</a>
+        
+<a id="CRLDistFieldsSeq"></a><a id="1462" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1462" class="Function">CRLDistFieldsSeq</a> <a id="1479" class="Symbol">:</a> <a id="1481" class="Symbol">@</a><a id="1482" class="Symbol">0</a> <a id="1484" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1489" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="1495" class="Symbol">→</a> <a id="1497" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="1501" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1462" class="Function">CRLDistFieldsSeq</a> <a id="1518" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1518" class="Bound">xs</a> <a id="1521" class="Symbol">=</a> <a id="1523" href="Armor.Data.X690-DER.TLV.TCB.html#534" class="Record">TLV</a> <a id="1527" href="Armor.Data.X690-DER.Tag.html#776" class="Function">Tag.Sequence</a> <a id="1540" class="Symbol">(</a><a id="1541" href="Armor.Data.X690-DER.SequenceOf.TCB.html#1176" class="Function">NonEmptySequenceOf</a> <a id="1560" href="Armor.Data.X509.Extension.CRLDistPoint.DistPoint.TCB.html#1013" class="Function">DistPoint</a><a id="1569" class="Symbol">)</a> <a id="1571" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1518" class="Bound">xs</a>
+
+<a id="CRLDistFields"></a><a id="1575" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1575" class="Function">CRLDistFields</a> <a id="1589" class="Symbol">:</a> <a id="1591" class="Symbol">@</a><a id="1592" class="Symbol">0</a> <a id="1594" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1599" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="1605" class="Symbol">→</a> <a id="1607" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="1611" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1575" class="Function">CRLDistFields</a> <a id="1625" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1625" class="Bound">xs</a> <a id="1628" class="Symbol">=</a> <a id="1630" href="Armor.Data.X690-DER.TLV.TCB.html#534" class="Record">TLV</a> <a id="1634" href="Armor.Data.X690-DER.Tag.html#229" class="Function">Tag.OctetString</a>  <a id="1651" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1462" class="Function">CRLDistFieldsSeq</a> <a id="1668" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1625" class="Bound">xs</a>
+
+<a id="RawCRLDistFields"></a><a id="1672" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1672" class="Function">RawCRLDistFields</a> <a id="1689" class="Symbol">:</a> <a id="1691" href="Armor.Grammar.Definitions.NonMalleable.Base.html#125" class="Record">Raw</a> <a id="1695" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1575" class="Function">CRLDistFields</a>
+<a id="1709" href="Armor.Data.X509.Extension.CRLDistPoint.TCB.html#1672" class="Function">RawCRLDistFields</a> <a id="1726" class="Symbol">=</a> <a id="1728" href="Armor.Data.X690-DER.TLV.TCB.html#1272" class="Function">RawTLV</a> <a id="1735" class="Symbol">_</a> <a id="1737" class="Symbol">(</a><a id="1738" href="Armor.Data.X690-DER.TLV.TCB.html#1272" class="Function">RawTLV</a> <a id="1745" class="Symbol">_</a> <a id="1747" class="Symbol">(</a><a id="1748" href="Armor.Data.X690-DER.SequenceOf.TCB.html#1645" class="Function">RawBoundedSequenceOf</a> <a id="1769" href="Armor.Data.X509.Extension.CRLDistPoint.DistPoint.TCB.html#1886" class="Function">RawDistPoint</a> <a id="1782" class="Number">1</a><a id="1783" class="Symbol">))</a>
+</pre></body></html>

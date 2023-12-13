@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X690-DER.Strings.TeletexString.Properties</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X690-DER.Strings.TeletexString.TCB.html" class="Module">Armor.Data.X690-DER.Strings.TeletexString.TCB</a>
+<a id="84" class="Keyword">import</a>      <a id="96" href="Armor.Data.X690-DER.TLV.Properties.html" class="Module">Armor.Data.X690-DER.TLV.Properties</a> <a id="131" class="Symbol">as</a> <a id="134" class="Module">TLV</a>
+<a id="138" class="Keyword">import</a>      <a id="150" href="Armor.Grammar.Definitions.NonMalleable.Base.html" class="Module">Armor.Grammar.Definitions.NonMalleable.Base</a>
+<a id="194" class="Keyword">import</a>      <a id="206" href="Armor.Data.X690-DER.OctetString.Properties.html" class="Module">Armor.Data.X690-DER.OctetString.Properties</a> <a id="249" class="Symbol">as</a> <a id="252" class="Module">OctetString</a>
+<a id="264" class="Keyword">open</a> <a id="269" class="Keyword">import</a> <a id="276" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="291" class="Keyword">module</a> <a id="298" href="Armor.Data.X690-DER.Strings.TeletexString.Properties.html" class="Module">Armor.Data.X690-DER.Strings.TeletexString.Properties</a> <a id="351" class="Keyword">where</a>
+
+<a id="358" class="Keyword">open</a> <a id="363" href="Armor.Grammar.Definitions.NonMalleable.Base.html" class="Module">Armor.Grammar.Definitions.NonMalleable.Base</a> <a id="407" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="414" class="Symbol">@</a><a id="415" class="Symbol">0</a> <a id="nonmalleable"></a><a id="417" href="Armor.Data.X690-DER.Strings.TeletexString.Properties.html#417" class="Function">nonmalleable</a> <a id="430" class="Symbol">:</a> <a id="432" href="Armor.Grammar.Definitions.NonMalleable.Base.html#669" class="Function">NonMalleable</a> <a id="445" href="Armor.Data.X690-DER.Strings.TeletexString.TCB.html#438" class="Function">RawTeletexString</a>
+<a id="462" href="Armor.Data.X690-DER.Strings.TeletexString.Properties.html#417" class="Function">nonmalleable</a> <a id="475" class="Symbol">=</a> <a id="477" href="Armor.Data.X690-DER.TLV.Properties.html#6791" class="Function">TLV.nonmalleable</a> <a id="494" href="Armor.Data.X690-DER.OctetString.Properties.html#490" class="Function">OctetString.nonmalleableValue</a>
+</pre></body></html>

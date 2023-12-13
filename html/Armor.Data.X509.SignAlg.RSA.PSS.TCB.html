@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.SignAlg.RSA.PSS.TCB</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Comment">-- open import Armor.Binary</a>
+<a id="29" class="Comment">-- import      Armor.Data.X509.HashAlg.RFC4055.TCB     as RFC4055</a>
+<a id="95" class="Comment">-- import      Armor.Data.X509.HashAlg.TCB.OIDs        as OIDs</a>
+<a id="158" class="Comment">-- import      Armor.Data.X509.MaskGenAlg.RFC4055.TCB  as RFC4055</a>
+<a id="224" class="Comment">-- import      Armor.Data.X509.SignAlg.TCB.OIDs        as OIDs</a>
+<a id="287" class="Comment">-- open import Armor.Data.X690-DER.Int.TCB</a>
+<a id="330" class="Comment">-- open import Armor.Data.X690-DER.OID.TCB</a>
+<a id="373" class="Comment">-- open import Armor.Data.X690-DER.OctetString.TCB</a>
+<a id="424" class="Comment">-- open import Armor.Data.X690-DER.Sequence.DefinedByOID</a>
+<a id="481" class="Comment">-- open import Armor.Data.X690-DER.TLV.TCB</a>
+<a id="524" class="Comment">-- import      Armor.Data.X690-DER.Tag                 as Tag</a>
+<a id="586" class="Comment">-- import      Armor.Grammar.Definitions</a>
+<a id="627" class="Comment">-- import      Armor.Grammar.Option.TCB</a>
+<a id="667" class="Comment">-- import      Armor.Grammar.Parallel.TCB</a>
+<a id="709" class="Comment">-- import      Armor.Grammar.Seq.TCB</a>
+<a id="746" class="Comment">-- import      Armor.Grammar.Sum.TCB</a>
+<a id="783" class="Comment">-- open import Armor.Prelude</a>
+
+<a id="813" class="Keyword">module</a> <a id="820" href="Armor.Data.X509.SignAlg.RSA.PSS.TCB.html" class="Module">Armor.Data.X509.SignAlg.RSA.PSS.TCB</a> <a id="856" class="Keyword">where</a>
+
+<a id="863" class="Comment">-- open Armor.Grammar.Definitions  UInt8</a>
+<a id="904" class="Comment">-- open Armor.Grammar.Option.TCB   UInt8</a>
+<a id="945" class="Comment">-- open Armor.Grammar.Parallel.TCB UInt8</a>
+<a id="986" class="Comment">-- open Armor.Grammar.Seq.TCB      UInt8</a>
+<a id="1027" class="Comment">-- open Armor.Grammar.Sum.TCB      UInt8</a>
+
+<a id="1069" class="Comment">-- SupportedHashAlg : @0 List UInt8 → Set</a>
+<a id="1111" class="Comment">-- SupportedHashAlg =</a>
+<a id="1133" class="Comment">--    Sum HashAlg.SHA1</a>
+<a id="1156" class="Comment">--   (Sum HashAlg.SHA224</a>
+<a id="1181" class="Comment">--   (Sum HashAlg.SHA256</a>
+<a id="1206" class="Comment">--   (Sum HashAlg.SHA384</a>
+<a id="1231" class="Comment">--        HashAlg.SHA512)))</a>
+
+<a id="1260" class="Comment">-- module SupportedHashAlg where</a>
+<a id="1293" class="Comment">--   erase : ∀ {@0 bs} → SupportedHashAlg bs → DefinedByOID (λ _ bs → Erased (OctetStringValue bs)) bs</a>
+<a id="1396" class="Comment">--   erase (inj₁ (mkTLV len (mkOIDDefinedFields o p refl) len≡ bs≡)) =</a>
+<a id="1467" class="Comment">--     mkTLV len (mkOIDDefinedFields o (─ self) refl) len≡ bs≡</a>
+<a id="1530" class="Comment">--   erase (inj₂ (inj₁ (mkTLV len (mkOIDDefinedFields o p refl) len≡ bs≡))) =</a>
+<a id="1608" class="Comment">--     mkTLV len (mkOIDDefinedFields o (─ self) refl) len≡ bs≡</a>
+<a id="1671" class="Comment">--   erase (inj₂ (inj₂ (inj₁ (mkTLV len (mkOIDDefinedFields o p refl) len≡ bs≡)))) =</a>
+<a id="1756" class="Comment">--     mkTLV len (mkOIDDefinedFields o (─ self) refl) len≡ bs≡</a>
+<a id="1819" class="Comment">--   erase (inj₂ (inj₂ (inj₂ (inj₁ (mkTLV len (mkOIDDefinedFields o p refl) len≡ bs≡))))) =</a>
+<a id="1911" class="Comment">--     mkTLV len (mkOIDDefinedFields o (─ self) refl) len≡ bs≡</a>
+<a id="1974" class="Comment">--   erase (inj₂ (inj₂ (inj₂ (inj₂ (mkTLV len (mkOIDDefinedFields o p refl) len≡ bs≡))))) =</a>
+<a id="2066" class="Comment">--     mkTLV len (mkOIDDefinedFields o (─ self) refl) len≡ bs≡</a>
+
+<a id="2130" class="Comment">--   {- https://datatracker.ietf.org/doc/html/rfc4055#section-3.1 -}</a>
+<a id="2199" class="Comment">{-
+      id-RSASSA-PSS  OBJECT IDENTIFIER  ::=  { pkcs-1 10 }
+
+      RSASSA-PSS-params  ::=  SEQUENCE  {
+         hashAlgorithm      [0] HashAlgorithm DEFAULT
+                                   sha1Identifier,
+         maskGenAlgorithm   [1] MaskGenAlgorithm DEFAULT
+                                   mgf1SHA1Identifier,
+         saltLength         [2] INTEGER DEFAULT 20,
+         trailerField       [3] INTEGER DEFAULT 1  }
+-}</a>
+<a id="2629" class="Comment">-- PSSHashAlg PSSMaskGenAlg PSSSaltLen PSSTrailer : @0 List UInt8 → Set</a>
+
+<a id="2702" class="Comment">-- PSSHashAlg    = TLV Tag.AA0 (Option RFC4055.HashAlg)</a>
+<a id="2758" class="Comment">-- PSSMaskGenAlg = TLV Tag.AA1 (Option RFC4055.MGF1)</a>
+<a id="2811" class="Comment">-- PSSSaltLen    = TLV Tag.AA2 (Option Int)</a>
+<a id="2855" class="Comment">-- PSSTrailer    = TLV Tag.AA3 (Option (Σₚ Int (λ _ i → getVal i ≡ ℤ.1ℤ)))</a>
+
+<a id="2931" class="Comment">-- record PSSParamFields (@0 bs : List UInt8) : Set where</a>
+<a id="2989" class="Comment">--   constructor mkPSSParam</a>
+<a id="3017" class="Comment">--   field</a>
+<a id="3028" class="Comment">--     @0 {h m s t} : List UInt8</a>
+<a id="3061" class="Comment">-- -- hashAlgorithm</a>
+
+<a id="3082" class="Comment">-- --    The hashAlgorithm field identifies the hash function.  It MUST</a>
+<a id="3154" class="Comment">-- --    be one of the algorithm identifiers listed in Section 2.1, and</a>
+<a id="3226" class="Comment">-- --    the default hash function is SHA-1.  Implementations MUST</a>
+<a id="3293" class="Comment">-- --    support SHA-1 and MAY support any of the other one-way hash</a>
+<a id="3362" class="Comment">-- --    functions listed in Section 2.1.  Implementations that perform</a>
+<a id="3434" class="Comment">-- --    signature generation MUST omit the hashAlgorithm field when</a>
+<a id="3503" class="Comment">-- --    SHA-1 is used, indicating that the default algorithm was used.</a>
+<a id="3575" class="Comment">-- --    Implementations that perform signature validation MUST</a>
+<a id="3639" class="Comment">-- --    recognize both the sha1Identifier algorithm identifier and an</a>
+<a id="3710" class="Comment">-- --    absent hashAlgorithm field as an indication that SHA-1 was</a>
+<a id="3778" class="Comment">-- --    used.</a>
+<a id="3793" class="Comment">--     hashAlg : PSSHashAlg h</a>
+
+<a id="3824" class="Comment">-- -- maskGenAlgorithm</a>
+
+<a id="3848" class="Comment">-- --    The maskGenAlgorithm field identifies the mask generation</a>
+<a id="3915" class="Comment">-- --    function.  The default mask generation function is MGF1 with</a>
+<a id="3985" class="Comment">-- --    SHA-1.  For MGF1, it is strongly RECOMMENDED that the</a>
+<a id="4048" class="Comment">-- --    underlying hash function be the same as the one identified by</a>
+<a id="4119" class="Comment">-- --    hashAlgorithm.  Implementations MUST support MGF1.  MGF1</a>
+<a id="4185" class="Comment">-- --    requires a one-way hash function that is identified in the</a>
+<a id="4253" class="Comment">-- --    parameters field of the MGF1 algorithm identifier.</a>
+<a id="4313" class="Comment">-- --    Implementations MUST support SHA-1 and MAY support any of the</a>
+<a id="4384" class="Comment">-- --    other one-way hash functions listed in section Section 2.1.</a>
+<a id="4453" class="Comment">-- --    The MGF1 algorithm identifier is comprised of the id-mgf1</a>
+<a id="4520" class="Comment">-- --    object identifier and a parameter that contains the algorithm</a>
+<a id="4591" class="Comment">-- --    identifier of the one-way hash function employed with MGF1.</a>
+<a id="4660" class="Comment">-- --    The SHA-1 algorithm identifier is comprised of the id-sha1</a>
+<a id="4728" class="Comment">-- --    object identifier and an (optional) parameter of NULL.</a>
+<a id="4792" class="Comment">-- --    Implementations that perform signature generation MUST omit the</a>
+<a id="4865" class="Comment">-- --    maskGenAlgorithm field when MGF1 with SHA-1 is used, indicating</a>
+<a id="4938" class="Comment">-- --    that the default algorithm was used.</a>
+
+<a id="4985" class="Comment">-- --    Although mfg1SHA1Identifier is defined as the default value for</a>
+<a id="5058" class="Comment">-- --    this field, implementations MUST accept both the default value</a>
+<a id="5130" class="Comment">-- --    encoding (i.e., an absent field) and mfg1SHA1Identifier to be</a>
+<a id="5201" class="Comment">-- --    explicitly present in the encoding.</a>
+<a id="5246" class="Comment">--     maskGenAlg : PSSMaskGenAlg m</a>
+
+<a id="5283" class="Comment">-- -- saltLength</a>
+
+<a id="5301" class="Comment">-- --    The saltLength field is the octet length of the salt.  For a</a>
+<a id="5371" class="Comment">-- --    given hashAlgorithm, the recommended value of saltLength is the</a>
+<a id="5444" class="Comment">-- --    number of octets in the hash value.  Unlike the other fields of</a>
+<a id="5517" class="Comment">-- --    type RSASSA-PSS-params, saltLength does not need to be fixed</a>
+<a id="5587" class="Comment">-- --    for a given RSA key pair; a different value could be used for</a>
+<a id="5658" class="Comment">-- --    each RSASSA-PSS signature generated.</a>
+<a id="5704" class="Comment">--     saltLength : PSSSaltLen s</a>
+
+<a id="5738" class="Comment">-- -- trailerField</a>
+
+<a id="5758" class="Comment">-- --    The trailerField field is an integer.  It provides</a>
+<a id="5818" class="Comment">-- --    compatibility with IEEE Std 1363a-2004 [P1363A].  The value</a>
+<a id="5887" class="Comment">-- --    MUST be 1, which represents the trailer field with hexadecimal</a>
+<a id="5959" class="Comment">-- --    value 0xBC.  Other trailer fields, including the trailer field</a>
+<a id="6031" class="Comment">-- --    composed of HashID concatenated with 0xCC that is specified in</a>
+<a id="6103" class="Comment">-- --    IEEE Std 1363a, are not supported.  Implementations that</a>
+<a id="6169" class="Comment">-- --    perform signature generation MUST omit the trailerField field,</a>
+<a id="6241" class="Comment">-- --    indicating that the default trailer field value was used.</a>
+<a id="6308" class="Comment">-- --    Implementations that perform signature validation MUST</a>
+<a id="6372" class="Comment">-- --    recognize both a present trailerField field with value 1 and an</a>
+<a id="6445" class="Comment">-- --    absent trailerField field.</a>
+<a id="6481" class="Comment">--     trailerField : PSSTrailer t</a>
+
+<a id="6517" class="Comment">--     @0 bs≡ : bs ≡ h ++ m ++ s ++ t</a>
+
+<a id="6556" class="Comment">-- PSSParamFieldsRep : @0 List UInt8 → Set</a>
+<a id="6599" class="Comment">-- PSSParamFieldsRep =</a>
+<a id="6622" class="Comment">--    &amp;ₚ PSSHashAlg</a>
+<a id="6642" class="Comment">--   (&amp;ₚ PSSMaskGenAlg</a>
+<a id="6665" class="Comment">--   (&amp;ₚ PSSSaltLen</a>
+<a id="6685" class="Comment">--       PSSTrailer))</a>
+
+<a id="6708" class="Comment">-- equivalent : Equivalent PSSParamFieldsRep PSSParamFields</a>
+<a id="6768" class="Comment">-- proj₁ equivalent (mk&amp;ₚ hash (mk&amp;ₚ mask (mk&amp;ₚ salt trail refl) refl) refl) =</a>
+<a id="6847" class="Comment">--   mkPSSParam hash mask salt trail refl</a>
+<a id="6889" class="Comment">-- proj₂ equivalent (mkPSSParam hashAlg maskGenAlg saltLength trailerField refl) =</a>
+<a id="6972" class="Comment">--   mk&amp;ₚ hashAlg (mk&amp;ₚ maskGenAlg (mk&amp;ₚ saltLength trailerField refl) refl) refl</a>
+
+<a id="7055" class="Comment">-- RawPSSParamFieldsRep : Raw PSSParamFieldsRep</a>
+<a id="7103" class="Comment">-- RawPSSParamFieldsRep =</a>
+<a id="7129" class="Comment">--    Raw&amp;ₚ (RawTLV _ (RawOption RFC4055.RawHashAlg))</a>
+<a id="7183" class="Comment">--   (Raw&amp;ₚ (RawTLV _ (RawOption RFC4055.RawMGF1))</a>
+<a id="7234" class="Comment">--   (Raw&amp;ₚ (RawTLV _ (RawOption RawInt))</a>
+<a id="7276" class="Comment">--          (RawTLV _ (RawOption (RawΣₚ₁ RawInt _)))))</a>
+
+<a id="7332" class="Comment">-- RawPSSParamFields : Raw PSSParamFields</a>
+<a id="7374" class="Comment">-- RawPSSParamFields = Iso.raw equivalent RawPSSParamFieldsRep</a>
+
+<a id="7438" class="Comment">-- PSSParamSeq : @0 List UInt8 → Set</a>
+<a id="7475" class="Comment">-- PSSParamSeq = TLV Tag.Sequence PSSParamFields</a>
+
+<a id="7525" class="Comment">-- RawPSSParamSeq : Raw PSSParamSeq</a>
+<a id="7561" class="Comment">-- RawPSSParamSeq = RawTLV _ RawPSSParamFields</a>
+</pre></body></html>

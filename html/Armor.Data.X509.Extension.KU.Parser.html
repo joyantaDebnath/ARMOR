@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Extension.KU.Parser</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="28" class="Keyword">open</a> <a id="33" class="Keyword">import</a> <a id="40" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="53" class="Keyword">open</a> <a id="58" class="Keyword">import</a> <a id="65" href="Armor.Data.X509.Extension.KU.TCB.html" class="Module">Armor.Data.X509.Extension.KU.TCB</a>
+<a id="98" class="Keyword">open</a> <a id="103" class="Keyword">import</a> <a id="110" href="Armor.Data.X690-DER.BitString.html" class="Module">Armor.Data.X690-DER.BitString</a>
+<a id="140" class="Keyword">open</a> <a id="145" class="Keyword">import</a> <a id="152" href="Armor.Data.X690-DER.TLV.html" class="Module">Armor.Data.X690-DER.TLV</a>
+<a id="176" class="Keyword">import</a>      <a id="188" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="214" class="Keyword">import</a>      <a id="226" href="Armor.Grammar.Parallel.html" class="Module">Armor.Grammar.Parallel</a>
+<a id="249" class="Keyword">import</a>      <a id="261" href="Armor.Grammar.Parser.html" class="Module">Armor.Grammar.Parser</a>
+
+<a id="283" class="Keyword">module</a> <a id="290" href="Armor.Data.X509.Extension.KU.Parser.html" class="Module">Armor.Data.X509.Extension.KU.Parser</a> <a id="326" class="Keyword">where</a>
+
+<a id="333" class="Keyword">open</a> <a id="338" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="364" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="370" class="Keyword">open</a> <a id="375" href="Armor.Grammar.Parallel.html" class="Module">Armor.Grammar.Parallel</a>    <a id="401" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="407" class="Keyword">open</a> <a id="412" href="Armor.Grammar.Parser.html" class="Module">Armor.Grammar.Parser</a>      <a id="438" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="445" class="Keyword">private</a>
+  <a id="here&#39;"></a><a id="455" href="Armor.Data.X509.Extension.KU.Parser.html#455" class="Function">here&#39;</a> <a id="461" class="Symbol">=</a> <a id="463" class="String">&quot;X509: Extension: KU&quot;</a>
+
+<a id="parseKUFields"></a><a id="486" href="Armor.Data.X509.Extension.KU.Parser.html#486" class="Function">parseKUFields</a> <a id="500" class="Symbol">:</a> <a id="502" href="Armor.Grammar.Parser.Core.html#844" class="Function">Parser</a> <a id="509" class="Symbol">(</a><a id="510" href="Armor.Prelude.html#14201" class="Record">Logging</a> <a id="518" href="Function.Base.html#1031" class="Function Operator">∘</a> <a id="520" href="Relation.Nullary.html#1511" class="Record">Dec</a><a id="523" class="Symbol">)</a> <a id="525" href="Armor.Data.X509.Extension.KU.TCB.html#958" class="Function">KUFields</a>
+<a id="534" href="Armor.Data.X509.Extension.KU.Parser.html#486" class="Function">parseKUFields</a> <a id="548" class="Symbol">=</a>
+  <a id="552" href="Armor.Data.X690-DER.TLV.Parser.html#788" class="Function">parseTLV</a> <a id="561" class="Symbol">_</a> <a id="563" href="Armor.Data.X509.Extension.KU.Parser.html#455" class="Function">here&#39;</a> <a id="569" class="Symbol">_</a>
+    <a id="575" class="Symbol">(</a><a id="576" href="Armor.Grammar.Parallel.Parser.html#3682" class="Function">parseExactLength</a> <a id="593" href="Armor.Data.X690-DER.TLV.Properties.html#592" class="Function">TLV.nosubstrings</a> <a id="610" class="Symbol">(</a><a id="611" href="Armor.Prelude.html#14135" class="Field">tell</a> <a id="616" href="Function.Base.html#1919" class="Function Operator">$</a> <a id="618" href="Armor.Data.X509.Extension.KU.Parser.html#455" class="Function">here&#39;</a> <a id="624" href="Data.String.Base.html#2366" class="Function Operator">String.++</a> <a id="634" class="String">&quot;: underflow&quot;</a><a id="647" class="Symbol">)</a>
+      <a id="655" href="Armor.Data.X690-DER.BitString.Parser.html#2871" class="Function">parseBitstring</a><a id="669" class="Symbol">)</a>
+
+<a id="672" class="Comment">-- private</a>
+<a id="683" class="Comment">--   module Test where</a>
+
+<a id="707" class="Comment">--     val₁ : List UInt8</a>
+<a id="732" class="Comment">--     val₁ = # 4 ∷ # 6 ∷ # 3 ∷ # 4 ∷ # 6 ∷ # 160 ∷ # 0 ∷ [ # 0 ]</a>
+
+<a id="799" class="Comment">--     val₂ : List UInt8</a>
+<a id="824" class="Comment">--     val₂ = # 4 ∷ # 4 ∷ # 3 ∷ # 2 ∷ # 4 ∷ [ # 160 ]</a>
+
+<a id="879" class="Comment">--     val₃ : List UInt8</a>
+<a id="904" class="Comment">--     val₃ = # 4 ∷ # 4 ∷ # 3 ∷ # 2 ∷ # 6 ∷ [ # 160 ]</a>
+
+<a id="959" class="Comment">--     test₁ : KUFields val₁</a>
+<a id="988" class="Comment">--     test₁ = Success.value (toWitness {Q = Logging.val (runParser parseKUFields val₁)} tt)</a>
+
+<a id="1082" class="Comment">--     test₂ : KUFields val₂</a>
+<a id="1111" class="Comment">--     test₂ = Success.value (toWitness {Q = Logging.val (runParser parseKUFields val₂)} tt)</a>
+
+    <a id="1209" class="Comment">-- test₃ : ¬ Success _ KUFields val₃</a>
+    <a id="1250" class="Comment">-- test₃ = toWitnessFalse {Q = Logging.val (runParser parseKUFields val₃)}</a>
+</pre></body></html>

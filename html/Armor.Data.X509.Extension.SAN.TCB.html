@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Extension.SAN.TCB</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.GeneralNames.TCB.html" class="Module">Armor.Data.X509.GeneralNames.TCB</a>
+<a id="71" class="Keyword">open</a> <a id="76" class="Keyword">import</a> <a id="83" href="Armor.Data.X690-DER.TLV.TCB.html" class="Module">Armor.Data.X690-DER.TLV.TCB</a>
+<a id="111" class="Keyword">import</a>      <a id="123" href="Armor.Data.X690-DER.Tag.html" class="Module">Armor.Data.X690-DER.Tag</a> <a id="147" class="Symbol">as</a> <a id="150" class="Module">Tag</a>
+<a id="154" class="Keyword">import</a>      <a id="166" href="Armor.Grammar.Definitions.NonMalleable.html" class="Module">Armor.Grammar.Definitions.NonMalleable</a>
+<a id="205" class="Keyword">open</a> <a id="210" class="Keyword">import</a> <a id="217" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+
+<a id="232" class="Keyword">module</a> <a id="239" href="Armor.Data.X509.Extension.SAN.TCB.html" class="Module">Armor.Data.X509.Extension.SAN.TCB</a> <a id="273" class="Keyword">where</a>
+
+<a id="280" class="Keyword">open</a> <a id="285" href="Armor.Grammar.Definitions.NonMalleable.html" class="Module">Armor.Grammar.Definitions.NonMalleable</a> <a id="324" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="331" class="Comment">-- https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.6</a>
+<a id="396" class="Comment">--    id-ce-subjectAltName OBJECT IDENTIFIER ::=  { id-ce 17 }</a>
+
+<a id="460" class="Comment">--    SubjectAltName ::= GeneralNames</a>
+
+<a id="499" class="Comment">--    GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName</a>
+
+<a id="561" class="Comment">--    GeneralName ::= CHOICE {</a>
+<a id="592" class="Comment">--         otherName                       [0]     OtherName,</a>
+<a id="654" class="Comment">--         rfc822Name                      [1]     IA5String,</a>
+<a id="716" class="Comment">--         dNSName                         [2]     IA5String,</a>
+<a id="778" class="Comment">--         x400Address                     [3]     ORAddress,</a>
+<a id="840" class="Comment">--         directoryName                   [4]     Name,</a>
+<a id="897" class="Comment">--         ediPartyName                    [5]     EDIPartyName,</a>
+<a id="962" class="Comment">--         uniformResourceIdentifier       [6]     IA5String,</a>
+<a id="1024" class="Comment">--         iPAddress                       [7]     OCTET STRING,</a>
+<a id="1089" class="Comment">--         registeredID                    [8]     OBJECT IDENTIFIER }</a>
+
+<a id="1161" class="Comment">--    OtherName ::= SEQUENCE {</a>
+<a id="1192" class="Comment">--         type-id    OBJECT IDENTIFIER,</a>
+<a id="1233" class="Comment">--         value      [0] EXPLICIT ANY DEFINED BY type-id }</a>
+
+<a id="1294" class="Comment">--    EDIPartyName ::= SEQUENCE {</a>
+<a id="1328" class="Comment">--         nameAssigner            [0]     DirectoryString OPTIONAL,</a>
+<a id="1397" class="Comment">--         partyName               [1]     DirectoryString }</a>
+ 
+<a id="SANFields"></a><a id="1460" href="Armor.Data.X509.Extension.SAN.TCB.html#1460" class="Function">SANFields</a> <a id="1470" class="Symbol">:</a> <a id="1472" class="Symbol">@</a><a id="1473" class="Symbol">0</a> <a id="1475" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1480" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a> <a id="1486" class="Symbol">→</a> <a id="1488" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="1492" href="Armor.Data.X509.Extension.SAN.TCB.html#1460" class="Function">SANFields</a> <a id="1502" href="Armor.Data.X509.Extension.SAN.TCB.html#1502" class="Bound">xs</a> <a id="1505" class="Symbol">=</a> <a id="1507" href="Armor.Data.X690-DER.TLV.TCB.html#534" class="Record">TLV</a> <a id="1511" href="Armor.Data.X690-DER.Tag.html#229" class="Function">Tag.OctetString</a> <a id="1527" href="Armor.Data.X509.GeneralNames.TCB.html#907" class="Function">GeneralNames</a> <a id="1540" href="Armor.Data.X509.Extension.SAN.TCB.html#1502" class="Bound">xs</a>
+
+<a id="RawSANFields"></a><a id="1544" href="Armor.Data.X509.Extension.SAN.TCB.html#1544" class="Function">RawSANFields</a> <a id="1557" class="Symbol">:</a> <a id="1559" href="Armor.Grammar.Definitions.NonMalleable.Base.html#125" class="Record">Raw</a> <a id="1563" href="Armor.Data.X509.Extension.SAN.TCB.html#1460" class="Function">SANFields</a>
+<a id="1573" href="Armor.Data.X509.Extension.SAN.TCB.html#1544" class="Function">RawSANFields</a> <a id="1586" class="Symbol">=</a> <a id="1588" href="Armor.Data.X690-DER.TLV.TCB.html#1272" class="Function">RawTLV</a> <a id="1595" class="Symbol">_</a> <a id="1597" href="Armor.Data.X509.GeneralNames.TCB.html#1065" class="Function">RawGeneralNames</a>
+</pre></body></html>

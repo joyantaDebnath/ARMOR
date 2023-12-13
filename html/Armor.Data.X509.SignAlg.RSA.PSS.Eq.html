@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.SignAlg.RSA.PSS.Eq</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Comment">-- open import Armor.Binary</a>
+<a id="29" class="Comment">-- open import Armor.Data.X509.HashAlg</a>
+<a id="68" class="Comment">-- import      Armor.Data.X509.HashAlg.TCB.OIDs        as OIDs</a>
+<a id="131" class="Comment">-- open import Armor.Data.X509.MaskGenAlg</a>
+<a id="173" class="Comment">-- open import Armor.Data.X509.SignAlg.RSA.PSS.Properties</a>
+<a id="231" class="Comment">-- open import Armor.Data.X509.SignAlg.RSA.PSS.TCB</a>
+<a id="282" class="Comment">-- import      Armor.Data.X509.SignAlg.TCB.OIDs        as OIDs</a>
+<a id="345" class="Comment">-- open import Armor.Data.X690-DER.Int</a>
+<a id="384" class="Comment">-- open import Armor.Data.X690-DER.OID.TCB</a>
+<a id="427" class="Comment">-- open import Armor.Data.X690-DER.OctetString</a>
+<a id="474" class="Comment">-- open import Armor.Data.X690-DER.Sequence.DefinedByOID</a>
+<a id="531" class="Comment">-- open import Armor.Data.X690-DER.TLV</a>
+<a id="570" class="Comment">-- import      Armor.Data.X690-DER.Tag                 as Tag</a>
+<a id="632" class="Comment">-- import      Armor.Grammar.Definitions</a>
+<a id="673" class="Comment">-- import      Armor.Grammar.Option</a>
+<a id="709" class="Comment">-- import      Armor.Grammar.Parallel</a>
+<a id="747" class="Comment">-- import      Armor.Grammar.Properties</a>
+<a id="787" class="Comment">-- import      Armor.Grammar.Seq</a>
+<a id="820" class="Comment">-- import      Armor.Grammar.Sum</a>
+<a id="853" class="Comment">-- open import Armor.Prelude</a>
+
+<a id="883" class="Keyword">module</a> <a id="890" href="Armor.Data.X509.SignAlg.RSA.PSS.Eq.html" class="Module">Armor.Data.X509.SignAlg.RSA.PSS.Eq</a> <a id="925" class="Keyword">where</a>
+
+<a id="932" class="Comment">-- open Armor.Grammar.Definitions UInt8</a>
+<a id="972" class="Comment">-- open Armor.Grammar.Option      UInt8</a>
+<a id="1012" class="Comment">-- open Armor.Grammar.Parallel    UInt8</a>
+<a id="1052" class="Comment">-- open Armor.Grammar.Properties  UInt8</a>
+<a id="1092" class="Comment">-- open Armor.Grammar.Seq         UInt8</a>
+<a id="1132" class="Comment">-- open Armor.Grammar.Sum         UInt8</a>
+
+<a id="1173" class="Comment">-- instance</a>
+  <a id="1187" class="Comment">-- eq≋Supported : Eq≋ SupportedHashAlg</a>
+  <a id="1228" class="Comment">-- eq≋Supported =</a>
+  <a id="1248" class="Comment">--   Sum.sumEq≋ ⦃ eq₂ = Sum.sumEq≋ ⦃ eq₂ = Sum.sumEq≋ ⦃ eq₂ = Sum.sumEq≋ ⦄ ⦄ ⦄</a>
+
+  <a id="1330" class="Comment">-- eq≋Fields : Eq≋ PSSParamFields</a>
+  <a id="1366" class="Comment">-- eq≋Fields =</a>
+  <a id="1383" class="Comment">--   Iso.isoEq≋ Fields.iso</a>
+  <a id="1412" class="Comment">--     (Eq⇒Eq≋</a>
+  <a id="1429" class="Comment">--       (Seq.eq&amp;ₚ (Eq≋⇒Eq it)</a>
+  <a id="1462" class="Comment">--       (Seq.eq&amp;ₚ (Eq≋⇒Eq it)</a>
+  <a id="1495" class="Comment">--       (Seq.eq&amp;ₚ it (Eq≋⇒Eq (TLV.EqTLV ⦃ Option.OptionEq≋ ⦃ Parallel.eq≋Σₚ it λ a → record { _≟_ = λ x y → yes (≡-unique x y) } ⦄ ⦄))))))</a>
+  <a id="1637" class="Comment">-- eq≋ : Eq≋ (DefinedByOIDFields PSSParam)</a>
+  <a id="1682" class="Comment">-- eq≋ =</a>
+  <a id="1693" class="Comment">--   DefinedByOID.eq≋</a>
+  <a id="1717" class="Comment">--     PSSParam</a>
+  <a id="1735" class="Comment">--     (λ o → record</a>
+  <a id="1758" class="Comment">--       { _≋?_ = λ where</a>
+  <a id="1786" class="Comment">--           (mk×ₚ fstₚ₁ ≋-refl) (mk×ₚ fstₚ₂ ≋-refl) →</a>
+  <a id="1843" class="Comment">--             case fstₚ₁ ≋? fstₚ₂ ret (const _) of λ where</a>
+  <a id="1905" class="Comment">--               (yes ≋-refl) → yes ≋-refl</a>
+  <a id="1950" class="Comment">--               (no ¬≋) → no λ where ≋-refl → contradiction ≋-refl ¬≋</a>
+  <a id="2023" class="Comment">--       })</a>
+</pre></body></html>
