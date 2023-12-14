@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Armor.Data.X509.Semantic.Cert.R18</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Armor.Binary.html" class="Module">Armor.Binary</a>
+<a id="26" class="Keyword">open</a> <a id="31" class="Keyword">import</a> <a id="38" href="Armor.Data.X509.html" class="Module">Armor.Data.X509</a>
+<a id="54" class="Keyword">import</a>      <a id="66" href="Armor.Data.X509.Extension.TCB.OIDs.html" class="Module">Armor.Data.X509.Extension.TCB.OIDs</a> <a id="101" class="Symbol">as</a> <a id="104" class="Module">OIDs</a>
+<a id="109" class="Keyword">open</a> <a id="114" class="Keyword">import</a> <a id="121" href="Armor.Data.X509.Semantic.Cert.Utils.html" class="Module">Armor.Data.X509.Semantic.Cert.Utils</a>
+<a id="157" class="Keyword">import</a>      <a id="169" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a>
+<a id="195" class="Keyword">import</a>      <a id="207" href="Armor.Grammar.Option.html" class="Module">Armor.Grammar.Option</a>
+<a id="228" class="Keyword">open</a> <a id="233" class="Keyword">import</a> <a id="240" href="Armor.Grammar.IList.html" class="Module">Armor.Grammar.IList</a> <a id="260" class="Symbol">as</a> <a id="263" class="Module">IList</a>
+<a id="269" class="Keyword">open</a> <a id="274" class="Keyword">import</a> <a id="281" href="Armor.Prelude.html" class="Module">Armor.Prelude</a>
+<a id="295" class="Keyword">open</a> <a id="300" class="Keyword">import</a> <a id="307" href="Relation.Nullary.Implication.html" class="Module">Relation.Nullary.Implication</a>
+
+<a id="337" class="Keyword">module</a> <a id="344" href="Armor.Data.X509.Semantic.Cert.R18.html" class="Module">Armor.Data.X509.Semantic.Cert.R18</a> <a id="378" class="Keyword">where</a>
+
+<a id="385" class="Keyword">open</a> <a id="390" href="Armor.Grammar.Definitions.html" class="Module">Armor.Grammar.Definitions</a> <a id="416" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+<a id="422" class="Keyword">open</a> <a id="427" href="Armor.Grammar.Option.html" class="Module">Armor.Grammar.Option</a>      <a id="453" href="Armor.Binary.UInt8.TCB.html#158" class="Function">UInt8</a>
+
+<a id="460" class="Comment">-- https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.3</a>
+<a id="525" class="Comment">-- https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.12</a>
+<a id="591" class="Comment">--- consistency of certificate purposes based on key usage bits and extended key usage OIDs</a>
+<a id="683" class="Comment">--- only for end-entity certificate</a>
+
+<a id="R18"></a><a id="720" href="Armor.Data.X509.Semantic.Cert.R18.html#720" class="Function">R18</a> <a id="724" class="Symbol">:</a> <a id="726" class="Symbol">∀</a> <a id="728" class="Symbol">{@</a><a id="730" class="Symbol">0</a> <a id="732" href="Armor.Data.X509.Semantic.Cert.R18.html#732" class="Bound">bs</a><a id="734" class="Symbol">}</a> <a id="736" class="Symbol">→</a> <a id="738" href="Armor.Data.X509.Cert.TCB.html#5674" class="Function">Cert</a> <a id="743" href="Armor.Data.X509.Semantic.Cert.R18.html#732" class="Bound">bs</a> <a id="746" class="Symbol">→</a> <a id="748" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+<a id="752" href="Armor.Data.X509.Semantic.Cert.R18.html#720" class="Function">R18</a> <a id="756" href="Armor.Data.X509.Semantic.Cert.R18.html#756" class="Bound">c</a> <a id="758" class="Symbol">=</a> <a id="760" href="Data.Bool.Base.html#1451" class="Function">T</a> <a id="762" class="Symbol">(</a><a id="763" href="Armor.Data.X509.Semantic.Cert.Utils.html#24172" class="Function">checkPurposeConsistency</a> <a id="787" class="Symbol">(</a><a id="788" href="Armor.Data.X509.Cert.TCB.html#8338" class="Function">Cert.getKU</a> <a id="799" href="Armor.Data.X509.Semantic.Cert.R18.html#756" class="Bound">c</a><a id="800" class="Symbol">)</a> <a id="802" class="Symbol">(</a><a id="803" href="Armor.Data.X509.Semantic.Cert.Utils.html#18064" class="Function">getEKUOIDList</a> <a id="817" class="Symbol">(</a><a id="818" href="Armor.Data.X509.Cert.TCB.html#8439" class="Function">Cert.getEKU</a> <a id="830" href="Armor.Data.X509.Semantic.Cert.R18.html#756" class="Bound">c</a><a id="831" class="Symbol">)))</a>
+
+<a id="r18"></a><a id="836" href="Armor.Data.X509.Semantic.Cert.R18.html#836" class="Function">r18</a> <a id="840" class="Symbol">:</a> <a id="842" class="Symbol">∀</a> <a id="844" class="Symbol">{@</a><a id="846" class="Symbol">0</a> <a id="848" href="Armor.Data.X509.Semantic.Cert.R18.html#848" class="Bound">bs</a><a id="850" class="Symbol">}</a> <a id="852" class="Symbol">(</a><a id="853" href="Armor.Data.X509.Semantic.Cert.R18.html#853" class="Bound">c</a> <a id="855" class="Symbol">:</a> <a id="857" href="Armor.Data.X509.Cert.TCB.html#5674" class="Function">Cert</a> <a id="862" href="Armor.Data.X509.Semantic.Cert.R18.html#848" class="Bound">bs</a><a id="864" class="Symbol">)</a> <a id="866" class="Symbol">→</a> <a id="868" href="Relation.Nullary.html#1511" class="Record">Dec</a> <a id="872" class="Symbol">(</a><a id="873" href="Armor.Data.X509.Semantic.Cert.R18.html#720" class="Function">R18</a> <a id="877" href="Armor.Data.X509.Semantic.Cert.R18.html#853" class="Bound">c</a><a id="878" class="Symbol">)</a>
+<a id="880" href="Armor.Data.X509.Semantic.Cert.R18.html#836" class="Function">r18</a> <a id="884" href="Armor.Data.X509.Semantic.Cert.R18.html#884" class="Bound">c</a> <a id="886" class="Symbol">=</a> <a id="888" href="Armor.Prelude.html#6524" class="Function">T-dec</a>
+
+</pre></body></html>
