@@ -18,49 +18,29 @@
 
 ## Code listings used in the paper
 
--   `Fin` datatype (Figure 3):
-    
-    <html/Data.Fin.Base.html>
--   Base64 `encode`, `decode` and proofs (Figure 4):
-    
-    <html/Armor.Binary.Base64EncDec.html>
--   `IntegerValue` type (Figure 5):
-    
-    <html/Armor.Data.X690-DER.Int.TCB.html>
+-   [`Fin`](html/Data.Fin.Base.html) datatype (Figure 3):
 
--   `Raw` and `NonMalleable`
-    
-    <html/Armor.Grammar.Definitions.NonMalleable.Base.html>
+-   [Base64 `encode`, `decode` and proofs](html/Armor.Binary.Base64EncDec.html) (Figure 4):
 
--   `Success` and `Parser` (Figures 6, 7)
-    
-    <html/Armor.Grammar.Parser.Core.html>
+-   [`IntegerValue`](html/Armor.Data.X690-DER.Int.TCB.html) type (Figure 5):
+
+-   [`Raw` and `NonMalleable`](html/Armor.Grammar.Definitions.NonMalleable.Base.html)
+
+-   [`Success` and `Parser`](html/Armor.Grammar.Parser.Core.html) (Figures 6, 7)
     
     Note that `Parser` is parameterized by type-level function `M : Set ->
          Set`, and that `Dec` does not appear explicitly. `M` is almost always
     instantiated with ``Logging `circ` Dec``
 
--   `Sound`, `Complete`, and `StronglyComplete` (Figure 8, 9)
-    
-    <html/Armor.Grammar.Parser.Completeness.html>
+-   [`Sound`, `Complete`, and `StronglyComplete`](html/Armor.Grammar.Parser.Completeness.html) (Figure 8, 9)
 
--   `Chain` (Figure 10)
-    
-    <html/Armor.Data.X509.Semantic.Chain.TCB.html>
+-   [`Chain`](html/Armor.Data.X509.Semantic.Chain.TCB.html) (Figure 10)
 
--   `chainUnique` (Figure 11)
-    
-    <html/Armor.Data.X509.Semantic.Chain.Properties.html>
+-   [`chainUnique`](html/Armor.Data.X509.Semantic.Chain.Properties.html) (Figure 11)
 
--   `buildChains` and `buildChainsComplete` (Figure 12)
-    
-    <html/Armor.Data.X509.Semantic.Chain.Builder.html>
+-   [`buildChains` and `buildChainsComplete`](html/Armor.Data.X509.Semantic.Chain.Builder.html) (Figure 12)
 
--   `R1` semantic check
-    
-    <html/Armor.Data.X509.Semantic.Cert.R1.html>
+-   [`R1`](html/Armor.Data.X509.Semantic.Cert.R1.html) semantic check
 
--   `R3` semantic check
-    
-    <html/Armor.Data.X509.Semantic.Chain.R23.html>
+-   [`R3`](html/Armor.Data.X509.Semantic.Chain.R23.html) semantic check
 
