@@ -44,3 +44,47 @@
 
 -   [`R3`](html/Armor.Data.X509.Semantic.Chain.R23.html) semantic check
 
+
+# Building
+
+**Prerequisites**
+
+-   Ubuntu 20.04 system (one author uses Linux Mint 20)
+-   Git
+-   Python 3 (tested with Python 3.8.10)
+-   pip (tested with pip 20.0.2)
+
+
+## Stack (`haskell-stack`)
+
+    sudo apt install haskell-stack
+    stack update
+    stack upgrade
+
+
+## Agda
+
+Armor uses Agda v2.6.2.2. To install this from source, choose a directory
+listed in your $PATH environment variable (such as `~/.local/bin`) for the
+Agda executable. We will refer to this as $AGDA<sub>EXEC</sub><sub>DIR</sub> in what follows:
+**please replace all occurrences of $AGDA<sub>EXEC</sub><sub>DIR</sub> with this, or set this as
+an environment variable**
+
+Open a terminal in some working directory and perform the following steps. 
+
+1.  Checkout Agda source repository
+    
+        git clone --depth 1 --branch v2.6.2.2 https://github.com/agda/agda.git
+        cd agda
+2.  Build Agda (this will take a while: stack may need to install the
+    specific GHC and the Haskell base libraries, and then building Agda itself
+    takes a long time).
+    
+        stack install --stack-yaml stack-8.8.4.yaml --local-bin-path $AGDA_EXEC_DIR
+
+3.  Confirm Agda is installed correctly
+    
+    The result of `agda --version` should be
+    
+        Agda version 2.6.2.2-442c76b
+
