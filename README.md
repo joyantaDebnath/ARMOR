@@ -62,6 +62,13 @@
     stack upgrade
 
 
+## Python
+
+With `pip`, install
+
+-   `pem` (tested with version 21.2.0)
+
+
 ## Agda
 
 Armor uses Agda v2.6.2.2. To install this from source, choose a directory
@@ -87,4 +94,14 @@ Open a terminal in some working directory and perform the following steps.
     The result of `agda --version` should be
     
         Agda version 2.6.2.2-442c76b
+
+
+## ARMOR
+
+    make default
+
+
+# Running
+
+TODO
 
