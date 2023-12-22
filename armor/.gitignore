@@ -1,0 +1,12 @@
+*.agdai
+/src/MAlonzo/
+/doc/summary.aux
+/doc/summary.fdb_latexmk
+/doc/summary.fls
+/doc/summary.log
+/doc/summary.out
+/doc/summary.ptb
+/doc/summary.synctex.gz
+/doc/latex/
+/src/Main
+**/.DS_Store

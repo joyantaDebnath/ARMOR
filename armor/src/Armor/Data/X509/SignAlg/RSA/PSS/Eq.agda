@@ -1,0 +1,53 @@
+-- open import Armor.Binary
+-- open import Armor.Data.X509.HashAlg
+-- import      Armor.Data.X509.HashAlg.TCB.OIDs        as OIDs
+-- open import Armor.Data.X509.MaskGenAlg
+-- open import Armor.Data.X509.SignAlg.RSA.PSS.Properties
+-- open import Armor.Data.X509.SignAlg.RSA.PSS.TCB
+-- import      Armor.Data.X509.SignAlg.TCB.OIDs        as OIDs
+-- open import Armor.Data.X690-DER.Int
+-- open import Armor.Data.X690-DER.OID.TCB
+-- open import Armor.Data.X690-DER.OctetString
+-- open import Armor.Data.X690-DER.Sequence.DefinedByOID
+-- open import Armor.Data.X690-DER.TLV
+-- import      Armor.Data.X690-DER.Tag                 as Tag
+-- import      Armor.Grammar.Definitions
+-- import      Armor.Grammar.Option
+-- import      Armor.Grammar.Parallel
+-- import      Armor.Grammar.Properties
+-- import      Armor.Grammar.Seq
+-- import      Armor.Grammar.Sum
+-- open import Armor.Prelude
+
+module Armor.Data.X509.SignAlg.RSA.PSS.Eq where
+
+-- open Armor.Grammar.Definitions UInt8
+-- open Armor.Grammar.Option      UInt8
+-- open Armor.Grammar.Parallel    UInt8
+-- open Armor.Grammar.Properties  UInt8
+-- open Armor.Grammar.Seq         UInt8
+-- open Armor.Grammar.Sum         UInt8
+
+-- instance
+  -- eq≋Supported : Eq≋ SupportedHashAlg
+  -- eq≋Supported =
+  --   Sum.sumEq≋ ⦃ eq₂ = Sum.sumEq≋ ⦃ eq₂ = Sum.sumEq≋ ⦃ eq₂ = Sum.sumEq≋ ⦄ ⦄ ⦄
+
+  -- eq≋Fields : Eq≋ PSSParamFields
+  -- eq≋Fields =
+  --   Iso.isoEq≋ Fields.iso
+  --     (Eq⇒Eq≋
+  --       (Seq.eq&ₚ (Eq≋⇒Eq it)
+  --       (Seq.eq&ₚ (Eq≋⇒Eq it)
+  --       (Seq.eq&ₚ it (Eq≋⇒Eq (TLV.EqTLV ⦃ Option.OptionEq≋ ⦃ Parallel.eq≋Σₚ it λ a → record { _≟_ = λ x y → yes (≡-unique x y) } ⦄ ⦄))))))
+  -- eq≋ : Eq≋ (DefinedByOIDFields PSSParam)
+  -- eq≋ =
+  --   DefinedByOID.eq≋
+  --     PSSParam
+  --     (λ o → record
+  --       { _≋?_ = λ where
+  --           (mk×ₚ fstₚ₁ ≋-refl) (mk×ₚ fstₚ₂ ≋-refl) →
+  --             case fstₚ₁ ≋? fstₚ₂ ret (const _) of λ where
+  --               (yes ≋-refl) → yes ≋-refl
+  --               (no ¬≋) → no λ where ≋-refl → contradiction ≋-refl ¬≋
+  --       })
