@@ -50,9 +50,27 @@
 **Prerequisites**
 
 -   Ubuntu 20.04 system (one author uses Linux Mint 20)
--   Git
--   Python 3 (tested with Python 3.8.10)
--   pip (tested with pip 20.0.2)
+-   Git (`git`)
+-   Python 3 (`python3`) (tested with Python 3.8.10)
+-   pip (`python3-pip`) (tested with pip 22.0.2)
+
+    sudo apt install git python3 python3-pip
+
+
+## Download (Anonymous Repo)
+
+Follow the instructions here:
+<https://github.com/fedebotu/clone-anonymous-github>
+
+The hosting site for the anonymous repo only permits 350 file downloads every
+15 minutes. Run the Python downloader multiple times to download all of our
+source files; the downloader tracks which files needs to be re-downloaded on
+subsequent invocations.
+
+To better track the progress of your download, invoke the Python script with
+the `--verbose True` flag, e.g.,
+
+    python3 src/download.py --url https://anonymous.4open.science/r/armor-full-version --verbose True
 
 
 ## Stack (`haskell-stack`)
@@ -60,6 +78,10 @@
     sudo apt install haskell-stack
     stack update
     stack upgrade
+
+**Remark:** This step will create ~/.local/bin if it does not exist. If so,
+then (on some systems) to ensure that this directory is listed in your $PATH
+variable you can log off and log back in again.
 
 
 ## Python
@@ -73,23 +95,26 @@ With `pip`, install
 
 Armor uses Agda v2.6.2.2. To install this from source, choose a directory
 listed in your $PATH environment variable (such as `~/.local/bin`) for the
-Agda executable. We will refer to this as $AGDA<sub>EXEC</sub><sub>DIR</sub> in what follows:
-**please replace all occurrences of $AGDA<sub>EXEC</sub><sub>DIR</sub> with this, or set this as
+Agda executable. We will refer to this as $AGDAEXECDIR in what follows:
+**please replace all occurrences of $AGDAEXECDIR with this, or set this as
 an environment variable**
 
 Open a terminal in some working directory and perform the following steps. 
 
-1.  Checkout Agda source repository
+1.  Install dependencies for Agda
+    
+        sudo apt install zlib1g-dev libncurses5-dev
+2.  Checkout Agda source repository
     
         git clone --depth 1 --branch v2.6.2.2 https://github.com/agda/agda.git
         cd agda
-2.  Build Agda (this will take a while: stack may need to install the
+3.  Build Agda (this will take a while: stack may need to install the
     specific GHC and the Haskell base libraries, and then building Agda itself
     takes a long time).
     
-        stack install --stack-yaml stack-8.8.4.yaml --local-bin-path $AGDA_EXEC_DIR
+        stack install --stack-yaml stack-8.8.4.yaml --local-bin-path $AGDAEXECDIR
 
-3.  Confirm Agda is installed correctly
+4.  Confirm Agda is installed correctly
     
     The result of `agda --version` should be
     
@@ -98,7 +123,10 @@ Open a terminal in some working directory and perform the following steps.
 
 ## ARMOR
 
-    make default
+1.  From the root of the repository, navigate to `armor` and build the Agda modules
+    
+        cd armor
+        make default
 
 
 # Running
