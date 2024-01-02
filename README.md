@@ -90,6 +90,8 @@ With `pip`, install
 
 -   `pem` (tested with version 21.2.0)
 
+    pip install pem
+
 
 ## Agda
 
@@ -123,13 +125,29 @@ Open a terminal in some working directory and perform the following steps.
 
 ## ARMOR
 
-1.  From the root of the repository, navigate to `armor` and build the Agda modules
-    
-        cd armor
-        make default
+From the root of the repository, navigate to `armor` and build the Agda modules
+
+    cd armor
+    make all
+
+Note that this command is written to use `stack --compiler ghc-8.8.4 exec
+   ghc` to compile the generated Haskell source files. If you built Agda from
+source, this should already be installed.
 
 
 # Running
 
-TODO
+After building, perform the following steps to verify Armor was built correctly
+
+1.  Change directory to `armor-driver` (if you built Armor correctly,
+    `armor-bin` should now be in this directory).
+    
+        cd armor-driver
+
+2.  Invoke the driver with `python3` directly
+    
+        python3 driver.py --chain certs/facebook-com-chain.pem
+    
+    The expected result is for all tests up to R17 should pass, with R17
+    (certificate validity) failing.
 

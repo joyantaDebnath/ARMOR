@@ -49,14 +49,15 @@ def main():
 
     ep = random.random()
     args = sys.argv
-    home_dir = str(Path.home())
+    # home_dir = str(Path.home())
+    current_dir = str(Path.cwd())
     filename_certchain = input_chain
-    filename_armor_output = home_dir + "/.residuals/temp_{}.txt".format(ep)
+    filename_armor_output = current_dir + "/.residuals/temp_{}.txt".format(ep)
 
-    if not os.path.exists(home_dir + "/.residuals/"):
-        os.mkdir(home_dir + "/.residuals/")
+    if not os.path.exists(current_dir + "/.residuals/"):
+        os.mkdir(current_dir + "/.residuals/")
 
-    cmd = ['{}/.armor/armor-bin {} {} > {}'.format(home_dir, filename_certchain, input_CA_store, filename_armor_output)]
+    cmd = ['{}/armor-bin {} {} > {}'.format(current_dir, filename_certchain, input_CA_store, filename_armor_output)]
     armor_res = subprocess.getoutput(cmd)
     print(armor_res)
     if armor_res.__contains__("failed") or armor_res.__contains__("error") or armor_res.__contains__("Error") \
