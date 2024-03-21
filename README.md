@@ -95,23 +95,8 @@ or
 
 # Experimental Setup and Dataset
 The experimental setup, test harnesses, and datasets are publicly available here.
+
 [ARMOR-Evaluation](https://stonybrook365-my.sharepoint.com/:f:/g/personal/joyanta_debnath_stonybrook_edu/EmKh1KjaQABJghV2AaTT73sBqq7zULyzcMWG8Jpu06g6nw)
-
-
-## Download (Anonymous Repo)
-
-Follow the instructions here:
-<https://github.com/fedebotu/clone-anonymous-github>
-
-The hosting site for the anonymous repo only permits 350 file downloads every
-15 minutes. Run the Python downloader multiple times to download all of our
-source files; the downloader tracks which files needs to be re-downloaded on
-subsequent invocations.
-
-To better track the progress of your download, invoke the Python script with
-the `--verbose True` flag, e.g.,
-
-    python3 src/download.py --url https://anonymous.4open.science/r/armor-full-version --verbose True
 
 
 ## Stack (`haskell-stack`)
