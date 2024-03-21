@@ -87,7 +87,9 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`
 
 # Running
 `python3 src/armor-driver/driver.py --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
+
 or
+
 `./src/armor-driver/bin/armor --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
 
 
