@@ -62,17 +62,18 @@ sudo apt install git python3 python3-pip
 ```
 git submodule update --init --recursive --remote
 ```
+This will update the `src/` folder with `armor-agda` and `armor-driver`.
 
 **(Optional) Type-check and compile the modules written in Agda**
 ```
-cd src/armor-agda
+cd src/armor-agda/src
 agda -c Armor/Main.agda +RTS -M8G -RTS
-cd ../..
+cd ../../..
 ```
 This creates a binary called `Main` in `src/armor-agda`, which needs to be copied to `src/armor-driver`.
 
 ```
-cp src/armor-agda/Main src/armor-driver/armor-bin
+cp src/armor-agda/src/Main src/armor-driver/armor-bin
 ```
 
 **Install the driver module written in Python**
@@ -90,6 +91,8 @@ or
 `./src/armor-driver/bin/armor --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
 
 
+# Experimental Setup and Dataset
+*[ARMOR-Evaluation](https://stonybrook365-my.sharepoint.com/:f:/g/personal/joyanta_debnath_stonybrook_edu/EmKh1KjaQABJghV2AaTT73sBqq7zULyzcMWG8Jpu06g6nw)*
 
 
 ## Download (Anonymous Repo)
