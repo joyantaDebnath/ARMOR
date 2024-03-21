@@ -54,7 +54,42 @@
 -   Python 3 (`python3`) (tested with Python 3.8.10)
 -   pip (`python3-pip`) (tested with pip 22.0.2)
 
-    sudo apt install git python3 python3-pip
+```
+sudo apt install git python3 python3-pip
+```
+
+**Update all submodules**
+```
+git submodule update --init --recursive --remote
+```
+
+**(Optional) Type-check and compile the modules written in Agda**
+```
+cd src/armor-agda
+agda -c Armor/Main.agda +RTS -M8G -RTS
+cd ../..
+```
+This creates a binary called `Main` in `src/armor-agda`, which needs to be copied to `src/armor-driver`.
+
+```
+cp src/armor-agda/Main src/armor-driver/armor-bin
+```
+
+**Install the driver module written in Python**
+```
+cd src/armor-driver
+./install.sh
+cd ../..
+```
+An executable binary `armor` will be placed in `src/armor-driver/bin/`
+
+
+# Running
+`python3 src/armor-driver/driver.py --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
+or
+`./src/armor-driver/bin/armor --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
+
+
 
 
 ## Download (Anonymous Repo)
