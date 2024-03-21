@@ -81,7 +81,7 @@ If you built Agda from source, this should already be installed.
 
 `python3 src/armor-driver/driver.py --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
 
-- If you built Armor correctly, `armor-bin` can be invoked.
+- If you built Armor correctly, executable `armor` can be invoked.
 
 `./src/armor-driver/bin/armor --chain <pem/crt certificate chain> --trust_store <pem/crt trusted CA store>`
 
