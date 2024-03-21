@@ -94,6 +94,7 @@ or
 
 
 # Experimental Setup and Dataset
+The experimental setup, test harnesses, and datasets are publicly available here.
 [ARMOR-Evaluation](https://stonybrook365-my.sharepoint.com/:f:/g/personal/joyanta_debnath_stonybrook_edu/EmKh1KjaQABJghV2AaTT73sBqq7zULyzcMWG8Jpu06g6nw)
 
 
