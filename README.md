@@ -52,22 +52,11 @@ Open a terminal in some working directory and perform the following steps.
     
         Agda version 2.6.2.2-442c76b
 
-
-## Update Submodules
-```
-cd ARMOR/
-git submodule update --init --recursive --remote
-```
-This will update the `src/` folder with `armor-agda` and `armor-driver`.
-
-
 ## Build and Install
 ```
 ./install.sh
 ```
 An executable binary `armor` will be placed in `src/armor-driver/bin/`.
-Note that `src/armor-agda/Makefile` is written to use `stack --compiler ghc-8.8.4 exec ghc` to compile the generated Haskell source files. 
-If you built Agda from source, this should already be installed.
 
 ## Clean Up
 ```

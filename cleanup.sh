@@ -1,3 +1,4 @@
 #!/bin/bash
 
-cd src/armor-agda && make clean && cd ../..
+cd src/armor-agda && ./cleanup.sh && cd ../..
+cd src/armor-driver && ./cleanup.sh && cd ../..
