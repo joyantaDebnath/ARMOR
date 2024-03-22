@@ -4,5 +4,5 @@
 	branch = main
 [submodule "src/armor-driver"]
 	path = src/armor-driver
-	url = https://github.com/joyantaDebnath/aeres-external-driver.git
+	url = https://github.com/joyantaDebnath/armor-driver.git
 	branch = main
