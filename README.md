@@ -1,5 +1,7 @@
 This repository contains the official release of ARMOR ...
 
+- [Paper (full version)](resources/armor-full-paper.pdf)
+
 # Table of Contents
 
 # Building
