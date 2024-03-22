@@ -1,6 +1,6 @@
 [submodule "src/armor-agda"]
 	path = src/armor-agda
-	url = https://github.com/cwjnkins/aeres.git
+	url = https://github.com/cwjnkins/armor-agda.git
 	branch = main
 [submodule "src/armor-driver"]
 	path = src/armor-driver
