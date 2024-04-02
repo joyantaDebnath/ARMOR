@@ -228,4 +228,5 @@ evaluation/End_to_end_application/curl/
 evaluation/End_to_end_application/ltmain.sh
 evaluation/End_to_end_application/temp_der.data
 evaluation/End_to_end_application/modified_boringssl/BUILD
+evaluation/End_to_end_application/modified_boringssl/install
 evaluation/End_to_end_application/modified_boringssl/lib
