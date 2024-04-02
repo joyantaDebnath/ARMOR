@@ -1,6 +1,6 @@
 ## Assumptions
 
-- Stable Internet connect
+- Stable Internet connection
 
 - `ARMOR/src/armor-agda` is already built and the executable is already placed inside `ARMOR/src/armor-driver`.
    Otherwise, build and install **ARMOR** first, executing `./install.sh` from the `ARMOR` root directory.
