@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/bssl.dir/tool/args.cc.o"
+  "CMakeFiles/bssl.dir/tool/args.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/ciphers.cc.o"
+  "CMakeFiles/bssl.dir/tool/ciphers.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/client.cc.o"
+  "CMakeFiles/bssl.dir/tool/client.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/const.cc.o"
+  "CMakeFiles/bssl.dir/tool/const.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/digest.cc.o"
+  "CMakeFiles/bssl.dir/tool/digest.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/fd.cc.o"
+  "CMakeFiles/bssl.dir/tool/fd.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/file.cc.o"
+  "CMakeFiles/bssl.dir/tool/file.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/generate_ech.cc.o"
+  "CMakeFiles/bssl.dir/tool/generate_ech.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/generate_ed25519.cc.o"
+  "CMakeFiles/bssl.dir/tool/generate_ed25519.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/genrsa.cc.o"
+  "CMakeFiles/bssl.dir/tool/genrsa.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/pkcs12.cc.o"
+  "CMakeFiles/bssl.dir/tool/pkcs12.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/rand.cc.o"
+  "CMakeFiles/bssl.dir/tool/rand.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/server.cc.o"
+  "CMakeFiles/bssl.dir/tool/server.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/sign.cc.o"
+  "CMakeFiles/bssl.dir/tool/sign.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/speed.cc.o"
+  "CMakeFiles/bssl.dir/tool/speed.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/tool.cc.o"
+  "CMakeFiles/bssl.dir/tool/tool.cc.o.d"
+  "CMakeFiles/bssl.dir/tool/transport_common.cc.o"
+  "CMakeFiles/bssl.dir/tool/transport_common.cc.o.d"
+  "bssl"
+  "bssl.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/bssl.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

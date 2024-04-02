@@ -1,0 +1,2 @@
+/usr/bin/ar qc libboringssl_gtest.a CMakeFiles/boringssl_gtest.dir/third_party/googletest/googlemock/src/gmock-all.cc.o CMakeFiles/boringssl_gtest.dir/third_party/googletest/googletest/src/gtest-all.cc.o
+/usr/bin/ranlib libboringssl_gtest.a
