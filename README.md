@@ -69,11 +69,11 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`.
 
 - Invoke the driver with `python3` directly.
 
-`python3 driver.py --chain <input chain> --trust_store <input CA store> [--purpose <expected purpose>]`
+`python3 src/armor-driver/driver.py --chain <input chain> --trust_store <input CA store> [--purpose <expected purpose>]`
 
 - If you built ARMOR correctly, executable `armor` can be invoked.
 
-`./bin/armor --chain <input chain> --trust_store <input CA store> [--purpose <expected purpose>]`
+`./src/armor-driver/bin/armor --chain <input chain> --trust_store <input CA store> [--purpose <expected purpose>]`
 
 **List of Supported Purposes**
 
