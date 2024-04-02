@@ -14,13 +14,13 @@
     accepted. If not, the connection is terminated due to a possible
     inconsistency or validation failure.
 
-  ## Assumptions
-  - ARMOR is already built and installed
-  - OS: Linux
-  - Trusted CA Store Location: `/etc/ssl/certs/ca-certificates.crt`
- 
-  ## Build
-  `./install.sh`
+## Assumptions
+- ARMOR is already built and installed
+- OS: Linux
+- Trusted CA Store Location: `/etc/ssl/certs/ca-certificates.crt`
 
-  ## Run (Example)
-  `./curl/BUILD/bin/curl -s "https://www.amazon.com"`
+## Build
+`./install.sh`
+
+## Run (Example)
+`./curl/BUILD/bin/curl -s "https://www.amazon.com"`
