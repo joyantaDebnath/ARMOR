@@ -76,6 +76,7 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`.
 `./bin/armor --chain <input chain> --trust_store <input CA store> [--purpose <expected purpose>]`
 
 **List of Supported Purposes**
+
 `serverAuth`, `clientAuth`, `codeSigning`, `emailProtection`, `timeStamping`, `ocspSigning`
 
 
