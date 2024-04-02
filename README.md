@@ -81,23 +81,20 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`.
 
 
 ## Experimental Setup and Dataset
-The experimental setup, test harnesses, and datasets are publicly available here.
+[Experimental Setup and Test Harnesses](evaluation/Diff_test_setup/)
 
-[ARMOR-Evaluation](https://stonybrook365-my.sharepoint.com/:f:/g/personal/joyanta_debnath_stonybrook_edu/EmKh1KjaQABJghV2AaTT73sBqq7zULyzcMWG8Jpu06g6nw)
+[End to End Application](evaluation/End_to_end_application/)
 
+[Datasets](https://stonybrook365-my.sharepoint.com/:u:/g/personal/joyanta_debnath_stonybrook_edu/EXzZ7iezxZhEkoLeHw8ivskByMFmtVvaUCxixaRIFxF-TQ?e=TrELf6)
 
-
-
+[Example Certificte Chains to Trigger Discrepancies](evaluation/Discrepancy_triggering_inputs/)
 
 ## Disclaimer
 
 ## Acknowledgements
 
-
 ## License
 
-
 ## Citation
-
 
 ## Contributors
