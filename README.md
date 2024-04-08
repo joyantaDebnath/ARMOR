@@ -90,11 +90,16 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`.
 [Example Certificte Chains to Trigger Discrepancies](evaluation/Discrepancy_triggering_inputs/)
 
 ## Disclaimer
+We follow a best-effort approach to manually interpret the RFC 5280 standard. Although our empirical evaluation gives confidence about our interpretation's correctness, "we do not claim our interpretation to be accurate". Hence, our interpretation should not be considered as the official interpretation intended by the RFC authors. In addition, we currently only support RSA signature verification. We also do not check certificate revocation status and do not match hostnames.
 
-## Acknowledgements
-
-## License
+## Copyright
+Will be updated soon.
 
 ## Citation
+Will be updated soon.
 
-## Contributors
+## Contacts
+Please, feel free to contact one of us if you have any questions.
+* [Joyanta Debnath](https://www3.cs.stonybrook.edu/~jdebnath/)
+* [Christa Jenkins](https://cwjnkins.github.io/)
+* [Omar Chowdhury](https://www3.cs.stonybrook.edu/~omar/)
