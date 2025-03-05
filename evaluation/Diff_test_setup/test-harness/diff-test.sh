@@ -36,19 +36,6 @@ call_libs(){
     res2Desc="${res2Desc//','/' and '}"
     res2Desc="${res2Desc//$'\n'/' and '}"
 
-    ## matrix
-    res3=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; ./c-matrix/test_verify $1 $3 2>&1")
-    if [[ $res3 == success* ]]; then
-        res3Final="success"
-    elif [[ $res3 == failed* ]]; then
-        res3Final="failed"
-    else
-        res3Final="failed"
-    fi
-    res3Desc=$res3
-    res3Desc="${res3Desc//','/' and '}"
-    res3Desc="${res3Desc//$'\n'/' and '}"
-
     ## mbedtls
     res4=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; ./c-mbedtls/test_verify $1 $3 2>&1")
     if [[ $res4 == success* ]]; then
@@ -132,7 +119,7 @@ call_libs(){
     cd ..
 
     ## certvalidator
-    res10=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; python3 py-certvalidator/test_verify.py $1 $3 2>&1")
+    res10=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; python3.11 py-certvalidator/test_verify.py $1 $3 2>&1")
     if [[ $res10 == success* ]]; then
         res10Final="success"
     elif [[ $res10 == failed* ]]; then
@@ -145,7 +132,7 @@ call_libs(){
     res10Desc="${res10Desc//$'\n'/' and '}"
 
     ## aeres
-    res11=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; python3 armor-driver/driver.py --chain $3 --trust_store $1 --purpose serverAuth 2>&1")
+    res11=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; python3.11 armor-driver/driver.py --chain $3 --trust_store $1 --purpose serverAuth 2>&1")
     if [[ $res11 == *success ]]; then
         res11Final="success"
     elif [[ $res11 == *failed ]]; then
@@ -157,23 +144,8 @@ call_libs(){
     res11Desc="${res11Desc//','/' and '}"
     res11Desc="${res11Desc//$'\n'/' and '}"
 
-    ## ceres
-    res12=$(/bin/bash -c "export LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1; export FAKETIME_NO_CACHE=1; export FAKETIME=\"${new_time}\"; CERES/src/bin/ceres --ca-store $1 --input $3 --check-purpose serverAuth 2>&1")
-    if [[ $res12 == *"Couldn't"* ]]; then
-        res12Final="failed"
-    elif [[ $res12 == *"UNSAT"* ]]; then
-        res12Final="failed"
-    elif [[ $res12 == *"error"* ]]; then
-        res12Final="failed"
-    elif [[ $res12 == *"OK"* ]]; then
-        res12Final="success"
-    fi
-    res12Desc="${res12//','/' and '}"
-    res12Desc="${res12Desc//$'\n'/' and '}"
-
     echo "$2, $new_time, $res1Final, $res1Desc," >> $4/result_boringssl.csv
     echo "$2, $new_time, $res2Final, $res2Desc," >> $4/result_gnutls.csv
-    echo "$2, $new_time, $res3Final, $res3Desc," >> $4/result_matrix.csv
     echo "$2, $new_time, $res4Final, $res4Desc," >> $4/result_mbedtls.csv
     echo "$2, $new_time, $res5Final, $res5Desc," >> $4/result_openssl.csv
     echo "$2, $new_time, $res6Final, $res6Desc," >> $4/result_wolfssl.csv
@@ -182,7 +154,6 @@ call_libs(){
     echo "$2, $new_time, $res9Final, $res9Desc," >> $4/result_sun.csv
     echo "$2, $new_time, $res10Final, $res10Desc," >> $4/result_certvalidator.csv
     echo "$2, $new_time, $res11Final, $res11Desc," >> $4/result_aeres.csv
-    echo "$2, $new_time, $res12Final, $res12Desc," >> $4/result_ceres.csv
 }
 
 ## main program

@@ -6,6 +6,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update and install necessary packages and libraries
 RUN apt-get update && \
+    apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
     apt-get install -y --no-install-recommends build-essential \
         ca-certificates \
         nettle-dev dash git-core autoconf libtool \
@@ -22,26 +25,26 @@ RUN apt-get update && \
         automake \
         libtool \
         pkg-config \
-        libasound2 \
+        libasound2t64 \
         libc6-i386 \
         libc6-x32 \
         libxi6 \
         libxrender1 \
         libxtst6 \
         libfreetype6 \
-        python3-pip \
         golang-go \
         wget \
         libtasn1-bin \
-        libffi7 \
+        libffi-dev \
         sudo \
-        python3-dev \
+        python3.11 \
+        python3-pip \
         nano \
         valgrind \
         bc \
         ocaml
 
-RUN pip3 install jsonschema pem jinja2 certvalidator cryptography
+RUN python3.11 -m pip install jsonschema pem jinja2 certvalidator cryptography
 
 COPY test-harness/ /home/test-harness/
 
@@ -112,14 +115,6 @@ RUN cd c-mbedtls/ && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/test-harness/c-mbedtls/mbedtls/BUILD/lib && \
     cd ..
 
-## matrixssl
-RUN cd c-matrix/ && \
-     tar -xf matrixssl.tar.xz && \
-     cd matrixssl/ && \
-     make && \
-     cd .. && \
-     gcc -o test_verify test_verify.c -I matrixssl/matrixssl -I matrixssl/crypto -I matrixssl/core/include -I matrixssl/core/config -I matrixssl/core/osdep/include matrixssl/matrixssl/libssl_s.a matrixssl/crypto/libcrypt_s.a matrixssl/core/libcore_s.a && \
-     cd ..
 
 # Download and Copy the Oracle JDK Debian package into the container
 RUN wget -O jdk-20.deb "https://stonybrook365-my.sharepoint.com/:u:/g/personal/joyanta_debnath_stonybrook_edu/EZcP3EKIZixNoNIwqUx82JcB8dvEfNXB5WCTC8mZFafLig?e=02QM6M&download=1"
@@ -137,9 +132,7 @@ RUN echo 'export JAVA_HOME=/usr/lib/jvm/jdk-20' >> ~/.bashrc && \
 ENV JAVA_HOME /usr/lib/jvm/jdk-20
 ENV PATH $JAVA_HOME/bin:$PATH
 
-RUN git clone https://github.com/joyantaDebnath/CERES.git
 COPY armor-driver/ /home/test-harness/armor-driver/
-
 
 RUN cd /usr/lib/go/src && \
     go get github.com/grantae/certinfo
@@ -161,10 +154,6 @@ RUN cd java-SUN && \
 ## aeres
 RUN cd /home/test-harness/armor-driver/ && \
     ./install.sh
-
-## ceres
-RUN cd /home/test-harness/CERES/ && \
-    ./build-ceres.sh
 
 RUN git clone https://github.com/wolfcw/libfaketime.git libfaketime
 RUN cd libfaketime && make install && cd ..
