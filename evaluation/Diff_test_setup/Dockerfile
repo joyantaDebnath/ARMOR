@@ -81,7 +81,7 @@ RUN cd c-wolfssl/ && \
     cd wolfssl && \
     ./autogen.sh && \
     mkdir BUILD && \
-    ./configure --prefix=`pwd`/BUILD && \
+    ./configure --prefix=`pwd`/BUILD --enable-crl --enable-wolfclu --enable-debug && \
     make && \
     make install && \
     cd .. && \

@@ -94,14 +94,6 @@ void validate_certificate(X509 *end_cert, STACK_OF(X509) *chain, X509_STORE *sto
         return;
     }
 
-    // Add CRLs to the verification store if provided
-    if (crls) {
-        for (int i = 0; i < sk_X509_CRL_num(crls); i++) {
-            X509_CRL *crl = sk_X509_CRL_value(crls, i);
-            X509_STORE_add_crl(store, crl);
-        }
-    }
-
     // Initialize the verification context
     if (!X509_STORE_CTX_init(ctx, store, end_cert, chain)) {
         fprintf(stderr, "Error initializing verification context\n");
@@ -109,6 +101,12 @@ void validate_certificate(X509 *end_cert, STACK_OF(X509) *chain, X509_STORE *sto
         X509_STORE_CTX_free(ctx);
         return;
     }
+
+    // Add CRLs to the verification store if provided
+    if (crls) {
+        X509_STORE_CTX_set0_crls(ctx, crls);
+    }
+
 
     X509_VERIFY_PARAM *param = X509_VERIFY_PARAM_new();
     if (!param) {
