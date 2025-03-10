@@ -41,9 +41,9 @@ ocamlc -o /$home/.armor/oracle pkcs1.mli pkcs1.ml oracle.ml
 cd $home
 
 opam update
-opam switch create 4.14.1
 opam init -a
 . /$home/.bashrc
+opam switch create 4.14.1
 eval $(opam env --switch=4.14.1 --set-switch)
 opam install -y ppx_deriving_yojson zarith pprint "menhir>=20161115" sedlex process fix "wasm>=2.0.0" visitors ctypes-foreign ctypes uucp
 
