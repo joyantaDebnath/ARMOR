@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Update and install necessary packages and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends build-essential \
         ca-certificates \
@@ -37,14 +37,14 @@ RUN apt-get update && \
         libtasn1-bin \
         libffi-dev \
         sudo \
-        python3.11 \
+        python3 \
         python3-pip \
         nano \
         valgrind \
         bc \
         ocaml
 
-RUN python3.11 -m pip install jsonschema pem jinja2 certvalidator cryptography
+RUN python3 -m pip install jsonschema pem jinja2 oscrypto certvalidator cryptography --break-system-packages
 
 COPY test-harness/ /home/test-harness/
 
@@ -75,47 +75,6 @@ RUN cd c-gnutls/ && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/test-harness/c-gnutls/gnutls/BUILD/lib && \
     cd ..
 
-## wolfssl
-RUN cd c-wolfssl/ && \
-    git clone https://github.com/wolfssl/wolfssl.git wolfssl && \
-    cd wolfssl && \
-    ./autogen.sh && \
-    mkdir BUILD && \
-    ./configure --prefix=`pwd`/BUILD --enable-crl --enable-wolfclu --enable-debug && \
-    make && \
-    make install && \
-    cd .. && \
-    # gcc test_verify.c -o test_verify -I wolfssl/BUILD/include wolfssl/BUILD/lib/libwolfssl.la -lm && \
-    gcc test_verify.c -o test_verify -I wolfssl/BUILD/include  -L wolfssl/BUILD/lib -lwolfssl && \
-    cd ..
-
-## boringssl
-RUN cd c-boringssl/ && \
-    git clone https://boringssl.googlesource.com/boringssl boringssl && \
-    cd boringssl && \
-    mkdir BUILD && \
-    cd BUILD && \
-    cmake .. && \
-    cmake --build . && \
-    cmake --install . && \
-    cd ../.. && \
-    gcc -o test_verify test_verify.c -I boringssl/install/include boringssl/install/lib/libcrypto.a  boringssl/install/lib/libssl.a && \
-    cd ..
-
-## mbedtls
-RUN cd c-mbedtls/ && \
-    git clone https://github.com/Mbed-TLS/mbedtls.git mbedtls && \
-    cd mbedtls/ && \
-    git submodule update --init && \
-    mkdir BUILD && \
-    make && \
-    make DESTDIR=BUILD install && \
-    cd .. && \
-    gcc test_verify.c -o test_verify -I mbedtls/BUILD/include  -L mbedtls/BUILD/lib -lmbedtls -lmbedx509 -lmbedcrypto && \
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/test-harness/c-mbedtls/mbedtls/BUILD/lib && \
-    cd ..
-
-
 # Download and Copy the Oracle JDK Debian package into the container
 RUN wget -O jdk-20.deb "https://stonybrook365-my.sharepoint.com/:u:/g/personal/joyanta_debnath_stonybrook_edu/EZcP3EKIZixNoNIwqUx82JcB8dvEfNXB5WCTC8mZFafLig?e=02QM6M&download=1"
 RUN cp jdk-20.deb /tmp
@@ -131,8 +90,6 @@ RUN echo 'export JAVA_HOME=/usr/lib/jvm/jdk-20' >> ~/.bashrc && \
 
 ENV JAVA_HOME /usr/lib/jvm/jdk-20
 ENV PATH $JAVA_HOME/bin:$PATH
-
-COPY armor-driver/ /home/test-harness/armor-driver/
 
 RUN cd /usr/lib/go/src && \
     go get github.com/grantae/certinfo
@@ -151,9 +108,8 @@ RUN cd java-SUN && \
 
 ## certvalidator
 
-## aeres
-RUN cd /home/test-harness/armor-driver/ && \
-    ./install.sh
+# armor crl-revocation
+# RUN ./armor-setup.sh
 
 RUN git clone https://github.com/wolfcw/libfaketime.git libfaketime
 RUN cd libfaketime && make install && cd ..
@@ -164,8 +120,8 @@ RUN rm -rf /tmp/jdk-20.deb && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ## copy data to docker image
-COPY Data/ /home/Data/
-COPY sample_root_ca_store.pem /home/test-harness/sample_root_ca_store.pem
+COPY test_data/ /home/test_data/
+COPY ca-certificates.crt /home/test-harness/ca-certificates.crt
 
 RUN mkdir /home/docker_results/
 
