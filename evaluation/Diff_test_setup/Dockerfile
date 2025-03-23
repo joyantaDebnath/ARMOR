@@ -76,19 +76,19 @@ RUN cd c-gnutls/ && \
     cd ..
 
 # Download and Copy the Oracle JDK Debian package into the container
-RUN wget -O jdk-20.deb "https://stonybrook365-my.sharepoint.com/:u:/g/personal/joyanta_debnath_stonybrook_edu/EZcP3EKIZixNoNIwqUx82JcB8dvEfNXB5WCTC8mZFafLig?e=02QM6M&download=1"
-RUN cp jdk-20.deb /tmp
+RUN wget -O jdk-24.deb https://download.oracle.com/java/24/latest/jdk-24_linux-x64_bin.deb --no-check-certificate
+RUN cp jdk-24.deb /tmp
 
 # Install the Oracle JDK
-RUN dpkg -i /tmp/jdk-20.deb && \
+RUN dpkg -i /tmp/jdk-24.deb && \
     apt-get install -f
 
 # Set the JAVA_HOME environment variable (replace the path with the correct one for your JDK)
-ENV JAVA_HOME=/usr/lib/jvm/jdk-20
-RUN echo 'export JAVA_HOME=/usr/lib/jvm/jdk-20' >> ~/.bashrc && \
+ENV JAVA_HOME=/usr/lib/jvm/jdk-24
+RUN echo 'export JAVA_HOME=/usr/lib/jvm/jdk-24' >> ~/.bashrc && \
     echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc
 
-ENV JAVA_HOME /usr/lib/jvm/jdk-20
+ENV JAVA_HOME /usr/lib/jvm/jdk-24
 ENV PATH $JAVA_HOME/bin:$PATH
 
 RUN cd /usr/lib/go/src && \
@@ -115,7 +115,7 @@ RUN git clone https://github.com/wolfcw/libfaketime.git libfaketime
 RUN cd libfaketime && make install && cd ..
 
 # Clean up
-RUN rm -rf /tmp/jdk-20.deb && \
+RUN rm -rf /tmp/jdk-24.deb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
