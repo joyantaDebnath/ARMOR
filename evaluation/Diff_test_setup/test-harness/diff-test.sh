@@ -78,6 +78,10 @@ call_libs(){
     # else
     #     echo "$dir, $new_time, NA, NA, $crl_size_kb, SKIPPED - CRL too large" >> "$result_dir/result_armor.csv"
     # fi
+
+    echo "[INFO] Running BoringSSL..."
+    read t12 m12 res12 < <(run_and_measure "./c-boringssl/test_verify $crl_file")
+    echo "$dir, $new_time, $t12, $m12, $crl_size_kb, $res12" >> "$result_dir/result_boringssl.csv"
 }
 
 # === Main Program ===
