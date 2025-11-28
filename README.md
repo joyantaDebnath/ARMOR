@@ -93,10 +93,25 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`.
 We follow a best-effort approach to manually interpret the RFC 5280 standard. Although our empirical evaluation gives confidence about our interpretation's correctness, "we do not claim our interpretation to be accurate". Hence, our interpretation should not be considered as the official interpretation intended by the RFC authors. In addition, we currently only support RSA signature verification. We also do not check certificate revocation status and do not match hostnames.
 
 ## Copyright
-Will be updated soon.
+© 2024, Joyanta Debnath. Under license to IEEE.
 
-## Citation
-Will be updated soon.
+## Citation (BibTex)
+[Publication Link](https://doi.ieeecomputersociety.org/10.1109/SP54263.2024.00220)
+
+@INPROCEEDINGS {10646820,
+author = { Debnath, Joyanta and Jenkins, Christa and Sun, Yuteng and Chau, Sze Yiu and Chowdhury, Omar },
+booktitle = { 2024 IEEE Symposium on Security and Privacy (SP) },
+title = {{ ARMOR: A Formally Verified Implementation of X.509 Certificate Chain Validation }},
+year = {2024},
+volume = {},
+ISSN = {},
+pages = {1462-1480},
+keywords = {Privacy;Runtime;Accuracy;Buildings;Semantics;Software;Libraries},
+doi = {10.1109/SP54263.2024.00220},
+url = {https://doi.ieeecomputersociety.org/10.1109/SP54263.2024.00220},
+publisher = {IEEE Computer Society},
+address = {Los Alamitos, CA, USA},
+month =May}
 
 ## Contacts
 Please, feel free to contact one of us if you have any questions.
