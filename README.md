@@ -98,6 +98,8 @@ We follow a best-effort approach to manually interpret the RFC 5280 standard. Al
 ## Citation (BibTex)
 [Publication Link](https://doi.ieeecomputersociety.org/10.1109/SP54263.2024.00220)
 
+Please, use the following bibtex for citing this work.
+```
 @INPROCEEDINGS {10646820,
 author = { Debnath, Joyanta and Jenkins, Christa and Sun, Yuteng and Chau, Sze Yiu and Chowdhury, Omar },
 booktitle = { 2024 IEEE Symposium on Security and Privacy (SP) },
@@ -112,6 +114,7 @@ url = {https://doi.ieeecomputersociety.org/10.1109/SP54263.2024.00220},
 publisher = {IEEE Computer Society},
 address = {Los Alamitos, CA, USA},
 month =May}
+```
 
 ## Contacts
 Please, feel free to contact one of us if you have any questions.
