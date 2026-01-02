@@ -85,7 +85,7 @@ An executable binary `armor` will be placed in `src/armor-driver/bin/`.
 
 [End to End Application](evaluation/End_to_end_application/)
 
-[Datasets](https://stonybrook365-my.sharepoint.com/:u:/g/personal/joyanta_debnath_stonybrook_edu/EXzZ7iezxZhEkoLeHw8ivskByMFmtVvaUCxixaRIFxF-TQ?e=TrELf6)
+[Datasets](https://drive.google.com/file/d/1OQI9LlvvQI7kvkH9Enr2U2CKTUiJg5qU/view?usp=sharing)
 
 [Example Certificte Chains to Trigger Discrepancies](evaluation/Discrepancy_triggering_inputs/)
 
@@ -115,6 +115,6 @@ month =May}
 
 ## Contacts
 Please, feel free to contact one of us if you have any questions.
-* [Joyanta Debnath](https://www3.cs.stonybrook.edu/~jdebnath/)
+* [Joyanta Debnath](https://joyantadebnath.github.io/homepage/)
 * [Christa Jenkins](https://cwjnkins.github.io/)
 * [Omar Chowdhury](https://www3.cs.stonybrook.edu/~omar/)
